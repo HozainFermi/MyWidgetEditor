@@ -8,6 +8,7 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #include "EditorMainWindowLayout.h"
+#include "Widget.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -30,6 +31,7 @@
 #ifdef __EMSCRIPTEN__
 #include "../libs/emscripten/emscripten_mainloop_stub.h"
 #endif
+#include <vector>
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -123,21 +125,15 @@ int main(int, char**)
     //IM_ASSERT(font != nullptr);
 
     // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
+
     static bool MAIN_WINDOW_OPENED = true;
     
-    static char text[1024 * 16] =
-        "/*\n"
-        " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
-        " the hexadecimal encoding of one offending instruction,\n"
-        " more formally, the invalid operand with locked CMPXCHG8B\n"
-        " instruction bug, is a design flaw in the majority of\n"
-        " Intel Pentium, Pentium MMX, and Pentium OverDrive\n"
-        " processors (all in the P5 microarchitecture).\n"
-        "*/\n\n"
-        "label:\n"
-        "\tlock cmpxchg8b eax\n";
+    static char text[1024*16] = "";
+    std::vector<Widget> widget_collection;
+
+    widget_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
+    widget_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Label1", "Label", "Hello World"));
+    widget_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Slider1", "Slider", "Value: 50%"));
 
     //ImGui ImGui::GetIO();
     
@@ -171,8 +167,11 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        //отрисовка главного окна
+        if(MAIN_WINDOW_OPENED){
         
-        ShowMainWindowLayout(&MAIN_WINDOW_OPENED, main_viewport, text);
+            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, main_viewport, widget_collection, io);
+        }
 
 
 

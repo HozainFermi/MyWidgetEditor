@@ -141,6 +141,7 @@
     <ClInclude Include="lib\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\imstb_truetype.h" />
     <ClInclude Include="src\include\EditorMainWindowLayout.h" />
+    <ClInclude Include="src\include\Widget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\imgui\backends\imgui_impl_glfw.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\EditorMainWindowLayout.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\WindgetType\Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="lib\imgui\backends\sdlgpu3\build_instructions.txt" />
