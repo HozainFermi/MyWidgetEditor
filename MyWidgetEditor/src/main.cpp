@@ -129,11 +129,12 @@ int main(int, char**)
     static bool MAIN_WINDOW_OPENED = true;
     
     static char text[1024*16] = "";
-    std::vector<Widget> widget_collection;
+    std::vector<Widget> asset_collection;
+    std::vector<Widget> using_assets;
 
-    widget_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
-    widget_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Label1", "Label", "Hello World"));
-    widget_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Slider1", "Slider", "Value: 50%"));
+    asset_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
+    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Label1", "Label", "Hello World"));
+    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Slider1", "Slider", "Value: 50%"));
 
     //ImGui ImGui::GetIO();
     
@@ -168,10 +169,11 @@ int main(int, char**)
         ImGui::NewFrame();
 
         //отрисовка главного окна
-        if(MAIN_WINDOW_OPENED){
-        
-            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, main_viewport, widget_collection, io);
+        if(MAIN_WINDOW_OPENED){        
+            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, main_viewport, asset_collection, using_assets,io);
         }
+
+
 
 
 

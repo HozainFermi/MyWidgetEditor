@@ -1,14 +1,16 @@
 #include "EditorMainWindowLayout.h"
+#include "DrawItems.h"
 #include <imgui.h>
 #include <stdio.h>
 #include <imgui_internal.h>
 #include <vector>
 #include "Widget.h"
 
-void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Widget>& assets, std::vector<Widget> used_assets ,ImGuiIO& io)
+void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Widget>& assets, std::vector<Widget>& used_assets ,ImGuiIO& io)
 {
     //ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
+    static ImVec2 last_valid_mouse_rel = ImVec2(0, 0);
+   
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
 
@@ -131,42 +133,49 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
             }
             ImGui::EndChild();
             ImGui::SameLine();
-            ;
+            
 
             //Рабочая область
-            ImGui::BeginChild("WidgetPanel", ImVec2(0, 0), ImGuiChildFlags_AlwaysAutoResize | ImGuiChildFlags_Borders);
+            ImGui::BeginChild("WidgetPanel", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
             {
                 
                 ImGui::Text("Working Area");
-
-                ImVec2 panel_pos = ImGui::GetWindowPos();
-                ImVec2 panel_size = ImGui::GetWindowSize();
-                ImVec2 mouse_pos = io.MousePos;
-
-                ImVec2 mouse_pos_rel = ImVec2(mouse_pos.x - panel_pos.x, mouse_pos.y - panel_pos.y);
-
-                if (ImGui::IsMousePosValid())
-                    ImGui::Text("Mouse Position: (%.1f,%.1f)", mouse_pos_rel.x, mouse_pos_rel.y);
-                else
-                    ImGui::Text("Mouse Position: <invalid>");
+                ImGui::Text("Mouse Position: (%.1f,%.1f)", last_valid_mouse_rel.x, last_valid_mouse_rel.y);
 
                 // Создаем невидимую кнопку-канвас для перехвата взаимодействий
-                ImVec2 canvas_size = ImVec2(ImGui::GetContentRegionAvail().x, 400);
+                ImVec2 canvas_size = ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
                 ImGui::InvisibleButton("canvas", canvas_size, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
                 const bool is_hovered = ImGui::IsItemHovered();
                 const bool is_active = ImGui::IsItemActive();
 
-                // Получаем позицию канваса
+                // Получаем позицию и размеры канваса в экранных координатах
                 ImVec2 canvas_p0 = ImGui::GetItemRectMin();
                 ImVec2 canvas_p1 = ImGui::GetItemRectMax();
+                ImVec2 canvas_size_actual = ImVec2(canvas_p1.x - canvas_p0.x, canvas_p1.y - canvas_p0.y);
 
-                // Получаем draw_list для этой панели
+                // Получаем текущую позицию мыши в экранных координатах
+                ImVec2 mouse_pos = io.MousePos;
+
+                // Вычисляем координаты мыши ОТНОСИТЕЛЬНО ЛЕВОГО ВЕРХНЕГО УГЛА КАНВАСА
+                ImVec2 mouse_pos_rel(0, 0);
+                if (ImGui::IsMousePosValid() && is_hovered) // Проверяем, что мышь над канвасом
+                {
+                    mouse_pos_rel.x = mouse_pos.x - canvas_p0.x;
+                    mouse_pos_rel.y = mouse_pos.y - canvas_p0.y;
+                    last_valid_mouse_rel = mouse_pos_rel; // Обновляем последние валидные координаты
+                }
+                else
+                {
+                    // Если мышь не над канвасом, используем последние валидные координаты
+                    mouse_pos_rel = last_valid_mouse_rel;
+                }
+
+        
                 ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
                 // Рисуем фон канваса
                 draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
                 draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
-
+                DrawItems(used_assets,draw_list, canvas_p0, canvas_p1);
 
                 // Обрабатываем Drag & Drop на канвасе
                 if (ImGui::BeginDragDropTarget())
@@ -179,19 +188,10 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
                         // Вычисляем позицию относительно канваса
                         ImVec2 drop_pos_rel = ImVec2(mouse_pos.x - canvas_p0.x, mouse_pos.y - canvas_p0.y);
 
-                        // Создаем новый виджет в позиции дропа
-                        //Widget new_widget = assets[payload_index];
-                        assets[payload_index].p_min = drop_pos_rel;
-                        assets[payload_index].p_max = ImVec2(drop_pos_rel.x + 50, drop_pos_rel.y + 30);
-                        //assets.push_back(assets[payload_index]);
-                        // Немедленно отрисовываем прямоугольник на канвасе
-                        ImVec2 screen_min = ImVec2(canvas_p0.x + assets[payload_index].p_min.x, canvas_p0.y + assets[payload_index].p_min.y);
-                        ImVec2 screen_max = ImVec2(canvas_p0.x + assets[payload_index].p_max.x, canvas_p0.y + assets[payload_index].p_max.y);
-                        draw_list->AddRect(screen_min, screen_max, IM_COL32(50, 10, 100, 255), 0.0f, 0, 2.0f);
-
-                        // Добавляем текст с именем виджета
-                        ImVec2 text_pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
-                        draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), assets[payload_index].Name.c_str());
+                        // Создаем новый виджет в позиции дропа                       
+                        used_assets.push_back(assets[payload_index]);
+                        used_assets[payload_index].p_min = drop_pos_rel;
+                        used_assets[payload_index].p_max = ImVec2(drop_pos_rel.x + 50, drop_pos_rel.y + 30);                                               
                     }
                     ImGui::EndDragDropTarget();
                 }

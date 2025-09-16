@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -140,6 +140,7 @@
     <ClInclude Include="lib\imgui\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\include\DrawItems.h" />
     <ClInclude Include="src\include\EditorMainWindowLayout.h" />
     <ClInclude Include="src\include\Widget.h" />
   </ItemGroup>
@@ -153,6 +154,7 @@
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\EditorMainWindowLayout.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\DrawItems.cpp" />
     <ClCompile Include="src\WindgetType\Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
