@@ -10,6 +10,7 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
 {
     //ImDrawList* draw_list = ImGui::GetWindowDrawList();
     static ImVec2 last_valid_mouse_rel = ImVec2(0, 0);
+    static   ImVec2 canvas_size_actual = ImVec2(0, 0);
    
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -31,7 +32,7 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
         }
 
         // Главный контейнер
-        ImGui::BeginChild("MainContainer", ImVec2(0, 0), ImGuiChildFlags_Borders);
+        ImGui::BeginChild("MainContainer", ImVec2(0, 0));
         {
             static int selected_widget = -1; // Выбранный виджет
 
@@ -140,7 +141,10 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
             {
                 
                 ImGui::Text("Working Area");
-                ImGui::Text("Mouse Position: (%.1f,%.1f)", last_valid_mouse_rel.x, last_valid_mouse_rel.y);
+                ImGui::Text("Mouse position: (x:%.1f, y:%.1f) |", last_valid_mouse_rel.x, last_valid_mouse_rel.y);
+                ImGui::SameLine();
+                ImGui::Text("Canvas size: (x:%.1f, y:%.1f) ", canvas_size_actual.x, canvas_size_actual.y);
+                
 
                 // Создаем невидимую кнопку-канвас для перехвата взаимодействий
                 ImVec2 canvas_size = ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
@@ -151,7 +155,7 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
                 // Получаем позицию и размеры канваса в экранных координатах
                 ImVec2 canvas_p0 = ImGui::GetItemRectMin();
                 ImVec2 canvas_p1 = ImGui::GetItemRectMax();
-                ImVec2 canvas_size_actual = ImVec2(canvas_p1.x - canvas_p0.x, canvas_p1.y - canvas_p0.y);
+                canvas_size_actual = ImVec2(canvas_p1.x - canvas_p0.x, canvas_p1.y - canvas_p0.y);
 
                 // Получаем текущую позицию мыши в экранных координатах
                 ImVec2 mouse_pos = io.MousePos;
@@ -188,10 +192,11 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
                         // Вычисляем позицию относительно канваса
                         ImVec2 drop_pos_rel = ImVec2(mouse_pos.x - canvas_p0.x, mouse_pos.y - canvas_p0.y);
 
-                        // Создаем новый виджет в позиции дропа                       
-                        used_assets.push_back(assets[payload_index]);
-                        used_assets[payload_index].p_min = drop_pos_rel;
-                        used_assets[payload_index].p_max = ImVec2(drop_pos_rel.x + 50, drop_pos_rel.y + 30);                                               
+                        // Создаем новый виджет в позиции дропа 
+                        Widget new_used_asset = assets[payload_index];
+                       new_used_asset.p_min = drop_pos_rel;
+                       new_used_asset.p_max = ImVec2(drop_pos_rel.x + 50, drop_pos_rel.y + 30);                                               
+                        used_assets.push_back(new_used_asset);
                     }
                     ImGui::EndDragDropTarget();
                 }
