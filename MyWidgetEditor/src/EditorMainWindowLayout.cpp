@@ -6,11 +6,12 @@
 #include <vector>
 #include "Widget.h"
 
-void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Widget>& assets, std::vector<Widget>& used_assets ,ImGuiIO& io)
+void ShowMainWindowLayout(bool* p_open, bool* use_grid, ImGuiViewport* viewport, std::vector<Widget>& assets, std::vector<Widget>& used_assets ,ImGuiIO& io)
 {
     //ImDrawList* draw_list = ImGui::GetWindowDrawList();
     static ImVec2 last_valid_mouse_rel = ImVec2(0, 0);
-    static   ImVec2 canvas_size_actual = ImVec2(0, 0);
+    static ImVec2 canvas_size_actual = ImVec2(0, 0);
+    static ImVec2 canvas_minpoint_actual = ImVec2(0, 0);
    
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -141,6 +142,7 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
             {
                 
                 ImGui::Text("Working Area");
+                ImGui::Checkbox("Grid", use_grid);
                 ImGui::Text("Mouse position: (x:%.1f, y:%.1f) |", last_valid_mouse_rel.x, last_valid_mouse_rel.y);
                 ImGui::SameLine();
                 ImGui::Text("Canvas size: (x:%.1f, y:%.1f) ", canvas_size_actual.x, canvas_size_actual.y);
@@ -148,6 +150,8 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
 
                 // Создаем невидимую кнопку-канвас для перехвата взаимодействий
                 ImVec2 canvas_size = ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
+                canvas_minpoint_actual = ImGui::GetCursorScreenPos();
+
                 ImGui::InvisibleButton("canvas", canvas_size, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
                 const bool is_hovered = ImGui::IsItemHovered();
                 const bool is_active = ImGui::IsItemActive();
@@ -179,7 +183,7 @@ void ShowMainWindowLayout(bool* p_open, ImGuiViewport* viewport, std::vector<Wid
                 // Рисуем фон канваса
                 draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
                 draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
-                DrawItems(used_assets,draw_list, canvas_p0, canvas_p1);
+                DrawItems(use_grid,used_assets,draw_list, canvas_minpoint_actual,canvas_p0, canvas_p1);
 
                 // Обрабатываем Drag & Drop на канвасе
                 if (ImGui::BeginDragDropTarget())
