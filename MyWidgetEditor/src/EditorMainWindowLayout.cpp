@@ -143,8 +143,8 @@ void ShowMainWindowLayout(bool* p_open, bool* use_grid, ImGuiViewport* viewport,
                 
                 ImGui::Text("Working Area");
                 ImGui::Checkbox("Grid", use_grid);
-                ImGui::Text("Mouse position: (x:%.1f, y:%.1f) |", last_valid_mouse_rel.x, last_valid_mouse_rel.y);
-                ImGui::SameLine();
+                ImGui::Text("Mouse position: (x:%.1f, y:%.1f)", last_valid_mouse_rel.x, last_valid_mouse_rel.y);
+                //ImGui::SameLine();
                 ImGui::Text("Canvas size: (x:%.1f, y:%.1f) ", canvas_size_actual.x, canvas_size_actual.y);
                 
 
