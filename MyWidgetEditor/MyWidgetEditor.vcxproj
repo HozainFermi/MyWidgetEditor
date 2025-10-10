@@ -143,6 +143,7 @@
     <ClInclude Include="src\include\DrawItems.h" />
     <ClInclude Include="src\include\EditorMainWindowLayout.h" />
     <ClInclude Include="src\include\Widget.h" />
+    <ClInclude Include="src\include\WidgetInteraction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\imgui\backends\imgui_impl_glfw.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="src\EditorMainWindowLayout.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\DrawItems.cpp" />
+    <ClCompile Include="src\WidgetInteraction.cpp" />
     <ClCompile Include="src\WindgetType\Widget.cpp" />
   </ItemGroup>
   <ItemGroup>

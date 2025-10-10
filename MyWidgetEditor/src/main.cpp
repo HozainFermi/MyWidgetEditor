@@ -127,6 +127,7 @@ int main(int, char**)
     // Our state
 
     static bool MAIN_WINDOW_OPENED = true;
+    static bool USE_GRID = false;
     
     static char text[1024*16] = "";
     std::vector<Widget> asset_collection;
@@ -170,7 +171,7 @@ int main(int, char**)
 
         //отрисовка главного окна
         if(MAIN_WINDOW_OPENED){        
-            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, main_viewport, asset_collection, using_assets,io);
+            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, &USE_GRID, main_viewport, asset_collection, using_assets,io);
         }
 
 
