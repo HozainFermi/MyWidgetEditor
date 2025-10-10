@@ -8,10 +8,10 @@
 
 void ShowMainWindowLayout(bool* p_open, bool* use_grid, ImGuiViewport* viewport, std::vector<Widget>& assets, std::vector<Widget>& used_assets ,ImGuiIO& io)
 {
-    //ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    
     static ImVec2 last_valid_mouse_rel = ImVec2(0, 0);
     static ImVec2 canvas_size_actual = ImVec2(0, 0);
-   // static ImVec2 canvas_minpoint_screen = ImVec2(0, 0);
+  
    
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
