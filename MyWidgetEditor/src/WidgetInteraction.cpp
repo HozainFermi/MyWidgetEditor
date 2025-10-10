@@ -1,19 +1,31 @@
 #include "WidgetInteraction.h"
 #include <imgui_internal.h>
+#include <unordered_map>
 
 
 namespace WidgetInteraction
 {
-    static bool s_is_dragging = false;
-    static bool s_is_resizing = false;
-    static ResizeHandle s_active_handle = NONE;
-    static ImVec2 s_drag_start_pos;
-    static ImVec2 s_resize_start_size;
+     
+     struct WidgetState {
+         bool is_dragging = false;
+         bool is_resizing = false;
+         ResizeHandle active_handle = NONE;
+         ImVec2 drag_start_pos;
+         ImVec2 drag_start_screen_min;
+         ImVec2 resize_start_size;
+         ImVec2 drag_offset;
+     };
 
-    bool HandleWidgetInteraction(Widget& widget, const ImVec2& canvas_p0, bool is_hovered, bool is_active)
+     // Храним состояния для всех виджетов (по индексу или ID)
+     static std::unordered_map<int, WidgetState> widget_states;
+     static int active_widget_id = -1; // Какой виджет сейчас активен
+
+    bool HandleWidgetInteraction(Widget& widget, const ImVec2& canvas_p0, bool is_hovered, bool is_active, int widget_id)
     {
         ImGuiIO& io = ImGui::GetIO();
         ImVec2 mouse_pos = io.MousePos;
+
+        WidgetState& state = widget_states[widget_id];
 
         // Конвертируем координаты виджета в экранные координаты
         ImVec2 screen_min = ImVec2(canvas_p0.x + widget.p_min.x, canvas_p0.y + widget.p_min.y);
@@ -65,23 +77,37 @@ namespace WidgetInteraction
 
             if (hovered_handle != NONE) {
                 // Начало ресайза
-                s_is_resizing = true;
-                s_active_handle = hovered_handle;
-                s_resize_start_size = ImVec2(widget.p_max.x - widget.p_min.x, widget.p_max.y - widget.p_min.y);
-                s_drag_start_pos = mouse_pos;
+                state.is_resizing = true;
+                state.active_handle = hovered_handle;
+                state.resize_start_size = ImVec2(widget.p_max.x - widget.p_min.x, widget.p_max.y - widget.p_min.y);
+                state.drag_start_pos = mouse_pos;
             }
             else if (widget_rect.Contains(mouse_pos)) {
                 // Начало перетаскивания
-                s_is_dragging = true;
-                s_drag_start_pos = mouse_pos;
+                state.is_dragging = true;
+                state.drag_start_pos = mouse_pos;
+                state.drag_start_screen_min = ImVec2(screen_min);
+                state.drag_offset = ImVec2(
+                    state.drag_start_pos.x - state.drag_start_screen_min.x,
+                    state.drag_start_pos.y - state.drag_start_screen_min.y
+                );
             }
         }
 
-        // Обработка перетаскивания
-        if (s_is_dragging && ImGui::IsMouseDragging(0)) {
+        // Обработка перетаскивания                             
+        if (state.is_dragging && ImGui::IsMouseDragging(0)) {
             ImVec2 delta = ImGui::GetMouseDragDelta(0);
-            ImVec2 new_min = ImVec2(s_drag_start_pos.x - canvas_p0.x + delta.x - (s_drag_start_pos.x - screen_min.x),
-                s_drag_start_pos.y - canvas_p0.y + delta.y - (s_drag_start_pos.y - screen_min.y));
+
+            ImVec2 new_screen_min = ImVec2(
+                mouse_pos.x - state.drag_offset.x,
+                mouse_pos.y - state.drag_offset.y
+            );
+
+            ImVec2 new_min = ImVec2(new_screen_min.x-canvas_p0.x,
+                                    new_screen_min.y - canvas_p0.y);
+
+               /* ImVec2(s_drag_start_pos.x - canvas_p0.x + delta.x - (s_drag_start_pos.x - screen_min.x),
+                    s_drag_start_pos.y - canvas_p0.y + delta.y - (s_drag_start_pos.y - screen_min.y));*/
 
             float width = widget.p_max.x - widget.p_min.x;
             float height = widget.p_max.y - widget.p_min.y;
@@ -92,33 +118,33 @@ namespace WidgetInteraction
         }
 
         // Обработка ресайза с пропорциональным масштабированием
-        if (s_is_resizing && ImGui::IsMouseDragging(0)) {
+        if (state.is_resizing && ImGui::IsMouseDragging(0)) {
             ImVec2 delta = ImGui::GetMouseDragDelta(0);
-            ImVec2 new_size = s_resize_start_size;
+            ImVec2 new_size = state.resize_start_size;
 
             // Пропорциональное масштабирование при зажатом Shift
             bool proportional = io.KeyShift;
 
-            switch (s_active_handle) {
+            switch (state.active_handle) {
             case TOP_LEFT:
                 new_size.x -= delta.x;
                 new_size.y -= proportional ? delta.x : delta.y;
                 break;
             case TOP:
                 new_size.y -= delta.y;
-                if (proportional) new_size.x = new_size.y * (s_resize_start_size.x / s_resize_start_size.y);
+                if (proportional) new_size.x = new_size.y * (state.resize_start_size.x / state.resize_start_size.y);
                 break;
             case TOP_RIGHT:
                 new_size.x += delta.x;
-                new_size.y += proportional ? delta.x : delta.y;
+                new_size.y += proportional ? delta.x : -delta.y;
                 break;
             case LEFT:
                 new_size.x -= delta.x;
-                if (proportional) new_size.y = new_size.x * (s_resize_start_size.y / s_resize_start_size.x);
+                if (proportional) new_size.y = new_size.x * (state.resize_start_size.y / state.resize_start_size.x);
                 break;
             case RIGHT:
                 new_size.x += delta.x;
-                if (proportional) new_size.y = new_size.x * (s_resize_start_size.y / s_resize_start_size.x);
+                if (proportional) new_size.y = new_size.x * (state.resize_start_size.y / state.resize_start_size.x);
                 break;
             case BOTTOM_LEFT:
                 new_size.x -= delta.x;
@@ -126,7 +152,7 @@ namespace WidgetInteraction
                 break;
             case BOTTOM:
                 new_size.y += delta.y;
-                if (proportional) new_size.x = new_size.y * (s_resize_start_size.x / s_resize_start_size.y);
+                if (proportional) new_size.x = new_size.y * (state.resize_start_size.x / state.resize_start_size.y);
                 break;
             case BOTTOM_RIGHT:
                 new_size.x += delta.x;
@@ -139,7 +165,7 @@ namespace WidgetInteraction
             new_size.y = ImMax(new_size.y, 10.0f);
 
             // Применяем изменения к виджету
-            switch (s_active_handle) {
+            switch (state.active_handle) {
             case TOP_LEFT:
                 widget.p_min.x = widget.p_max.x - new_size.x;
                 widget.p_min.y = widget.p_max.y - new_size.y;
@@ -175,9 +201,10 @@ namespace WidgetInteraction
 
         // Завершение операций
         if (ImGui::IsMouseReleased(0)) {
-            s_is_dragging = false;
-            s_is_resizing = false;
-            s_active_handle = NONE;
+            state.is_dragging = false;
+            state.is_resizing = false;
+            state.active_handle = NONE;
+            active_widget_id = -1;
         }
 
         return widget_modified;

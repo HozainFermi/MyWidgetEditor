@@ -21,14 +21,14 @@ struct Widget {
     char EditBuffer[4096]; // Буфер для редактирования
 
     Widget(
-        ImVec2 left_bot_p,
-        ImVec2 right_up_p,
+        ImVec2 left_up_p,
+        ImVec2 right_bot_p,
         ImVec4 col,
         std::string name = "",
         std::string type = "",
         std::string info = "")
 
-        : p_min(left_bot_p), p_max(right_up_p), color(col), Name(name), Type(type), Info(info)
+        : p_min(left_up_p), p_max(right_bot_p), color(col), Name(name), Type(type), Info(info)
     {
         // Инициализируем буфер
         strncpy_s(EditBuffer, info.c_str(), sizeof(EditBuffer) - 1);
@@ -36,13 +36,13 @@ struct Widget {
     }
 
     Widget(
-        ImVec2 left_bot_p,
-        ImVec2 right_up_p,       
+        ImVec2 left_up_p,
+        ImVec2 right_bot_p,       
         std::string name = "",
         std::string type = "",
         std::string info = "")
 
-        : p_min(left_bot_p), p_max(right_up_p), Name(name), Type(type), Info(info)
+        : p_min(left_up_p), p_max(right_bot_p), Name(name), Type(type), Info(info)
     {
         // Инициализируем буфер
         strncpy_s(EditBuffer, info.c_str(), sizeof(EditBuffer) - 1);

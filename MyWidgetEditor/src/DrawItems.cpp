@@ -32,19 +32,16 @@ void DrawItems(bool* use_grid,std::vector<Widget>& used_assets, ImDrawList* draw
 
     for (size_t i = 0; i < used_assets.size(); i++)
     {
-        
-        
+                
         // Обработка взаимодействий
-        WidgetInteraction::HandleWidgetInteraction(used_assets[i], canvas_pmin_screen, is_hovered, is_active);
-
+        WidgetInteraction::HandleWidgetInteraction(used_assets[i], canvas_pmin_screen, is_hovered, is_active,i);
         // Отрисовка
         WidgetInteraction::DrawWidget(used_assets[i], canvas_pmin_screen, draw_list);
 
         //// Немедленно отрисовываем прямоугольник на канвасе
         //ImVec2 screen_min = ImVec2(canvas_pmin_screen.x + used_assets[i].p_min.x, canvas_pmin_screen.y + used_assets[i].p_min.y);
         //ImVec2 screen_max = ImVec2(canvas_pmin_screen.x + used_assets[i].p_max.x, canvas_pmin_screen.y + used_assets[i].p_max.y);
-    
-    
+        
         //
         //draw_list->AddRectFilled(screen_min, screen_max, IM_COL32(50, 10, 100, 255), 0.0f, 0);
         //// Добавляем текст с именем виджета
