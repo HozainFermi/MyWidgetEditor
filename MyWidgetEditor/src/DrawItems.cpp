@@ -3,24 +3,24 @@
 
 
 
-void DrawItems(bool* use_grid,std::vector<Widget>& used_assets, ImDrawList* draw_list, ImVec2& canvas_minpoint_actual,ImVec2& canvas_pmin, ImVec2& canvas_pmax)
+void DrawItems(bool* use_grid,std::vector<Widget>& used_assets, ImDrawList* draw_list,ImVec2& canvas_pmin_screen, ImVec2& canvas_pmax_screen)
 {
     if (*use_grid) {
         // Используем фактические границы канваса для рисования линий
-        ImVec2 canvas_size = ImVec2(canvas_pmax.x - canvas_minpoint_actual.x,
-            canvas_pmax.y - canvas_minpoint_actual.y);
+        ImVec2 canvas_size = ImVec2(canvas_pmax_screen.x - canvas_pmin_screen.x,
+            canvas_pmax_screen.y - canvas_pmin_screen.y);
 
         for (size_t i = 1; i < 5; i++) {
             // Вертикальные линии - от верхней до нижней границы канваса
-            float x_pos = canvas_minpoint_actual.x + canvas_size.x * i / 5;
-            draw_list->AddLine(ImVec2(x_pos, canvas_minpoint_actual.y),
-                ImVec2(x_pos, canvas_pmax.y),
+            float x_pos = canvas_pmin_screen.x + canvas_size.x * i / 5;
+            draw_list->AddLine(ImVec2(x_pos, canvas_pmin_screen.y),
+                ImVec2(x_pos, canvas_pmax_screen.y),
                 ImColor(128, 255, 128, 255), 1);
 
             // Горизонтальные линии - от левой до правой границы канваса
-            float y_pos = canvas_minpoint_actual.y + canvas_size.y * i / 5;
-            draw_list->AddLine(ImVec2(canvas_minpoint_actual.x, y_pos),
-                ImVec2(canvas_pmax.x, y_pos),
+            float y_pos = canvas_pmin_screen.y + canvas_size.y * i / 5;
+            draw_list->AddLine(ImVec2(canvas_pmin_screen.x, y_pos),
+                ImVec2(canvas_pmax_screen.x, y_pos),
                 ImColor(128, 255, 128, 255), 1);
         }
     }
@@ -35,14 +35,14 @@ void DrawItems(bool* use_grid,std::vector<Widget>& used_assets, ImDrawList* draw
         
         
         // Обработка взаимодействий
-        WidgetInteraction::HandleWidgetInteraction(used_assets[i], canvas_pmin, is_hovered, is_active);
+        WidgetInteraction::HandleWidgetInteraction(used_assets[i], canvas_pmin_screen, is_hovered, is_active);
 
         // Отрисовка
-        WidgetInteraction::DrawWidget(used_assets[i], canvas_pmin, draw_list);
+        WidgetInteraction::DrawWidget(used_assets[i], canvas_pmin_screen, draw_list);
 
         //// Немедленно отрисовываем прямоугольник на канвасе
-        //ImVec2 screen_min = ImVec2(canvas_pmin.x + used_assets[i].p_min.x, canvas_pmin.y + used_assets[i].p_min.y);
-        //ImVec2 screen_max = ImVec2(canvas_pmin.x + used_assets[i].p_max.x, canvas_pmin.y + used_assets[i].p_max.y);
+        //ImVec2 screen_min = ImVec2(canvas_pmin_screen.x + used_assets[i].p_min.x, canvas_pmin_screen.y + used_assets[i].p_min.y);
+        //ImVec2 screen_max = ImVec2(canvas_pmin_screen.x + used_assets[i].p_max.x, canvas_pmin_screen.y + used_assets[i].p_max.y);
     
     
         //
