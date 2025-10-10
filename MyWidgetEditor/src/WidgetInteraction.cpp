@@ -25,14 +25,14 @@ namespace WidgetInteraction
         // Определяем зоны ресайза (8 точек вокруг виджета)
         const float handle_size = 8.0f;
         ImVec2 handles[8] = {
-            {screen_min.x, screen_min.y}, // TOP_LEFT
-            {(screen_min.x + screen_max.x) * 0.5f, screen_min.y}, // TOP
-            {screen_max.x, screen_min.y}, // TOP_RIGHT
-            {screen_min.x, (screen_min.y + screen_max.y) * 0.5f}, // LEFT
-            {screen_max.x, (screen_min.y + screen_max.y) * 0.5f}, // RIGHT
-            {screen_min.x, screen_max.y}, // BOTTOM_LEFT
-            {(screen_min.x + screen_max.x) * 0.5f, screen_max.y}, // BOTTOM
-            {screen_max.x, screen_max.y} // BOTTOM_RIGHT
+            {screen_min.x, screen_min.y},                           // TOP_LEFT
+            {(screen_min.x + screen_max.x) * 0.5f, screen_min.y},   // TOP
+            {screen_max.x, screen_min.y},                           // TOP_RIGHT
+            {screen_min.x, (screen_min.y + screen_max.y) * 0.5f},   // LEFT
+            {screen_max.x, (screen_min.y + screen_max.y) * 0.5f},   // RIGHT
+            {screen_min.x, screen_max.y},                           // BOTTOM_LEFT
+            {(screen_min.x + screen_max.x) * 0.5f, screen_max.y},   // BOTTOM
+            {screen_max.x, screen_max.y}                            // BOTTOM_RIGHT
         };
 
         // Проверяем ховер над ручками ресайза
@@ -185,28 +185,28 @@ namespace WidgetInteraction
 
     void DrawWidget(const Widget& widget, const ImVec2& canvas_p0, ImDrawList* draw_list)
     {
-        ImVec2 screen_min = ImVec2(canvas_p0.x + widget.p_min.x, canvas_p0.y + widget.p_min.y);
-        ImVec2 screen_max = ImVec2(canvas_p0.x + widget.p_max.x, canvas_p0.y + widget.p_max.y);
+        ImVec2 widget_pmin_screen = ImVec2(canvas_p0.x + widget.p_min.x, canvas_p0.y + widget.p_min.y);
+        ImVec2 widget_pmax_screen = ImVec2(canvas_p0.x + widget.p_max.x, canvas_p0.y + widget.p_max.y);
 
         // Рисуем основной прямоугольник
-        draw_list->AddRectFilled(screen_min, screen_max, IM_COL32(50, 10, 100, 255));
-        draw_list->AddRect(screen_min, screen_max, IM_COL32(255, 255, 255, 255), 0.0f, 0, 2.0f);
+        draw_list->AddRectFilled(widget_pmin_screen, widget_pmax_screen, IM_COL32(50, 10, 100, 255));
+        draw_list->AddRect(widget_pmin_screen, widget_pmax_screen, IM_COL32(255, 255, 255, 255), 0.0f, 0, 2.0f);
 
         // Текст
-        ImVec2 text_pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
+        ImVec2 text_pos = ImVec2(widget_pmin_screen.x + 5, widget_pmin_screen.y + 5);
         draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), widget.Name.c_str());
 
-        // Рисуем ручки ресайза (только если виджет активен или ховерен)
+        // Рисуем ручки ресайза (только если виджет активен или ховер)
         const float handle_size = 4.0f;
         ImVec2 handles[8] = {
-            screen_min, // TOP_LEFT
-            ImVec2((screen_min.x + screen_max.x) * 0.5f, screen_min.y), // TOP
-            ImVec2(screen_max.x, screen_min.y), // TOP_RIGHT
-            ImVec2(screen_min.x, (screen_min.y + screen_max.y) * 0.5f), // LEFT
-            ImVec2(screen_max.x, (screen_min.y + screen_max.y) * 0.5f), // RIGHT
-            ImVec2(screen_min.x, screen_max.y), // BOTTOM_LEFT
-            ImVec2((screen_min.x + screen_max.x) * 0.5f, screen_max.y), // BOTTOM
-            screen_max // BOTTOM_RIGHT
+            widget_pmin_screen,                                                                     // TOP_LEFT
+            ImVec2((widget_pmin_screen.x + widget_pmax_screen.x) * 0.5f, widget_pmin_screen.y),     // TOP
+            ImVec2(widget_pmax_screen.x, widget_pmin_screen.y),                                     // TOP_RIGHT
+            ImVec2(widget_pmin_screen.x, (widget_pmin_screen.y + widget_pmax_screen.y) * 0.5f),     // LEFT
+            ImVec2(widget_pmax_screen.x, (widget_pmin_screen.y + widget_pmax_screen.y) * 0.5f),     // RIGHT
+            ImVec2(widget_pmin_screen.x, widget_pmax_screen.y),                                     // BOTTOM_LEFT
+            ImVec2((widget_pmin_screen.x + widget_pmax_screen.x) * 0.5f, widget_pmax_screen.y),     // BOTTOM
+            widget_pmax_screen                                                                      // BOTTOM_RIGHT
         };
 
         for (int i = 0; i < 8; i++) {
