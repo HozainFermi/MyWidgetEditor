@@ -72,11 +72,13 @@ int main(int, char**)
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
     // Create window with graphics context
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
     GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
     if (window == nullptr)
@@ -132,10 +134,15 @@ int main(int, char**)
     static char text[1024*16] = "";
     std::vector<Widget> asset_collection;
     std::vector<Widget> using_assets;
+    
+    asset_collection.reserve(20);
+    using_assets.reserve(20);
 
     asset_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
     asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Label1", "Label", "Hello World"));
     asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Slider1", "Slider", "Value: 50%"));
+    //TODO
+    //Добавить таблицы
 
     //ImGui ImGui::GetIO();
     
