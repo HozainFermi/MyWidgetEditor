@@ -6,26 +6,28 @@
 #include <vector>
 #include "Widget.h"
 
+
 static void ShowMenuFile();
 
-void ShowMainWindowLayout(bool* p_open, bool* use_grid, ImGuiViewport* viewport, std::vector<Widget>& assets, std::vector<Widget>& used_assets ,ImGuiIO& io)
+void ShowMainWindowLayout(bool* p_open, bool* use_grid, ImGuiViewport* viewport, GLFWwindow* window, std::vector<Widget>& assets, std::vector<Widget>& used_assets ,ImGuiIO& io)
 {
     
     static ImVec2 last_valid_mouse_rel = ImVec2(0, 0);
     static ImVec2 canvas_size_actual = ImVec2(0, 0);
     static int selected_widget = -1;        // Выбранный виджет
     static int selected_used_widget = -1;   // Выбранный используемый виджет
-  
    
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
 
     if (ImGui::Begin("Widget Editor", p_open,
         ImGuiWindowFlags_MenuBar |
-        ImGuiWindowFlags_NoBringToFrontOnFocus |
+        ImGuiWindowFlags_NoTitleBar |
+        //ImGuiWindowFlags_NoBringToFrontOnFocus |
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoResize))
     {
+              
         // Menu bar
         if (ImGui::BeginMenuBar())
         {
@@ -155,12 +157,14 @@ void ShowMainWindowLayout(bool* p_open, bool* use_grid, ImGuiViewport* viewport,
 
                     // Отображаем имя виджета
                     for (int i = 0; i < used_assets.size(); i++) {
-                        //std::string used_name = i+"-"+used_assets[i].Name;
+                        //std::string used_name = i+"-"+used_assets[i].Name;                                              
+                        ImGui::PushID(i);
                         if (ImGui::Selectable(used_assets[i].Name.c_str(), selected_used_widget == i))
                         {
                             selected_used_widget = i; // Запоминаем выбранный виджет
                             selected_widget = -1;
                         }
+                        ImGui::PopID();
                     }
                 }
 
@@ -230,7 +234,8 @@ void ShowMainWindowLayout(bool* p_open, bool* use_grid, ImGuiViewport* viewport,
 
                         // Создаем новый виджет в позиции дропа
                         Widget new_used_asset = assets[payload_index];
-                        new_used_asset.Name = std::to_string(used_assets.size() + 1) + "-" + new_used_asset.Name;
+                        //std::to_string(used_assets.size() + 1) + "-" +
+                        new_used_asset.Name = new_used_asset.Name;
                         new_used_asset.p_min = drop_pos_rel;
                         new_used_asset.p_max = ImVec2(drop_pos_rel.x + 50, drop_pos_rel.y + 30);                                               
                         used_assets.push_back(new_used_asset);

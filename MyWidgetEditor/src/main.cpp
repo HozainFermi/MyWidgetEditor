@@ -78,7 +78,7 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
-    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+    //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
     GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
     if (window == nullptr)
@@ -137,14 +137,13 @@ int main(int, char**)
     
     asset_collection.reserve(20);
     using_assets.reserve(20);
-
+    //эту хуйню заменить потом на чтнеие из  JSON!!!
     asset_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
-    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Label1", "Label", "Hello World"));
-    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Slider1", "Slider", "Value: 50%"));
+    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "TextBox1", "TextBox", "Hello World"));
+    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Table1", "Table", "Spread sheet"));
+    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Plot1", "Plot", "Plotting func"));
     //TODO
     //Добавить таблицы
-
-    //ImGui ImGui::GetIO();
     
     ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -178,7 +177,10 @@ int main(int, char**)
 
         //отрисовка главного окна
         if(MAIN_WINDOW_OPENED){        
-            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, &USE_GRID, main_viewport, asset_collection, using_assets,io);
+            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, &USE_GRID, main_viewport, window, asset_collection, using_assets,io);
+        }
+        else {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
 
 
