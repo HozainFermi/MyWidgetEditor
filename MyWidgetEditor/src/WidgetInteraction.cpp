@@ -214,9 +214,23 @@ namespace WidgetInteraction
     {
         ImVec2 widget_pmin_screen = ImVec2(canvas_p0.x + widget.p_min.x, canvas_p0.y + widget.p_min.y);
         ImVec2 widget_pmax_screen = ImVec2(canvas_p0.x + widget.p_max.x, canvas_p0.y + widget.p_max.y);
-
+        static char* edit_name_buf;
         // Рисуем основной прямоугольник
         draw_list->AddRectFilled(widget_pmin_screen, widget_pmax_screen, IM_COL32(50, 10, 100, 255));
+        if (ImGui::BeginPopupContextItem())
+        {
+            ImGui::Text("Edit name:");
+            ImGui::InputText("##edit", edit_name_buf, IM_ARRAYSIZE(widget.EditBuffer));
+            static bool enabled = true;
+            ImGui::MenuItem("Enabled", "", &enabled);            
+            static float f = 0.5f;
+            static int n = 0;
+            ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
+            ImGui::InputFloat("Input", &f, 0.1f);
+            ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
+            ImGui::EndMenu();
+            ImGui::EndPopup();
+        }
         draw_list->AddRect(widget_pmin_screen, widget_pmax_screen, IM_COL32(255, 255, 255, 255), 0.0f, 0, 2.0f);
 
         // Текст

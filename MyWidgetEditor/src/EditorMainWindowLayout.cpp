@@ -306,17 +306,7 @@ static void ShowMenuFile()
         }
         ImGui::EndMenu();
     }
-
-    // Here we demonstrate appending again to the "Options" menu (which we already created above)
-    // Of course in this demo it is a little bit silly that this function calls BeginMenu("Options") twice.
-    // In a real code-base using it would make senses to use this feature from very different code locations.
-    if (ImGui::BeginMenu("Options")) // <-- Append!
-    {
-        static bool b = true;
-        ImGui::Checkbox("SomeOption", &b);
-        ImGui::EndMenu();
-    }
-
+  
     if (ImGui::BeginMenu("Disabled", false)) // Disabled
     {
         ImGui::EndMenu();
