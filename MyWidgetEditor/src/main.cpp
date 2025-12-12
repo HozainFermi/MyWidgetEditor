@@ -8,7 +8,8 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #include "EditorMainWindowLayout.h"
-#include "Widget.h"
+//#include "Widget.h"
+#include "ui/EditorMainWindowLayout.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -127,21 +128,21 @@ int main(int, char**)
     //IM_ASSERT(font != nullptr);
 
     // Our state
-
+    Editor editor;
     static bool MAIN_WINDOW_OPENED = true;
     static bool USE_GRID = false;
+    bool show_editor = true;
+    //static char text[1024*16] = "";
+    //std::vector<Widget> asset_collection;
+    //std::vector<Widget> using_assets;
     
-    static char text[1024*16] = "";
-    std::vector<Widget> asset_collection;
-    std::vector<Widget> using_assets;
-    
-    asset_collection.reserve(20);
-    using_assets.reserve(20);
-    //эту хуйню заменить потом на чтнеие из  JSON!!!
-    asset_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
-    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "TextBox1", "TextBox", "Hello World"));
-    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Table1", "Table", "Spread sheet"));
-    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Plot1", "Plot", "Plotting func"));
+   // asset_collection.reserve(20);
+   // using_assets.reserve(20);
+   // //эту хуйню заменить потом на чтнеие из  JSON!!!
+   // asset_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
+   // asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "TextBox1", "TextBox", "Hello World"));
+   // asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Table1", "Table", "Spread sheet"));
+   // asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Plot1", "Plot", "Plotting func"));
     //TODO
     //Добавить таблицы
     
@@ -175,13 +176,8 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //отрисовка главного окна
-        if(MAIN_WINDOW_OPENED){        
-            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, &USE_GRID, main_viewport, window, asset_collection, using_assets,io);
-        }
-        else {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-        }
+        //отрисовка главного окна       
+        editor.Render(&show_editor, ImGui::GetMainViewport(), window);
 
 
 

@@ -119,7 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)lib\glfw\include;$(ProjectDir)lib\imgui;$(ProjectDir)lib\imgui\backends;$(ProjectDir)src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)lib\glfw\include;$(ProjectDir)lib\imgui;$(ProjectDir)lib\imgui\backends;$(ProjectDir)src\include;$(ProjectDir)lib\imgui\misc\cpp;$(ProjectDir)lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -141,10 +141,18 @@
     <ClInclude Include="lib\imgui\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\imstb_truetype.h" />
+    <ClInclude Include="lib\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="lib\imgui\misc\single_file\imgui_single_file.h" />
+    <ClInclude Include="lib\json.hpp" />
     <ClInclude Include="src\include\DrawItems.h" />
     <ClInclude Include="src\include\EditorMainWindowLayout.h" />
     <ClInclude Include="src\include\Widget.h" />
     <ClInclude Include="src\include\WidgetInteraction.h" />
+    <ClInclude Include="src\managers\WidgetManager.h" />
+    <ClInclude Include="src\ui\EditorMainWindowLayout.h" />
+    <ClInclude Include="src\widgets\InputTextWidget.h" />
+    <ClInclude Include="src\widgets\TextWidget.h" />
+    <ClInclude Include="src\widgets\Widget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\imgui\backends\imgui_impl_glfw.cpp" />
@@ -154,11 +162,13 @@
     <ClCompile Include="lib\imgui\imgui_draw.cpp" />
     <ClCompile Include="lib\imgui\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\EditorMainWindowLayout.cpp" />
+    <ClCompile Include="lib\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\DrawItems.cpp" />
-    <ClCompile Include="src\WidgetInteraction.cpp" />
-    <ClCompile Include="src\WindgetType\Widget.cpp" />
+    <ClCompile Include="src\managers\WidgetManager.cpp" />
+    <ClCompile Include="src\ui\EditorMainWindowLayout.cpp" />
+    <ClCompile Include="src\widgets\InputTextWidget.cpp" />
+    <ClCompile Include="src\widgets\TextWidget.cpp" />
+    <ClCompile Include="src\widgets\Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="lib\imgui\backends\sdlgpu3\build_instructions.txt" />
