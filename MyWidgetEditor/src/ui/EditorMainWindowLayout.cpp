@@ -120,7 +120,19 @@ void Editor::RenderRightPanel() {
 ImVec2 Editor::GetMousePosRelativeToCanvas() const {
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 mouse_pos = io.MousePos;
-    return ImVec2(mouse_pos.x - canvas_p0_.x, mouse_pos.y - canvas_p0_.y);
+   
+    ImVec2 relative_pos(
+        mouse_pos.x - canvas_p0_.x,
+        mouse_pos.y - canvas_p0_.y
+    );
+
+    // Проверяем, находится ли relative_pos внутри размеров канваса
+    if (relative_pos.x < 0 || relative_pos.x > canvas_size_.x ||
+        relative_pos.y < 0 || relative_pos.y > canvas_size_.y) {
+        return ImVec2(0, 0);
+    }
+
+    return relative_pos;
 }
 
 void Editor::CreateWidgetFromTemplate(const std::string& type, const ImVec2& position) {
@@ -197,7 +209,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window) {
 
             // Центральная панель (60%)
             ImGui::BeginChild("CanvasPanel", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, 0),
-                ImGuiChildFlags_ResizeX | ImGuiChildFlags_Borders);
+                ImGuiChildFlags_ResizeX |ImGuiChildFlags_ResizeY | ImGuiChildFlags_Borders);
             RenderCanvas();
             ImGui::EndChild();
 
@@ -215,12 +227,22 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window) {
 
 // Реализация RenderCanvas (если её нет)
 void Editor::RenderCanvas() {
-    ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");
-    ImGui::SameLine();
+    ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
+    ImGui::Text("Grid size");
+    
     ImGui::Checkbox("Grid", &show_grid_);
+    ImGui::SameLine();    
+    ImGui::DragFloat("", &grid_size_, 1.0f, 5.0f, 100.0f);
+    ImGui::Spacing();
+    ImVec2 curmouse= GetMousePosRelativeToCanvas();
+    
+    // Информация о канвасе
+    ImGui::Text("Canvas: %.0fx%.0f", canvas_size_.x, canvas_size_.y);
     ImGui::SameLine();
-    ImGui::DragFloat("Grid Size", &grid_size_, 1.0f, 5.0f, 100.0f);
-
+    ImGui::Text("Mouse: %.0f, %.0f",
+       curmouse.x,
+       curmouse.y);
+    
     // Создаём невидимую кнопку-канвас
     ImVec2 canvas_avail = ImGui::GetContentRegionAvail();
     ImGui::InvisibleButton("CanvasButton", canvas_avail,
@@ -231,7 +253,7 @@ void Editor::RenderCanvas() {
     canvas_p0_ = ImGui::GetItemRectMin();
     ImVec2 canvas_p1 = ImGui::GetItemRectMax();
     canvas_size_ = ImVec2(canvas_p1.x - canvas_p0_.x, canvas_p1.y - canvas_p0_.y);
-
+    
     // DrawList для отрисовки
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
@@ -259,9 +281,5 @@ void Editor::RenderCanvas() {
         ImGui::EndDragDropTarget();
     }
 
-    // Информация о канвасе
-    ImGui::Text("Canvas: %.0fx%.0f", canvas_size_.x, canvas_size_.y);
-    ImGui::Text("Mouse: %.0f, %.0f",
-        GetMousePosRelativeToCanvas().x,
-        GetMousePosRelativeToCanvas().y);
+    
 }

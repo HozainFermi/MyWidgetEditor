@@ -1,0 +1,23 @@
+{
+    "widgets": [
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_0",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "Text_1",
+            "position": [
+                283.0,
+                160.0
+            ],
+            "size": [
+                150.0,
+                60.0
+            ],
+            "text": "Sample Text",
+            "type": 0,
+            "wrap_text": false
+        }
+    ]
+}
