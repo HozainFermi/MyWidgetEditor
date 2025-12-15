@@ -150,7 +150,7 @@ void Editor::CreateWidgetFromTemplate(const std::string& type, const ImVec2& pos
 
     // Сразу выделяем созданный виджет
     if (widget_manager_.GetCount() > 0) {
-        // widget_manager_.SelectWidget(???) // Нужен метод для выделения
+        // widget_manager_.SelectWidget() // Нужен метод для выделения
     }
 }
 
@@ -266,11 +266,6 @@ void Editor::RenderCanvas() {
     // Рамка канваса
     draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
 
-    // === Обновляем и рисуем все виджеты ===
-    widget_manager_.UpdateAll(canvas_p0_);
-    widget_manager_.RenderAll(draw_list, canvas_p0_);
-    widget_manager_.RenderContentAll();
-
     // Обработка Drag & Drop
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("WIDGET_TEMPLATE")) {
@@ -280,6 +275,11 @@ void Editor::RenderCanvas() {
         }
         ImGui::EndDragDropTarget();
     }
+    // === Обновляем и рисуем все виджеты ===
+    widget_manager_.UpdateAll(canvas_p0_);
+    widget_manager_.RenderAll(draw_list, canvas_p0_);
+    widget_manager_.RenderContentAll();
+
 
     
 }

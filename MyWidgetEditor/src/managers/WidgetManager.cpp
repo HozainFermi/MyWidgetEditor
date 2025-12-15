@@ -3,11 +3,12 @@
 #include "../widgets/TextWidget.h"
 #include "../widgets/InputTextWidget.h"
 #include <fstream>
+#include <iostream>
 
 namespace wg {
     void WidgetManager::UpdateAll(const ImVec2& canvas_p0) {
         for (size_t i = 0; i < widgets_.size(); i++) {
-            widgets_[i]->UpdateInteraction(canvas_p0, (int)i);
+            widgets_[i]->UpdateInteraction(canvas_p0, (int)i);            
         }
     }
 

@@ -3,6 +3,9 @@
 #include <imgui_stdlib.h>
 
 namespace wg {
+
+    ImVec2 can_p0;
+
     InputTextWidget::InputTextWidget(const std::string& name, const ImVec2& pos)
         : Widget(name, WidgetType::INPUT_TEXT, pos, ImVec2(200, 80)) {
         label_ = name + ":";
@@ -11,6 +14,7 @@ namespace wg {
     }
 
     bool InputTextWidget::UpdateInteraction(const ImVec2& canvas_p0, int widget_id) {
+        can_p0 = canvas_p0;
         ImGuiIO& io = ImGui::GetIO();
         ImVec2 mouse_pos = io.MousePos;
 
@@ -41,32 +45,34 @@ namespace wg {
     }
 
     void InputTextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
-        ImVec2 screen_min = GetScreenMin(canvas_p0);
+        // Вызываем базовую отрисовку (фон, рамка, имя)
+        Widget::Render(draw_list, canvas_p0);
+        ImVec2 screen_min =GetScreenMin(canvas_p0);
 
         // Фон
-        draw_list->AddRectFilled(screen_min, GetScreenMax(canvas_p0), bg_color_);
+        //draw_list->AddRectFilled(screen_min, GetScreenMax(canvas_p0), bg_color_);
 
         // Заголовок для перетаскивания
         DrawHeader(draw_list, screen_min);
 
         // Рамка
-        draw_list->AddRect(screen_min, GetScreenMax(canvas_p0),
-            is_selected_ ? IM_COL32(255, 200, 0, 255) : border_color_,
-            0.0f, 0, border_thickness_);
+       //draw_list->AddRect(screen_min, GetScreenMax(canvas_p0),
+       //    is_selected_ ? IM_COL32(255, 200, 0, 255) : border_color_,
+       //    0.0f, 0, border_thickness_);
     }
 
     void InputTextWidget::RenderContent() {
-        ImVec2 screen_min = GetScreenMin(ImVec2(0, 0)); // canvas_p0 уже учтено
+        ImVec2 screen_min = GetScreenMin(can_p0); // кастыль какой то
 
         // Создаём область для ImGui элементов
         ImGui::SetCursorScreenPos(ImVec2(screen_min.x + 5, screen_min.y + 25));
 
-        ImGui::BeginChild(GetId().c_str(),
-            ImVec2(size_.x - 10, size_.y - 30),
-            false,
-            ImGuiWindowFlags_NoDecoration |
-            ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoSavedSettings);
+       ImGui::BeginChild(GetId().c_str(),
+           ImVec2(size_.x - 10, size_.y - 30),
+           false,
+           ImGuiWindowFlags_NoDecoration |
+           ImGuiWindowFlags_NoMove |
+           ImGuiWindowFlags_NoSavedSettings);
 
         // InputText с поддержкой std::string
         if (is_multiline_) {
@@ -93,10 +99,10 @@ namespace wg {
     }
 
     void InputTextWidget::DrawHeader(ImDrawList* draw_list, const ImVec2& screen_min) {
-        ImVec2 header_max = ImVec2(screen_min.x + size_.x, screen_min.y + 20);
-
+        ImVec2 header_max = ImVec2(screen_min.x + size_.x-2, screen_min.y + 20);
+        ImVec2 header_min = ImVec2(screen_min.x + 2, screen_min.y + 2);
         // Фон заголовка
-        draw_list->AddRectFilled(screen_min, header_max, IM_COL32(60, 60, 100, 255));
+        draw_list->AddRectFilled(header_min, header_max, IM_COL32(60, 60, 100, 255));
 
         // Текст заголовка
         draw_list->AddText(ImVec2(screen_min.x + 5, screen_min.y + 2),
@@ -104,7 +110,7 @@ namespace wg {
 
         // Индикатор перетаскивания
         if (is_hovered_) {
-            draw_list->AddText(ImVec2(header_max.x - 40, screen_min.y + 2),
+            draw_list->AddText(ImVec2(header_max.x - 45, screen_min.y + 2),
                 IM_COL32(200, 200, 200, 255), "? drag");
         }
     }

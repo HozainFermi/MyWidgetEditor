@@ -15,8 +15,8 @@ namespace wg {
 
         // Отрисовываем текст
         ImVec2 screen_max = GetScreenMax(canvas_p0);
-        
-        DrawTextContent(draw_list, ImVec2(screen_max.x*0.5f-text_.length()*0.5f, screen_max.y*0.5f));
+        //screen_max.x*0.5f-text_.length()*0.1f*0.5f, screen_max.y*0.5f
+        DrawTextContent(draw_list, ImVec2(screen_max.x-(size_.x*0.5f)-(text_.length()*3), screen_max.y - (size_.y) * 0.5f));
     }
 
     void TextWidget::DrawTextContent(ImDrawList* draw_list, const ImVec2& screen_pos) {

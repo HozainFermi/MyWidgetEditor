@@ -8,12 +8,71 @@
             "min_width": 30.0,
             "name": "Text_1",
             "position": [
-                283.0,
-                160.0
+                190.0,
+                89.0
             ],
             "size": [
                 150.0,
                 60.0
+            ],
+            "text": "Sample Text",
+            "type": 0,
+            "wrap_text": false
+        },
+        {
+            "bg_color": 4282129950,
+            "buffer": "jkjh",
+            "hint": "",
+            "id": "widget_1",
+            "is_multiline": false,
+            "label": "Input_2:",
+            "max_length": 256,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "Input_2",
+            "position": [
+                183.0,
+                293.0
+            ],
+            "size": [
+                200.0,
+                80.0
+            ],
+            "type": 1
+        },
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_2",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "Text_3",
+            "position": [
+                243.0,
+                192.0
+            ],
+            "size": [
+                150.0,
+                60.0
+            ],
+            "text": "Sample Text",
+            "type": 0,
+            "wrap_text": false
+        },
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_3",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "Text_4",
+            "position": [
+                440.0,
+                151.0
+            ],
+            "size": [
+                191.0,
+                148.0
             ],
             "text": "Sample Text",
             "type": 0,
