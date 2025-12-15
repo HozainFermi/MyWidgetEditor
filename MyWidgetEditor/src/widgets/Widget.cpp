@@ -126,7 +126,7 @@ namespace wg {
         // Переопределяется в потомках
     }
 
-    // ... остальные методы
+    //Общие элементы (рамка, ручки)
     void Widget::DrawCommonElements(ImDrawList* draw_list, const ImRect& rect) {
         if (IsSelected()) {
             draw_list->AddRect(rect.Min, rect.Max, selected_border_color_, 0.0f, 0, 2.0f);
@@ -199,50 +199,83 @@ namespace wg {
     bool Widget::ProcessResizing(const ImVec2& canvas_p0, const ImVec2& mouse_pos, bool proportional) {
 
         ImVec2 delta = ImGui::GetMouseDragDelta(0);
-        ImVec2 old_size = size_;
+        ImVec2 new_size = resize_start_size_;
 
         // Пропорциональное масштабирование при зажатом Shift
         
         switch (active_handle_) {
         case ResizeHandle(1):
-            size_.x -= delta.x;
-            size_.y -= proportional ? delta.x : delta.y;
+            new_size.x -= delta.x;
+            new_size.y -= proportional ? delta.x : delta.y;
             break;
         case ResizeHandle(2):
-            size_.y -= delta.y;
-            if (proportional) size_.x = size_.y * (resize_start_size_.x / resize_start_size_.y);
+            new_size.y -= delta.y;
+            if (proportional) new_size.x = new_size.y * (resize_start_size_.x / resize_start_size_.y);
             break;
         case ResizeHandle(3):
-            size_.x += delta.x;
-            size_.y += proportional ? delta.x : -delta.y;
+            new_size.x += delta.x;
+            new_size.y += proportional ? delta.x : -delta.y;
             break;
         case ResizeHandle(4):
-            size_.x -= delta.x;
-            if (proportional) size_.y = size_.x * (resize_start_size_.y / resize_start_size_.x);
+            new_size.x -= delta.x;
+            if (proportional) new_size.y = new_size.x * (resize_start_size_.y / resize_start_size_.x);
             break;
         case ResizeHandle(5):
-            size_.x += delta.x;
-            if (proportional) size_.y = size_.x * (resize_start_size_.y / resize_start_size_.x);
+            new_size.x += delta.x;
+            if (proportional) new_size.y = new_size.x * (resize_start_size_.y / resize_start_size_.x);
             break;
         case ResizeHandle(6):
-            size_.x -= delta.x;
-            size_.y += proportional ? delta.x : delta.y;
+            new_size.x -= delta.x;
+            new_size.y += proportional ? delta.x : delta.y;
             break;
         case ResizeHandle(7):
-            size_.y += delta.y;
-            if (proportional) size_.x = size_.y * (resize_start_size_.x / resize_start_size_.y);
+            new_size.y += delta.y;
+            if (proportional) new_size.x = new_size.y * (resize_start_size_.x / resize_start_size_.y);
             break;
         case ResizeHandle(8):
-            size_.x += delta.x;
-            size_.y += proportional ? delta.x : delta.y;
+            new_size.x += delta.x;
+            new_size.y += proportional ? delta.x : delta.y;
             break;
         }
 
         // Минимальный размер
-        size_.x = ImMax(size_.x, 10.0f);
-        size_.y = ImMax(size_.y, 10.0f);
+        new_size.x = ImMax(new_size.x, 10.0f);
+        new_size.y = ImMax(new_size.y, 10.0f);
+        ImRect widget {position_.x,position_.y,position_.x+size_.x,position_.y+size_.y};
 
-        return (size_.x != old_size.x || size_.y != old_size.y);
+        switch (active_handle_) {
+        case ResizeHandle::TOP_LEFT:
+            widget.Min.x = widget.Max.x - new_size.x;
+            widget.Min.y = widget.Max.y - new_size.y;
+            break;
+            case ResizeHandle::TOP:
+            widget.Min.y = widget.Max.y - new_size.y;
+            break;
+        case ResizeHandle::TOP_RIGHT:
+            widget.Max.x = widget.Min.x + new_size.x;
+            widget.Min.y = widget.Max.y - new_size.y;
+            break;
+        case ResizeHandle::LEFT:
+            widget.Min.x = widget.Max.x - new_size.x;
+            break;
+        case ResizeHandle::RIGHT:
+            widget.Max.x = widget.Min.x + new_size.x;
+            break;
+        case ResizeHandle::BOTTOM_LEFT:
+            widget.Min.x = widget.Max.x - new_size.x;
+            widget.Max.y = widget.Min.y + new_size.y;
+            break;
+        case ResizeHandle::BOTTOM:
+            widget.Max.y = widget.Min.y + new_size.y;
+            break;
+        case ResizeHandle::BOTTOM_RIGHT:
+            widget.Max.x = widget.Min.x + new_size.x;
+            widget.Max.y = widget.Min.y + new_size.y;
+            break;
+        }
+        position_ = widget.Min;
+        size_ = { widget.Max.x - widget.Min.x, widget.Max.y - widget.Min.y };
+        return (size_.x != resize_start_size_.x || size_.y != resize_start_size_.y);
 
     }
 
