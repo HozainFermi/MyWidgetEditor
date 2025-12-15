@@ -14,31 +14,34 @@ namespace wg {
     }
 
     bool InputTextWidget::UpdateInteraction(const ImVec2& canvas_p0, int widget_id) {
-        can_p0 = canvas_p0;
-        ImGuiIO& io = ImGui::GetIO();
-        ImVec2 mouse_pos = io.MousePos;
+        //can_p0 = canvas_p0;
+        //ImGuiIO& io = ImGui::GetIO();
+        //ImVec2 mouse_pos = io.MousePos;
 
-        ImRect screen_rect = GetScreenRect(canvas_p0);
-        ImRect header_rect = ImRect(
-            screen_rect.Min.x, screen_rect.Min.y,
-            screen_rect.Max.x, screen_rect.Min.y + 20
-        );
+        //ImRect screen_rect = GetScreenRect(canvas_p0);
+        //ImRect header_rect = ImRect(
+        //    screen_rect.Min.x, screen_rect.Min.y,
+        //    screen_rect.Max.x, screen_rect.Min.y + 20
+        //);
 
-        // Проверяем клик на заголовке (для перетаскивания)
-        bool is_header_hovered = header_rect.Contains(mouse_pos);
+        //// Проверяем клик на заголовке (для перетаскивания)
+        //bool is_header_hovered = header_rect.Contains(mouse_pos);
 
-        // InputText может заблокировать перетаскивание, если клик был на текстовом поле
-        bool block_drag = ShouldBlockDrag();
+        //// InputText может заблокировать перетаскивание, если клик был на текстовом поле
+        //bool block_drag = ShouldBlockDrag();
 
-        if (!block_drag && is_header_hovered && ImGui::IsMouseClicked(0)) {
-            // Перетаскивание за заголовок
-            is_dragging_ = true;
-            drag_offset_ = ImVec2(
-                mouse_pos.x - screen_rect.Min.x,
-                mouse_pos.y - screen_rect.Min.y
-            );
-            return true;
-        }
+        //if (!block_drag && is_header_hovered && ImGui::IsMouseClicked(0)) {
+        //    // Перетаскивание за заголовок
+        //    is_dragging_ = true;
+        //    drag_offset_ = ImVec2(
+        //        mouse_pos.x - screen_rect.Min.x,
+        //        mouse_pos.y - screen_rect.Min.y
+        //    );
+        //    return true;
+        //}
+       // if (ImGui::IsItemActive()) {
+       //     return false; // Не обрабатываем события виджета если InputText активен
+       // }
 
         // Вызываем базовую логику для остальных случаев
         return Widget::UpdateInteraction(canvas_p0, widget_id);
@@ -61,40 +64,35 @@ namespace wg {
        //    0.0f, 0, border_thickness_);
     }
 
-    void InputTextWidget::RenderContent() {
-        ImVec2 screen_min = GetScreenMin(can_p0); // кастыль какой то
+    void InputTextWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
+        
+        ImVec2 size = ImVec2(screen_max.x - screen_min.x,
+            screen_max.y - screen_min.y);
+        
+        ImVec2 text_input_size = ImVec2(size.x * 0.8f,  // 80% ширины виджета
+            size.y * 0.50f); // 60% высоты
 
-        // Создаём область для ImGui элементов
-        ImGui::SetCursorScreenPos(ImVec2(screen_min.x + 5, screen_min.y + 25));
+        // Центрируем
+        ImVec2 input_pos = ImVec2(
+            screen_min.x + (size.x - text_input_size.x) * 0.5f,
+            screen_min.y + (size.y - text_input_size.y) * 0.7f
+        );
 
-       ImGui::BeginChild(GetId().c_str(),
-           ImVec2(size_.x - 10, size_.y - 30),
-           false,
-           ImGuiWindowFlags_NoDecoration |
-           ImGuiWindowFlags_NoMove |
-           ImGuiWindowFlags_NoSavedSettings);
+        ImGui::SetCursorScreenPos(input_pos);
 
-        // InputText с поддержкой std::string
-        if (is_multiline_) {
-            if (ImGui::InputTextMultiline("##input", &buffer_,
-                ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 4))) {
-                OnValueChanged();
-            }
-        }
-        else {
-            if (ImGui::InputText("##input", &buffer_)) {
-                OnValueChanged();
-            }
-        }
+        ImGui::BeginChild("##input_child", text_input_size, false,
+            ImGuiWindowFlags_NoDecoration |
+            ImGuiWindowFlags_NoScrollbar);
 
-        // Подсказка
-        if (buffer_.empty() && !hint_.empty()) {
-            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 100, 100, 255));
-            ImGui::SetCursorPos(ImVec2(4, 4));
-            ImGui::Text("%s", hint_.c_str());
-            ImGui::PopStyleColor();
+        // Центрируем текст внутри InputText
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 10));
+
+        if (ImGui::InputTextMultiline("##input", &buffer_,
+            ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 3))) {
+            OnValueChanged();
         }
 
+        ImGui::PopStyleVar();
         ImGui::EndChild();
     }
 

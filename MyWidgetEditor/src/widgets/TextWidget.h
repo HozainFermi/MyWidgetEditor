@@ -13,7 +13,7 @@ namespace wg {
         TextWidget(const std::string& name, const ImVec2& pos, const std::string& text = "");
 
         void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
-        void RenderContent() override;
+        void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
 
         // Специфичные методы
         void SetText(const std::string& text) { text_ = text; }

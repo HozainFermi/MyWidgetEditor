@@ -72,7 +72,7 @@ namespace wg {
         virtual void Render(ImDrawList* draw_list, const ImVec2& canvas_p0);
 
         // Отрисовка содержимого (ImGui элементы)
-        virtual void RenderContent();
+        virtual void RenderContent(ImVec2& screen_min, ImVec2& screen_max);
 
         // === События ===
         virtual void OnSelected() {}
@@ -104,6 +104,24 @@ namespace wg {
         // === Вспомогательные методы ===
         bool ContainsPoint(const ImVec2& point, const ImVec2& canvas_p0) const;
         ResizeHandle GetHoveredHandle(const ImVec2& mouse_pos, const ImRect& screen_rect) const;
+
+        std::string TypeToString(WidgetType type) {
+            switch (type) {
+            case WidgetType::TEXT: return "TEXT";
+            case WidgetType::INPUT_TEXT: return "INPUT_TEXT";
+            case WidgetType::BUTTON: return "BUTTON";
+            case WidgetType::SLIDER: return "SLIDER";
+            case WidgetType::CHECKBOX: return "CHECKBOX";
+            case WidgetType::COMBOBOX: return "COMBOBOX";
+            case WidgetType::COLOR_PICKER: return "COLOR_PICKER";
+            case WidgetType::PLOT: return "PLOT";
+            case WidgetType::TABLE: return "TABLE";
+            case WidgetType::IMAGE: return "IMAGE";
+            case WidgetType::CONTAINER: return "CONTAINER";
+            case WidgetType::CUSTOM: return "CUSTOM";
+            default: return "NONE";
+            }
+        }
 
     protected:
         // Внутренние методы для обработки

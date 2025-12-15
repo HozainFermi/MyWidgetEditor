@@ -92,7 +92,7 @@ void Editor::RenderRightPanel() {
         }
 
         // Тип виджета (только для чтения)
-        ImGui::Text("Type: %d", (int)selected->GetType());
+        ImGui::Text("Type: %s", selected->TypeToString(selected->GetType()).c_str());
 
         ImGui::Separator();
 
@@ -217,6 +217,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window) {
 
             // Правая панель (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
+
             RenderRightPanel();
             ImGui::EndChild();
         }
@@ -278,7 +279,7 @@ void Editor::RenderCanvas() {
     // === Обновляем и рисуем все виджеты ===
     widget_manager_.UpdateAll(canvas_p0_);
     widget_manager_.RenderAll(draw_list, canvas_p0_);
-    widget_manager_.RenderContentAll();
+    widget_manager_.RenderContentAll(canvas_p0_);
 
 
     

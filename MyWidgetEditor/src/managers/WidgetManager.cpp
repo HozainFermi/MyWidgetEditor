@@ -18,9 +18,13 @@ namespace wg {
         }
     }
 
-    void WidgetManager::RenderContentAll() {
+    void WidgetManager::RenderContentAll(const ImVec2& canvas_p0) {
         for (auto& widget : widgets_) {
-            widget->RenderContent();
+            
+            ImVec2 screen_min = widget->GetScreenMin(canvas_p0);
+            ImVec2 screen_max = widget->GetScreenMax(canvas_p0); 
+
+            widget->RenderContent(screen_min, screen_max);
         }
     }
 

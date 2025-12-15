@@ -17,7 +17,7 @@ namespace wg {
 
         bool UpdateInteraction(const ImVec2& canvas_p0, int widget_id) override;
         void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
-        void RenderContent() override;
+        void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
 
         void SetValue(const std::string& value) { buffer_ = value; }
         const std::string& GetValue() const { return buffer_; }

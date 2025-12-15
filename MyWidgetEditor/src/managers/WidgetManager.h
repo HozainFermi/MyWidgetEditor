@@ -36,7 +36,7 @@ namespace wg {
         // === Обновление и отрисовка ===
         void UpdateAll(const ImVec2& canvas_p0);
         void RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0);
-        void RenderContentAll();
+        void RenderContentAll(const ImVec2& canvas_p0);
 
         // === Доступ к виджетам ===
         size_t GetCount() const { return widgets_.size(); }

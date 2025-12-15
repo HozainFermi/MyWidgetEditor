@@ -35,7 +35,7 @@ namespace wg {
         */
     }
 
-    void TextWidget::RenderContent() {
+    void TextWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
         // Для текстового виджета не нужно ImGui содержимое
         // Всё рисуется через DrawList
     }

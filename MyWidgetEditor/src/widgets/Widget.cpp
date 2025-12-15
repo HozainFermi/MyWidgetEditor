@@ -47,7 +47,7 @@ namespace wg {
 
         // 1. Всегда обновляем состояние ховера
         is_hovered_ = screen_rect.Contains(mouse_pos);
-
+        
         // 2. Проверяем ховер над ручками (только если выделен)
         ResizeHandle hovered_handle = ResizeHandle::NONE;
         if (is_selected_) {
@@ -55,7 +55,8 @@ namespace wg {
         }
 
         // 3. Обрабатываем клик (если не заняты другие элементы)
-        if (ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemActive()) {
+        //&& !ImGui::IsAnyItemActive()
+        if (ImGui::IsMouseClicked(0) ) {
             if (hovered_handle != ResizeHandle::NONE) {
                 // Начинаем ресайз
                 is_resizing_ = true;
@@ -73,6 +74,9 @@ namespace wg {
                 );
                 SetSelected(true);
                 changed = true;
+            }
+            else if (io.KeyCtrl && is_selected_) {
+                SetSelected(true);
             }
             else if (is_selected_) {
                 // Клик вне виджета - снимаем выделение
@@ -121,7 +125,7 @@ namespace wg {
         draw_list->AddText(text_pos, text_color_, name_.c_str());
     }
 
-    void Widget::RenderContent() {
+    void Widget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
         // Базовый виджет не имеет содержимого
         // Переопределяется в потомках
     }
