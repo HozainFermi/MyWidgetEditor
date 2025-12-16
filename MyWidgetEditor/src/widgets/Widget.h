@@ -43,6 +43,7 @@ namespace wg {
         bool is_resizing_ = false;
         bool is_hovered_ = false;
         bool is_selected_ = false;
+        bool stay_selected_ = false;
         ResizeHandle active_handle_ = ResizeHandle::NONE;
 
         // Стиль
@@ -100,6 +101,8 @@ namespace wg {
 
         bool IsSelected() const { return is_selected_; }
         void SetSelected(bool selected);
+        bool IsStaySelected() const { return stay_selected_; }
+        void SetStaySelected(bool stay_selected) { stay_selected_ = stay_selected; }
 
         // === Вспомогательные методы ===
         bool ContainsPoint(const ImVec2& point, const ImVec2& canvas_p0) const;

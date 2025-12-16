@@ -2,6 +2,7 @@
 #include "EditorMainWindowLayout.h"
 #include "../widgets/TextWidget.h"
 #include "../widgets/InputTextWidget.h"
+#include <iostream>
 //#include "../widgets/ButtonWidget.h"
 // ... другие виджеты
 
@@ -52,7 +53,7 @@ void Editor::RenderLeftPanel() {
         if (ImGui::Selectable(templates[i], selected_template_ == i)) {
             selected_template_ = i;
         }
-
+       
         // Drag & Drop источник
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover)) {
             ImGui::SetDragDropPayload("WIDGET_TEMPLATE", templates[i], strlen(templates[i]) + 1);
@@ -202,6 +203,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window) {
             // Левая панель (20%)
             ImGui::BeginChild("LeftPanel", ImVec2(ImGui::GetContentRegionAvail().x * 0.2f, 0),
                 ImGuiChildFlags_ResizeX | ImGuiChildFlags_Borders);
+                        
             RenderLeftPanel();
             ImGui::EndChild();
 
@@ -217,7 +219,8 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window) {
 
             // Правая панель (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
-
+            wg::Widget* selected = widget_manager_.GetSelectedWidget();
+            if (selected) { selected->SetStaySelected(ImGui::IsWindowHovered()); }
             RenderRightPanel();
             ImGui::EndChild();
         }

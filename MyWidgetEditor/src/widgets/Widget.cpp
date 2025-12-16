@@ -77,11 +77,15 @@ namespace wg {
             }
             else if (io.KeyCtrl && is_selected_) {
                 SetSelected(true);
-            }
-            else if (is_selected_) {
+            }            
+            else if (is_selected_ && !stay_selected_) {
                 // Клик вне виджета - снимаем выделение
                 SetSelected(false);
+                stay_selected_ = false;
                 changed = true;
+            }
+            else if (is_selected_ && stay_selected_) {
+                SetSelected(true);
             }
         }
 

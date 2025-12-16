@@ -50,15 +50,15 @@ namespace wg {
     void InputTextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
         // Вызываем базовую отрисовку (фон, рамка, имя)
         Widget::Render(draw_list, canvas_p0);
-        ImVec2 screen_min =GetScreenMin(canvas_p0);
+        //ImVec2 screen_min =GetScreenMin(canvas_p0);
 
         // Фон
         //draw_list->AddRectFilled(screen_min, GetScreenMax(canvas_p0), bg_color_);
 
-        // Заголовок для перетаскивания
-        DrawHeader(draw_list, screen_min);
+        // Заголовок
+       // DrawHeader(draw_list, screen_min);
 
-        // Рамка
+       // Рамка
        //draw_list->AddRect(screen_min, GetScreenMax(canvas_p0),
        //    is_selected_ ? IM_COL32(255, 200, 0, 255) : border_color_,
        //    0.0f, 0, border_thickness_);
@@ -70,20 +70,20 @@ namespace wg {
             screen_max.y - screen_min.y);
         
         ImVec2 text_input_size = ImVec2(size.x * 0.8f,  // 80% ширины виджета
-            size.y * 0.50f); // 60% высоты
+            size.y * 0.80f); // 80% высоты
 
         // Центрируем
         ImVec2 input_pos = ImVec2(
             screen_min.x + (size.x - text_input_size.x) * 0.5f,
-            screen_min.y + (size.y - text_input_size.y) * 0.7f
+            screen_min.y + (size.y - text_input_size.y) * 2
         );
 
         ImGui::SetCursorScreenPos(input_pos);
 
         ImGui::BeginChild("##input_child", text_input_size, false,
-            ImGuiWindowFlags_NoDecoration |
-            ImGuiWindowFlags_NoScrollbar);
-
+            ImGuiWindowFlags_NoDecoration );
+        //|ImGuiWindowFlags_NoScrollbar
+        
         // Центрируем текст внутри InputText
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 10));
 
