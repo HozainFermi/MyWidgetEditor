@@ -38,23 +38,23 @@ namespace wg {
         }
     }
 
-    bool Widget::UpdateInteraction(const ImVec2& canvas_p0, int widget_id) {
+    bool Widget::UpdateInteraction(const ImVec2& canvas_p0,const ImVec2& canvas_size, int widget_id) {
         ImGuiIO& io = ImGui::GetIO();
         ImVec2 mouse_pos = io.MousePos;
         ImRect screen_rect = GetScreenRect(canvas_p0);
 
         bool changed = false;
 
-        // 1. Всегда обновляем состояние ховера
+        // Всегда обновляем состояние ховера
         is_hovered_ = screen_rect.Contains(mouse_pos);
         
-        // 2. Проверяем ховер над ручками (только если выделен)
+        // Проверяем ховер над ручками (только если выделен)
         ResizeHandle hovered_handle = ResizeHandle::NONE;
         if (is_selected_) {
             hovered_handle = GetHoveredHandle(mouse_pos, screen_rect);
         }
 
-        // 3. Обрабатываем клик (если не заняты другие элементы)
+        // Обрабатываем клик (если не заняты другие элементы)
         //&& !ImGui::IsAnyItemActive()
         if (ImGui::IsMouseClicked(0) ) {
             if (hovered_handle != ResizeHandle::NONE) {
@@ -89,8 +89,8 @@ namespace wg {
             }
         }
 
-        // 4. Обрабатываем ПРОДОЛЖЕНИЕ операций        
-        if (is_dragging_ && ImGui::IsMouseDragging(0)) {
+        // Обрабатываем ПРОДОЛЖЕНИЕ операций        
+        if (is_dragging_ && ImGui::IsMouseDragging(0) && IsWidgetInCanvas(canvas_p0, canvas_size,screen_rect)) {
             position_ = ImVec2(
                 mouse_pos.x - canvas_p0.x - drag_offset_.x,
                 mouse_pos.y - canvas_p0.y - drag_offset_.y
@@ -104,7 +104,7 @@ namespace wg {
             }
         }
 
-        // 5. Завершаем операции при отпускании мыши
+        // Завершаем операции при отпускании мыши
         if (ImGui::IsMouseReleased(0)) {
             is_dragging_ = false;
             is_resizing_ = false;
@@ -285,6 +285,46 @@ namespace wg {
         size_ = { widget.Max.x - widget.Min.x, widget.Max.y - widget.Min.y };
         return (size_.x != resize_start_size_.x || size_.y != resize_start_size_.y);
 
+    }
+
+    bool Widget::IsWidgetInCanvas(const ImVec2& canvas_p0, const ImVec2& canvas_size, ImRect& screen_rect) {
+      
+        if (screen_rect.GetTL().x < canvas_p0.x || screen_rect.GetTL().y < canvas_p0.y) {
+            
+           is_dragging_ = false;
+           is_resizing_ = false;
+           active_handle_ = ResizeHandle::NONE;
+           position_ = ImVec2(canvas_p0.x+canvas_size.x/5, canvas_p0.y + canvas_size.y/5);
+           return false;
+            
+        }
+        if (screen_rect.GetTR().x > canvas_p0.x + canvas_size.x || screen_rect.GetTR().y < canvas_p0.y) {
+            
+           is_dragging_ = false;
+           is_resizing_ = false;
+           active_handle_ = ResizeHandle::NONE;
+           position_ = ImVec2(canvas_p0.x + canvas_size.x / 5, canvas_p0.y + canvas_size.y / 5);           
+           return false;
+            
+        }
+        if (screen_rect.GetBL().x < canvas_p0.x || screen_rect.GetBL().y > canvas_p0.y + canvas_size.y) {
+            
+             is_dragging_ = false;
+             is_resizing_ = false;
+             active_handle_ = ResizeHandle::NONE;
+             position_ = ImVec2(canvas_p0.x + canvas_size.x / 5, canvas_p0.y + canvas_size.y /5);            
+             return false;            
+        }
+        if (screen_rect.GetBR().x > canvas_p0.x + canvas_size.x || screen_rect.GetBR().y > canvas_p0.y + canvas_size.y) {
+            
+            is_dragging_ = false;
+            is_resizing_ = false;
+            active_handle_ = ResizeHandle::NONE;
+            position_ = ImVec2(canvas_p0.x + canvas_size.x / 5, canvas_p0.y + canvas_size.y / 5);           
+            return false;            
+        }
+        
+        return true;
     }
 
     nlohmann::json Widget::ToJson() const {

@@ -151,6 +151,7 @@
     <ClInclude Include="src\managers\WidgetManager.h" />
     <ClInclude Include="src\ui\EditorMainWindowLayout.h" />
     <ClInclude Include="src\widgets\InputTextWidget.h" />
+    <ClInclude Include="src\widgets\TableWidget.h" />
     <ClInclude Include="src\widgets\TextWidget.h" />
     <ClInclude Include="src\widgets\Widget.h" />
   </ItemGroup>
@@ -167,6 +168,7 @@
     <ClCompile Include="src\managers\WidgetManager.cpp" />
     <ClCompile Include="src\ui\EditorMainWindowLayout.cpp" />
     <ClCompile Include="src\widgets\InputTextWidget.cpp" />
+    <ClCompile Include="src\widgets\TableWidget.cpp" />
     <ClCompile Include="src\widgets\TextWidget.cpp" />
     <ClCompile Include="src\widgets\Widget.cpp" />
   </ItemGroup>

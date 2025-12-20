@@ -47,7 +47,7 @@ namespace wg {
         ResizeHandle active_handle_ = ResizeHandle::NONE;
 
         // Стиль
-        ImU32 bg_color_ = IM_COL32(50, 10, 100, 255);
+        ImU32 bg_color_ = IM_COL32(40, 40, 80, 255);
         ImU32 border_color_ = IM_COL32(100, 100, 100, 255);
         ImU32 selected_border_color_ = IM_COL32(199, 197, 135, 255);
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
@@ -67,7 +67,7 @@ namespace wg {
         virtual ~Widget() = default;
 
         // Обработка взаимодействия (вместо HandleWidgetInteraction)
-        virtual bool UpdateInteraction(const ImVec2& canvas_p0, int widget_id);
+        virtual bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id);
 
         // Отрисовка (вместо DrawWidget)
         virtual void Render(ImDrawList* draw_list, const ImVec2& canvas_p0);
@@ -103,6 +103,7 @@ namespace wg {
         void SetSelected(bool selected);
         bool IsStaySelected() const { return stay_selected_; }
         void SetStaySelected(bool stay_selected) { stay_selected_ = stay_selected; }
+        bool IsWidgetInCanvas(const ImVec2& canvas_p0, const ImVec2& canvas_size, ImRect& screen_rect);
 
         // === Вспомогательные методы ===
         bool ContainsPoint(const ImVec2& point, const ImVec2& canvas_p0) const;

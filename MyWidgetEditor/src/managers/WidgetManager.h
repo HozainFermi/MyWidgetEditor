@@ -34,7 +34,7 @@ namespace wg {
         Widget* GetSelectedWidget() const;
 
         // === Обновление и отрисовка ===
-        void UpdateAll(const ImVec2& canvas_p0);
+        void UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size);
         void RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0);
         void RenderContentAll(const ImVec2& canvas_p0);
 

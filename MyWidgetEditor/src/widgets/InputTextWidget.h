@@ -15,7 +15,7 @@ namespace wg {
     public:
         InputTextWidget(const std::string& name, const ImVec2& pos);
 
-        bool UpdateInteraction(const ImVec2& canvas_p0, int widget_id) override;
+        bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) override;
         void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
         void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
 

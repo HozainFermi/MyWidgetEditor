@@ -5,7 +5,7 @@
 namespace wg {
     TextWidget::TextWidget(const std::string& name, const ImVec2& pos, const std::string& text)
         : Widget(name, WidgetType::TEXT, pos, ImVec2(150, 60)), text_(text) {
-        bg_color_ = IM_COL32(40, 40, 80, 255);
+        
     }
 
     void TextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {

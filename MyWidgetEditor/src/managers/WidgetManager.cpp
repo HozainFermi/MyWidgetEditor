@@ -6,9 +6,9 @@
 #include <iostream>
 
 namespace wg {
-    void WidgetManager::UpdateAll(const ImVec2& canvas_p0) {
+    void WidgetManager::UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size) {
         for (size_t i = 0; i < widgets_.size(); i++) {
-            widgets_[i]->UpdateInteraction(canvas_p0, (int)i);            
+            widgets_[i]->UpdateInteraction(canvas_p0,canvas_size, (int)i);            
         }
     }
 

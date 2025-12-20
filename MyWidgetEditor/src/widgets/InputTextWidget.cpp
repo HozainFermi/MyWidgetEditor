@@ -1,6 +1,7 @@
 #include "InputTextWidget.h"
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <string>
 
 namespace wg {
 
@@ -9,11 +10,10 @@ namespace wg {
     InputTextWidget::InputTextWidget(const std::string& name, const ImVec2& pos)
         : Widget(name, WidgetType::INPUT_TEXT, pos, ImVec2(200, 80)) {
         label_ = name + ":";
-        buffer_.resize(max_length_);
-        bg_color_ = IM_COL32(30, 30, 60, 255);
+        buffer_.resize(max_length_);        
     }
 
-    bool InputTextWidget::UpdateInteraction(const ImVec2& canvas_p0, int widget_id) {
+    bool InputTextWidget::UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) {
         //can_p0 = canvas_p0;
         //ImGuiIO& io = ImGui::GetIO();
         //ImVec2 mouse_pos = io.MousePos;
@@ -44,7 +44,7 @@ namespace wg {
        // }
 
         // Вызываем базовую логику для остальных случаев
-        return Widget::UpdateInteraction(canvas_p0, widget_id);
+        return Widget::UpdateInteraction(canvas_p0, canvas_size, widget_id);
     }
 
     void InputTextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
@@ -75,25 +75,25 @@ namespace wg {
         // Центрируем
         ImVec2 input_pos = ImVec2(
             screen_min.x + (size.x - text_input_size.x) * 0.5f,
-            screen_min.y + (size.y - text_input_size.y) * 2
+            screen_min.y + (size.y - text_input_size.y) * 1.5f
         );
 
         ImGui::SetCursorScreenPos(input_pos);
-
+        ImGui::PushID(this);
         ImGui::BeginChild("##input_child", text_input_size, false,
             ImGuiWindowFlags_NoDecoration );
         //|ImGuiWindowFlags_NoScrollbar
         
         // Центрируем текст внутри InputText
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 10));
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 10));       
 
         if (ImGui::InputTextMultiline("##input", &buffer_,
             ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 3))) {
             OnValueChanged();
         }
-
         ImGui::PopStyleVar();
         ImGui::EndChild();
+        ImGui::PopID();
     }
 
     void InputTextWidget::DrawHeader(ImDrawList* draw_list, const ImVec2& screen_min) {

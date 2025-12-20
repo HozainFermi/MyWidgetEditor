@@ -1,4 +1,3 @@
-// ui/EditorMainWindowLayout.cpp
 #include "EditorMainWindowLayout.h"
 #include "../widgets/TextWidget.h"
 #include "../widgets/InputTextWidget.h"
@@ -280,7 +279,7 @@ void Editor::RenderCanvas() {
         ImGui::EndDragDropTarget();
     }
     // === Обновляем и рисуем все виджеты ===
-    widget_manager_.UpdateAll(canvas_p0_);
+    widget_manager_.UpdateAll(canvas_p0_, canvas_size_);
     widget_manager_.RenderAll(draw_list, canvas_p0_);
     widget_manager_.RenderContentAll(canvas_p0_);
 
