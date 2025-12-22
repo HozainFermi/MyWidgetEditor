@@ -1,4 +1,3 @@
-// managers/WidgetManager.h
 #pragma once
 #include "../widgets/Widget.h"
 #include <memory>

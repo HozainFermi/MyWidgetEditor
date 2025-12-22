@@ -38,24 +38,19 @@ void Editor::RenderMenuBar() {
     }
 }
 
-void Editor::RenderLeftPanel() {
+void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     ImGui::Text("Widget Templates");
     ImGui::Separator();
 
-    // Список доступных виджетов
-    const char* templates[] = {
-        "Text", "InputText", "Button", "Slider",
-        "Checkbox", "ComboBox", "ColorPicker"
-    };
-
-    for (int i = 0; i < IM_ARRAYSIZE(templates); i++) {
-        if (ImGui::Selectable(templates[i], selected_template_ == i)) {
+       
+    for (int i = 0; i < templates.size(); i++) {
+        if (ImGui::Selectable(templates[i].c_str(), selected_template_ == i)) {
             selected_template_ = i;
         }
        
         // Drag & Drop источник
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover)) {
-            ImGui::SetDragDropPayload("WIDGET_TEMPLATE", templates[i], strlen(templates[i]) + 1);
+            ImGui::SetDragDropPayload("WIDGET_TEMPLATE", templates[i].c_str(), strlen(templates[i].c_str()) + 1);
             ImGui::Text("Add %s", templates[i]);
             ImGui::EndDragDropSource();
         }
@@ -138,11 +133,11 @@ ImVec2 Editor::GetMousePosRelativeToCanvas() const {
 void Editor::CreateWidgetFromTemplate(const std::string& type, const ImVec2& position) {
     static int widget_counter = 1;
 
-    if (type == "Text") {
+    if (type == "TextWidget") {
         std::string name = "Text_" + std::to_string(widget_counter++);
         widget_manager_.CreateWidget<wg::TextWidget>(name, position, "Sample Text");
     }
-    else if (type == "InputText") {
+    else if (type == "InputTextWidget") {
         std::string name = "Input_" + std::to_string(widget_counter++);
         widget_manager_.CreateWidget<wg::InputTextWidget>(name, position);
     }
@@ -184,7 +179,7 @@ void Editor::DrawGrid(ImDrawList* draw_list) const {
 }
 
 // Реализация основного метода Render (если его нет)
-void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window) {
+void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates) {
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
 
@@ -203,7 +198,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window) {
             ImGui::BeginChild("LeftPanel", ImVec2(ImGui::GetContentRegionAvail().x * 0.2f, 0),
                 ImGuiChildFlags_ResizeX | ImGuiChildFlags_Borders);
                         
-            RenderLeftPanel();
+            RenderLeftPanel(templates);
             ImGui::EndChild();
 
             ImGui::SameLine();

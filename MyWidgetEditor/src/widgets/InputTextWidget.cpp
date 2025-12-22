@@ -5,7 +5,7 @@
 
 namespace wg {
 
-    ImVec2 can_p0;
+    
 
     InputTextWidget::InputTextWidget(const std::string& name, const ImVec2& pos)
         : Widget(name, WidgetType::INPUT_TEXT, pos, ImVec2(200, 80)) {

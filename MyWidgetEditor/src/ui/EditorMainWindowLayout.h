@@ -6,11 +6,7 @@
 class Editor {
 private:
     wg::WidgetManager widget_manager_;
-    std::vector<std::string> widget_templates_ = {
-        "Text", "InputText", "Button", "Slider",
-        "Checkbox", "ComboBox", "ColorPicker"
-    };
-
+   
     // Состояние редактора
     ImVec2 canvas_p0_;
     ImVec2 canvas_size_;
@@ -19,11 +15,11 @@ private:
     int selected_template_ = -1;
 
 public:
-    void Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window);
+    void Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates_names);
 
 private:
     void RenderMenuBar();
-    void RenderLeftPanel();
+    void RenderLeftPanel(std::vector<std::string>& templates_names);
     void RenderRightPanel();
     void RenderCanvas();
     void RenderWidgetProperties();

@@ -1,4 +1,3 @@
-// WidgetManager.cpp
 #include "WidgetManager.h"
 #include "../widgets/TextWidget.h"
 #include "../widgets/InputTextWidget.h"
