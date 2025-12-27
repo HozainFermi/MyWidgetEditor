@@ -5,44 +5,23 @@
 
 namespace wg {
 
-    
+    REGISTER_WIDGET(InputTextWidget);
+
+    InputTextWidget::InputTextWidget()
+    {
+        SetWidgetClass("InputTextWidget");
+    }
 
     InputTextWidget::InputTextWidget(const std::string& name, const ImVec2& pos)
         : Widget(name, WidgetType::INPUT_TEXT, pos, ImVec2(200, 80)) {
         label_ = name + ":";
-        buffer_.resize(max_length_);        
+        buffer_.resize(max_length_);
+
+        SetWidgetClass("InputTextWidget");
     }
 
     bool InputTextWidget::UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) {
-        //can_p0 = canvas_p0;
-        //ImGuiIO& io = ImGui::GetIO();
-        //ImVec2 mouse_pos = io.MousePos;
-
-        //ImRect screen_rect = GetScreenRect(canvas_p0);
-        //ImRect header_rect = ImRect(
-        //    screen_rect.Min.x, screen_rect.Min.y,
-        //    screen_rect.Max.x, screen_rect.Min.y + 20
-        //);
-
-        //// Проверяем клик на заголовке (для перетаскивания)
-        //bool is_header_hovered = header_rect.Contains(mouse_pos);
-
-        //// InputText может заблокировать перетаскивание, если клик был на текстовом поле
-        //bool block_drag = ShouldBlockDrag();
-
-        //if (!block_drag && is_header_hovered && ImGui::IsMouseClicked(0)) {
-        //    // Перетаскивание за заголовок
-        //    is_dragging_ = true;
-        //    drag_offset_ = ImVec2(
-        //        mouse_pos.x - screen_rect.Min.x,
-        //        mouse_pos.y - screen_rect.Min.y
-        //    );
-        //    return true;
-        //}
-       // if (ImGui::IsItemActive()) {
-       //     return false; // Не обрабатываем события виджета если InputText активен
-       // }
-
+        
         // Вызываем базовую логику для остальных случаев
         return Widget::UpdateInteraction(canvas_p0, canvas_size, widget_id);
     }
@@ -50,18 +29,7 @@ namespace wg {
     void InputTextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
         // Вызываем базовую отрисовку (фон, рамка, имя)
         Widget::Render(draw_list, canvas_p0);
-        //ImVec2 screen_min =GetScreenMin(canvas_p0);
-
-        // Фон
-        //draw_list->AddRectFilled(screen_min, GetScreenMax(canvas_p0), bg_color_);
-
-        // Заголовок
-       // DrawHeader(draw_list, screen_min);
-
-       // Рамка
-       //draw_list->AddRect(screen_min, GetScreenMax(canvas_p0),
-       //    is_selected_ ? IM_COL32(255, 200, 0, 255) : border_color_,
-       //    0.0f, 0, border_thickness_);
+        
     }
 
     void InputTextWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {

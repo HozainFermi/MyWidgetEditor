@@ -3,6 +3,7 @@
 #include "../widgets/InputTextWidget.h"
 #include <iostream>
 #include "../widgets/TableWidget.h"
+#include "../src/managers/WidgetFactory.h"
 //#include "../widgets/ButtonWidget.h"
 // ... другие виджеты
 
@@ -155,27 +156,21 @@ ImVec2 Editor::GetMousePosRelativeToCanvas() const {
     return relative_pos;
 }
 
-void Editor::CreateWidgetFromTemplate(const std::string& type, const ImVec2& position) {
-    static int widget_counter = 1;
+void Editor::CreateWidgetFromTemplate(const std::string& widget_class, const ImVec2& position) {
+    static int widget_counter = 1; 
+    std::string name = widget_class + std::to_string(widget_counter++);
+   
+    // Создаем через фабрику
+    std::unique_ptr<wg::Widget> widget = wg::WidgetFactory::CreateWithName(widget_class, name, position);
 
-    if (type == "TextWidget") {
-        std::string name = "Text_" + std::to_string(widget_counter++);
-        widget_manager_.CreateWidget<wg::TextWidget>(name, position);
+    if (widget) {
+        // Добавляем в менеджер
+        widget_manager_.AddWidget(std::move(widget));        
     }
-    else if (type == "InputTextWidget") {
-        std::string name = "Input_" + std::to_string(widget_counter++);
-        widget_manager_.CreateWidget<wg::InputTextWidget>(name, position);
-    }
-    else if (type == "TableWidget") {
-        std::string name = "Table_" + std::to_string(widget_counter++);
-        widget_manager_.CreateWidget<wg::TableWidget>(name, position);
-    }
-    // Добавь другие типы по мере необходимости
-
-    // Сразу выделяем созданный виджет
-    if (widget_manager_.GetCount() > 0) {
-        // widget_manager_.SelectWidget() // Нужен метод для выделения
-    }
+    else {
+        // Обработка ошибки: виджет не зарегистрирован
+        std::cerr << "Widget class not registered: " << widget_class << std::endl;
+    }   
 }
 
 void Editor::DrawGrid(ImDrawList* draw_list) const {

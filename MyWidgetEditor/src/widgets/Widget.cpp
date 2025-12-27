@@ -3,7 +3,15 @@
 #include <imgui_stdlib.h>
 
 namespace wg {
+    
     int Widget::next_id_ = 0;
+
+    Widget::Widget()
+        : name_("Unnamed"), position_(0, 0), size_(100, 50) {
+        static int next_id = 0;
+        id_ = "widget_" + std::to_string(next_id++);
+        widget_class_ = "Widget";  // Базовый класс
+    }
 
     Widget::Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size)
         : name_(name), type_(type), position_(pos), size_(size) {
@@ -334,6 +342,7 @@ namespace wg {
         return {
             {"id", id_},
             {"name", name_},
+            {"widget_class", widget_class_},
             {"type", static_cast<int>(type_)},
             {"position", {position_.x, position_.y}},
             {"size", {size_.x, size_.y}},
@@ -344,7 +353,10 @@ namespace wg {
     }
 
     void Widget::FromJson(const nlohmann::json& json) {
+        if (json.contains("id")) id_ = json["id"];
         if (json.contains("name")) name_ = json["name"];
+        if (json.contains("widget_class")) {widget_class_ = json["widget_class"];}
+        if (json.contains("type")) {type_ = static_cast<WidgetType>(json["enum_type"].get<int>());}
         if (json.contains("position") && json["position"].is_array()) {
             position_.x = json["position"][0];
             position_.y = json["position"][1];

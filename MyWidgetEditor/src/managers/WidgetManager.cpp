@@ -72,36 +72,22 @@ namespace wg {
 
     void WidgetManager::FromJson(const nlohmann::json& json) {
         widgets_.clear();
-        if (json.contains("widgets") && json["widgets"].is_array()) {
-            for (const auto& widget_json : json["widgets"]) {
-                WidgetType type = static_cast<WidgetType>(widget_json.value("type", 0));
-                std::string name = widget_json.value("name", "Unnamed");
-                ImVec2 pos(0, 0);
-                ImVec2 size(100, 50);
 
-                if (widget_json.contains("position") && widget_json["position"].is_array()) {
-                    pos = ImVec2(widget_json["position"][0], widget_json["position"][1]);
-                }
+        if (!json.contains("widgets") || !json["widgets"].is_array()) {
+            return;
+        }
 
-                if (widget_json.contains("size") && widget_json["size"].is_array()) {
-                    size = ImVec2(widget_json["size"][0], widget_json["size"][1]);
-                }
+        for (const auto& widget_json : json["widgets"]) {
+            // Пробуем создать виджет через фабрику
+            std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);
 
-                std::unique_ptr<Widget> widget;
-                switch (type) {
-                case WidgetType::TEXT:
-                    widget = std::make_unique<TextWidget>(name, pos);
-                    break;
-                case WidgetType::INPUT_TEXT:
-                    widget = std::make_unique<InputTextWidget>(name, pos);
-                    break;
-                    // ... другие типы
-                }
-
-                if (widget) {
-                    widget->FromJson(widget_json);
-                    widgets_.push_back(std::move(widget));
-                }
+            if (widget) {
+                // Виджет уже создан и FromJson уже вызван внутри фабрики
+                widgets_.push_back(std::move(widget));
+            }
+            else {
+                std::cout << "Фабрика не смогла создать (старый формат или не зарегистрирован)";
+                
             }
         }
     }

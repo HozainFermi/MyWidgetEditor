@@ -134,6 +134,9 @@
     <ClCompile Include="src\widgets\TableWidget.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\managers\WidgetFactory.h">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="lib\imgui\LICENSE.txt" />

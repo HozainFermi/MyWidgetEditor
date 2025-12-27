@@ -22,6 +22,23 @@ namespace wg {
             return ptr;
         }
 
+        // Добавляет виджет в менеджер
+        void AddWidget(std::unique_ptr<Widget> widget) {
+            widgets_.push_back(std::move(widget));
+        }
+
+        //// Создает виджет по имени класса
+        //Widget* CreateWidgetByClass(const std::string& widget_class,
+        //    const std::string& name,
+        //    const ImVec2& pos) {
+        //    auto widget = WidgetFactory::CreateWithName(widget_class, name, pos);
+        //    if (!widget) return nullptr;
+
+        //    Widget* ptr = widget.get();
+        //    widgets_.push_back(std::move(widget));
+        //    return ptr;
+        //}
+
         void DeleteWidget(const std::string& id);
         void DeleteWidget(int index);
         void ClearAll() { widgets_.clear(); widgets_by_id_.clear(); };

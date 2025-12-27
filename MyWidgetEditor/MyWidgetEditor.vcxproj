@@ -165,6 +165,7 @@
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="lib\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\managers\WidgetFactory.h" />
     <ClCompile Include="src\managers\WidgetManager.cpp" />
     <ClCompile Include="src\ui\EditorMainWindowLayout.cpp" />
     <ClCompile Include="src\widgets\InputTextWidget.cpp" />

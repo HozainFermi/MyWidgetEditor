@@ -3,9 +3,17 @@
 #include <imgui_stdlib.h>
 
 namespace wg {
+
+    REGISTER_WIDGET(TextWidget);
+
+    TextWidget::TextWidget()
+    {
+        SetWidgetClass("TextWidget");
+    }
+
     TextWidget::TextWidget(const std::string& name, const ImVec2& pos)
         : Widget(name, WidgetType::TEXT, pos, ImVec2(150, 60)) {
-        
+        SetWidgetClass("TextWidget");
     }
 
     void TextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {

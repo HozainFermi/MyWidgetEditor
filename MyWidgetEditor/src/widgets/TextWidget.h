@@ -1,6 +1,7 @@
 #pragma once
 #include "Widget.h"
 #include <string>
+#include "../src/managers/WidgetFactory.h"
 
 namespace wg {
     class TextWidget : public Widget {
@@ -10,6 +11,7 @@ namespace wg {
         bool wrap_text_ = false;
 
     public:
+        TextWidget();
         TextWidget(const std::string& name, const ImVec2& pos);
 
         void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
@@ -24,5 +26,6 @@ namespace wg {
 
     private:
         void DrawTextContent(ImDrawList* draw_list, const ImVec2& screen_pos);
+        
     };
 }

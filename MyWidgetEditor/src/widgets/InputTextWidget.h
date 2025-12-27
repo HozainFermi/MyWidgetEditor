@@ -1,5 +1,6 @@
 #pragma once
 #include "Widget.h"
+#include "../src/managers/WidgetFactory.h"
 #include <string>
 
 namespace wg {
@@ -13,6 +14,7 @@ namespace wg {
         bool is_password_ = false;
 
     public:
+        InputTextWidget();
         InputTextWidget(const std::string& name, const ImVec2& pos);
 
         bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) override;
@@ -28,5 +30,6 @@ namespace wg {
     private:
         bool ShouldBlockDrag() const;
         void DrawHeader(ImDrawList* draw_list, const ImVec2& screen_min);
+        
     };
 }

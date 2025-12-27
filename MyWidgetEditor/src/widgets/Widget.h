@@ -34,6 +34,7 @@ namespace wg {
         std::string id_;
         std::string name_;
         WidgetType type_;
+        std::string widget_class_="None";
 
         ImVec2 position_;      // Ћевый верхний угол относительно канваса
         ImVec2 size_;          // Ўирина и высота
@@ -63,6 +64,7 @@ namespace wg {
         float min_height_ = 20.0f;
 
     public:
+        Widget();
         Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size);
         virtual ~Widget() = default;
 
@@ -93,10 +95,14 @@ namespace wg {
         ImVec2 GetSize() const { return size_; }
         ImVec2 GetScreenMin(const ImVec2& canvas_p0) const;
         ImVec2 GetScreenMax(const ImVec2& canvas_p0) const;
-
+        const std::string& GetWidgetClass() const { return widget_class_; }
+        
         void SetPosition(const ImVec2& pos) { position_ = pos; }
         void SetSize(const ImVec2& size) { size_ = size; };
         void SetName(const std::string& name) { name_ = name; }
+        void SetWidgetClass(const std::string& widget_class) {
+            widget_class_ = widget_class;
+        }
 
         bool IsSelected() const { return is_selected_; }
         void SetSelected(bool selected);

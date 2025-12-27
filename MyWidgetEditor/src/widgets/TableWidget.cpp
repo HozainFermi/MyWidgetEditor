@@ -3,6 +3,20 @@
 
 namespace wg {
 
+    REGISTER_WIDGET(TableWidget);
+
+    TableWidget::TableWidget() :
+        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // Больший размер по умолчанию
+        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+
+        // Инициализируем тестовые колонки для превью
+        columns_.push_back({ "ID", 50.0f, "id", true });
+        columns_.push_back({ "Name", 150.0f, "name", true });
+        columns_.push_back({ "Value", 100.0f, "value", false });
+
+        SetWidgetClass("TableWidget");
+    }
+
     TableWidget::TableWidget(const std::string& name, const ImVec2& pos) :
         Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // Больший размер по умолчанию
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
@@ -11,6 +25,8 @@ namespace wg {
         columns_.push_back({ "ID", 50.0f, "id", true });
         columns_.push_back({ "Name", 150.0f, "name", true });
         columns_.push_back({ "Value", 100.0f, "value", false });
+
+        SetWidgetClass("TableWidget");
     }
 
     bool TableWidget::UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id)
