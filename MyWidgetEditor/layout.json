@@ -1,0 +1,92 @@
+{
+    "widgets": [
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_0",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TextWidget1",
+            "position": [
+                49.0,
+                30.0
+            ],
+            "size": [
+                150.0,
+                60.0
+            ],
+            "text": "Sample text",
+            "type": 0,
+            "widget_class": "TextWidget",
+            "wrap_text": false
+        },
+        {
+            "alternate_row_colors": true,
+            "bg_color": 4283443240,
+            "columns": [
+                {
+                    "data_field": "id",
+                    "header": "ID",
+                    "sortable": true,
+                    "width": 50.0
+                },
+                {
+                    "data_field": "name",
+                    "header": "Name",
+                    "sortable": true,
+                    "width": 150.0
+                },
+                {
+                    "data_field": "value",
+                    "header": "Value",
+                    "sortable": false,
+                    "width": 100.0
+                }
+            ],
+            "data_source": "",
+            "data_source_type": 0,
+            "flags": 1984,
+            "id": "widget_1",
+            "max_display_rows": 100,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "InputTextWidget3",
+            "position": [
+                271.0,
+                22.0
+            ],
+            "show_borders": true,
+            "show_headers": true,
+            "size": [
+                422.0,
+                120.0
+            ],
+            "type": 8,
+            "update_interval": 5.0,
+            "update_trigger": 0,
+            "widget_class": "TableWidget"
+        },
+        {
+            "bg_color": 4283443240,
+            "buffer": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+            "hint": "",
+            "id": "widget_2",
+            "is_multiline": false,
+            "label": "InputTextWidget3:",
+            "max_length": 256,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "InputTextWidget3",
+            "position": [
+                46.79998779296875,
+                117.20001220703125
+            ],
+            "size": [
+                200.0,
+                80.0
+            ],
+            "type": 1,
+            "widget_class": "InputTextWidget"
+        }
+    ]
+}

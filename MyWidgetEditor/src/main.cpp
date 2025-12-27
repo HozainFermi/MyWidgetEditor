@@ -8,7 +8,7 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #include "EditorMainWindowLayout.h"
-#include "Widget.h"
+#include "ui/EditorMainWindowLayout.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -32,12 +32,12 @@
 #include "../libs/emscripten/emscripten_mainloop_stub.h"
 #endif
 #include <vector>
+#include <iostream>
 
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
-
 
 
 // Main code
@@ -72,11 +72,13 @@ int main(int, char**)
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
     // Create window with graphics context
+    //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
     GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
     if (window == nullptr)
@@ -125,81 +127,84 @@ int main(int, char**)
     //IM_ASSERT(font != nullptr);
 
     // Our state
-
+    Editor editor;
     static bool MAIN_WINDOW_OPENED = true;
     static bool USE_GRID = false;
-    
-    static char text[1024*16] = "";
-    std::vector<Widget> asset_collection;
-    std::vector<Widget> using_assets;
+    bool show_editor = true;
+    std::vector<std::string> templates;
+    std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
+    for (const auto& entry : std::filesystem::directory_iterator("./src/widgets")) {
+   
+        if (entry.is_regular_file()) {
+            std::filesystem::path filename_path = entry.path().filename();
+            
+            if (filename_path.extension() == ".h") {
+                std::string tempname = filename_path.stem().string();
+                std::cout << tempname << std::endl;
+                if (tempname == "Widget") { continue; }
+                templates.push_back(tempname);
+            }
+        }
+    }
+        ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    asset_collection.push_back(Widget(ImVec2(0,0), ImVec2(0, 0), "Button1", "Button", "Click me!"));
-    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Label1", "Label", "Hello World"));
-    asset_collection.push_back(Widget(ImVec2(0, 0), ImVec2(0, 0), "Slider1", "Slider", "Value: 50%"));
-
-    //ImGui ImGui::GetIO();
-    
-    ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-    // Main loop
+        // Main loop
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
     // You may manually call LoadIniSettingsFromMemory() to load settings from your own storage.
-    io.IniFilename = nullptr;
-    EMSCRIPTEN_MAINLOOP_BEGIN
+        io.IniFilename = nullptr;
+        EMSCRIPTEN_MAINLOOP_BEGIN
 #else
-    while (!glfwWindowShouldClose(window))
+        while (!glfwWindowShouldClose(window))
 #endif
-    {
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-        glfwPollEvents();
-        if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
         {
-            ImGui_ImplGlfw_Sleep(10);
-            continue;
+            // Poll and handle events (inputs, window resize, etc.)
+            // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+            // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+            // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+            // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+            glfwPollEvents();
+            if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
+            {
+                ImGui_ImplGlfw_Sleep(10);
+                continue;
+            }
+
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            //отрисовка главного окна       
+            editor.Render(&show_editor, ImGui::GetMainViewport(), window, templates);
+
+
+
+
+
+            // Rendering
+            ImGui::Render();
+            int display_w, display_h;
+            glfwGetFramebufferSize(window, &display_w, &display_h);
+            glViewport(0, 0, display_w, display_h);
+            glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+            glClear(GL_COLOR_BUFFER_BIT);
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            glfwSwapBuffers(window);
         }
-
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        //отрисовка главного окна
-        if(MAIN_WINDOW_OPENED){        
-            ShowMainWindowLayout(&MAIN_WINDOW_OPENED, &USE_GRID, main_viewport, asset_collection, using_assets,io);
-        }
-
-
-
-
-
-        // Rendering
-        ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
-    }
 #ifdef __EMSCRIPTEN__
-    EMSCRIPTEN_MAINLOOP_END;
+        EMSCRIPTEN_MAINLOOP_END;
 #endif
 
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+        // Cleanup
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+        glfwDestroyWindow(window);
+        glfwTerminate();
 
-    return 0;
-}
+        return 0;
+    }

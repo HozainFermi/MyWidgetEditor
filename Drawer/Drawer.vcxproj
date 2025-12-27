@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,36 +19,36 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
+    <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{7704e5ac-e78f-4974-aa51-7b3ef9d6f1b7}</ProjectGuid>
-    <RootNamespace>MyWidgetEditor</RootNamespace>
+    <ProjectGuid>{d132f254-bcfc-45a7-97bf-edb3f01f6eb8}</ProjectGuid>
+    <RootNamespace>Drawer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -76,6 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,6 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,13 +104,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)lib\glfw\include;$(ProjectDir)lib\imgui;$(ProjectDir)lib\imgui\backends;$(ProjectDir)src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -119,77 +119,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)lib\glfw\include;$(ProjectDir)lib\imgui;$(ProjectDir)lib\imgui\backends;$(ProjectDir)src\include;$(ProjectDir)lib\imgui\misc\cpp;$(ProjectDir)lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="lib\glfw\include\GLFW\glfw3.h" />
-    <ClInclude Include="lib\glfw\include\GLFW\glfw3native.h" />
-    <ClInclude Include="lib\imgui\backends\imgui_impl_glfw.h" />
-    <ClInclude Include="lib\imgui\backends\imgui_impl_opengl3.h" />
-    <ClInclude Include="lib\imgui\backends\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="lib\imgui\imconfig.h" />
-    <ClInclude Include="lib\imgui\imgui.h" />
-    <ClInclude Include="lib\imgui\imgui_internal.h" />
-    <ClInclude Include="lib\imgui\imstb_rectpack.h" />
-    <ClInclude Include="lib\imgui\imstb_textedit.h" />
-    <ClInclude Include="lib\imgui\imstb_truetype.h" />
-    <ClInclude Include="lib\imgui\misc\cpp\imgui_stdlib.h" />
-    <ClInclude Include="lib\imgui\misc\single_file\imgui_single_file.h" />
-    <ClInclude Include="lib\json.hpp" />
-    <ClInclude Include="src\include\DrawItems.h" />
-    <ClInclude Include="src\include\EditorMainWindowLayout.h" />
-    <ClInclude Include="src\include\Widget.h" />
-    <ClInclude Include="src\include\WidgetInteraction.h" />
-    <ClInclude Include="src\managers\WidgetManager.h" />
-    <ClInclude Include="src\ui\EditorMainWindowLayout.h" />
-    <ClInclude Include="src\widgets\InputTextWidget.h" />
-    <ClInclude Include="src\widgets\TableWidget.h" />
-    <ClInclude Include="src\widgets\TextWidget.h" />
-    <ClInclude Include="src\widgets\Widget.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="lib\imgui\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="lib\imgui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="lib\imgui\imgui.cpp" />
-    <ClCompile Include="lib\imgui\imgui_demo.cpp" />
-    <ClCompile Include="lib\imgui\imgui_draw.cpp" />
-    <ClCompile Include="lib\imgui\imgui_tables.cpp" />
-    <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="lib\imgui\misc\cpp\imgui_stdlib.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\managers\WidgetFactory.h" />
-    <ClCompile Include="src\managers\WidgetManager.cpp" />
-    <ClCompile Include="src\ui\EditorMainWindowLayout.cpp" />
-    <ClCompile Include="src\widgets\InputTextWidget.cpp" />
-    <ClCompile Include="src\widgets\TableWidget.cpp" />
-    <ClCompile Include="src\widgets\TextWidget.cpp" />
-    <ClCompile Include="src\widgets\Widget.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="lib\imgui\backends\sdlgpu3\build_instructions.txt" />
-    <Text Include="lib\imgui\backends\vulkan\build_instructions.txt" />
-    <Text Include="lib\imgui\LICENSE.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="lib\glfw\lib-vc2022\glfw3.dll" />
-    <None Include="lib\imgui\backends\sdlgpu3\shader.frag" />
-    <None Include="lib\imgui\backends\sdlgpu3\shader.vert" />
-    <None Include="lib\imgui\backends\vulkan\generate_spv.sh" />
-    <None Include="lib\imgui\backends\vulkan\glsl_shader.frag" />
-    <None Include="lib\imgui\backends\vulkan\glsl_shader.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="lib\glfw\lib-vc2022\glfw3.lib" />
-    <Library Include="lib\glfw\lib-vc2022\glfw3dll.lib" />
-    <Library Include="lib\glfw\lib-vc2022\glfw3_mt.lib" />
+    <ClCompile Include="Drawer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
