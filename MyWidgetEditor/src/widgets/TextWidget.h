@@ -5,12 +5,12 @@
 namespace wg {
     class TextWidget : public Widget {
     private:
-        std::string text_;
+        std::string text_="Sample text";
         float font_scale_ = 1.0f;
         bool wrap_text_ = false;
 
     public:
-        TextWidget(const std::string& name, const ImVec2& pos, const std::string& text = "");
+        TextWidget(const std::string& name, const ImVec2& pos);
 
         void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
         void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;

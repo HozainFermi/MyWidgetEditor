@@ -1,42 +1,70 @@
 {
     "widgets": [
         {
+            "alternate_row_colors": true,
             "bg_color": 4283443240,
-            "font_scale": 1.0,
+            "columns": [
+                {
+                    "data_field": "id",
+                    "header": "ID",
+                    "sortable": true,
+                    "width": 50.0
+                },
+                {
+                    "data_field": "name",
+                    "header": "Name",
+                    "sortable": true,
+                    "width": 150.0
+                },
+                {
+                    "data_field": "value",
+                    "header": "Price",
+                    "sortable": false,
+                    "width": 100.0
+                }
+            ],
+            "data_source": "https://api.mockaroo.com/api/25b4fcd0?count=100&key=31d42050",
+            "data_source_type": 1,
+            "flags": 1984,
             "id": "widget_0",
+            "max_display_rows": 100,
             "min_height": 20.0,
             "min_width": 30.0,
-            "name": "Text_2",
+            "name": "Table_1",
             "position": [
-                456.0,
-                191.0
+                48.0,
+                9.0
             ],
+            "show_borders": true,
+            "show_headers": true,
             "size": [
-                128.0,
-                79.0
+                462.0,
+                116.0
             ],
-            "text": "Sample Text",
-            "type": 0,
-            "wrap_text": false
+            "type": 8,
+            "update_interval": 3.0,
+            "update_trigger": 1
         },
         {
             "bg_color": 4283443240,
-            "font_scale": 1.0,
+            "buffer": "some text",
+            "hint": "",
             "id": "widget_1",
+            "is_multiline": false,
+            "label": "Input_2:",
+            "max_length": 256,
             "min_height": 20.0,
             "min_width": 30.0,
-            "name": "Text_2",
+            "name": "Input_2",
             "position": [
-                247.0,
-                199.0
+                49.20001220703125,
+                130.0
             ],
             "size": [
-                150.0,
-                60.0
+                202.0,
+                64.0
             ],
-            "text": "Sample Text",
-            "type": 0,
-            "wrap_text": false
+            "type": 1
         }
     ]
 }

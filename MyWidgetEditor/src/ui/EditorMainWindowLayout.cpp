@@ -2,8 +2,22 @@
 #include "../widgets/TextWidget.h"
 #include "../widgets/InputTextWidget.h"
 #include <iostream>
+#include "../widgets/TableWidget.h"
 //#include "../widgets/ButtonWidget.h"
 // ... другие виджеты
+
+static void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::BeginItemTooltip())
+    {
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
 
 // Реализация методов класса Editor
 void Editor::RenderMenuBar() {
@@ -40,6 +54,8 @@ void Editor::RenderMenuBar() {
 
 void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     ImGui::Text("Widget Templates");
+    ImGui::SameLine();
+    HelpMarker("Drag widgets to canvas");
     ImGui::Separator();
 
        
@@ -57,7 +73,12 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     }
 
     ImGui::Separator();
-    ImGui::Text("Drag widgets to canvas");
+    auto widgetsptrs = widget_manager_.GetAllWidgets();
+    for (int i = 0; i < widget_manager_.GetCount(); i++) {
+       if(ImGui::Selectable(widgetsptrs[i]->GetId().c_str(), widgetsptrs[i]->IsSelected())) {
+           widgetsptrs[i]->SetSelected(true);
+       }
+    }
 }
 
 void Editor::RenderRightPanel() {
@@ -102,7 +123,11 @@ void Editor::RenderRightPanel() {
 
         if (ImGui::Button("Bring to Front", ImVec2(-1, 0))) {
             // Логика поднятия наверх
+            widget_manager_.BringToFront(selected->GetId());
         }
+        ImGui::Separator();
+        selected->RenderProperties();
+        
     }
     else {
         ImGui::Text("No widget selected");
@@ -135,11 +160,15 @@ void Editor::CreateWidgetFromTemplate(const std::string& type, const ImVec2& pos
 
     if (type == "TextWidget") {
         std::string name = "Text_" + std::to_string(widget_counter++);
-        widget_manager_.CreateWidget<wg::TextWidget>(name, position, "Sample Text");
+        widget_manager_.CreateWidget<wg::TextWidget>(name, position);
     }
     else if (type == "InputTextWidget") {
         std::string name = "Input_" + std::to_string(widget_counter++);
         widget_manager_.CreateWidget<wg::InputTextWidget>(name, position);
+    }
+    else if (type == "TableWidget") {
+        std::string name = "Table_" + std::to_string(widget_counter++);
+        widget_manager_.CreateWidget<wg::TableWidget>(name, position);
     }
     // Добавь другие типы по мере необходимости
 
@@ -214,8 +243,8 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
             // Правая панель (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
             wg::Widget* selected = widget_manager_.GetSelectedWidget();
-            if (selected) { selected->SetStaySelected(ImGui::IsWindowHovered()); }
             RenderRightPanel();
+            if (selected) { selected->SetStaySelected(ImGui::IsWindowHovered()); }
             ImGui::EndChild();
         }
         ImGui::EndChild();

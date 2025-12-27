@@ -68,12 +68,11 @@ namespace wg {
 
         // Обработка взаимодействия (вместо HandleWidgetInteraction)
         virtual bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id);
-
         // Отрисовка (вместо DrawWidget)
         virtual void Render(ImDrawList* draw_list, const ImVec2& canvas_p0);
-
         // Отрисовка содержимого (ImGui элементы)
         virtual void RenderContent(ImVec2& screen_min, ImVec2& screen_max);
+        virtual void RenderProperties() { ImGui::Text("Custom properties"); };
 
         // === События ===
         virtual void OnSelected() {}

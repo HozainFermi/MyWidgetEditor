@@ -138,9 +138,10 @@ int main(int, char**)
         if (entry.is_regular_file()) {
             std::filesystem::path filename_path = entry.path().filename();
             std::cout << filename_path;
-            std::string name = filename_path.string();
+            //std::string name = filename_path.string();
             if (filename_path.extension() == ".h") {
                 std::string tempname = filename_path.stem().string();
+                if (tempname == "Widget") { break; }
                 templates.push_back(tempname);
             }
         }

@@ -90,7 +90,7 @@ namespace wg {
                 std::unique_ptr<Widget> widget;
                 switch (type) {
                 case WidgetType::TEXT:
-                    widget = std::make_unique<TextWidget>(name, pos, "");
+                    widget = std::make_unique<TextWidget>(name, pos);
                     break;
                 case WidgetType::INPUT_TEXT:
                     widget = std::make_unique<InputTextWidget>(name, pos);
