@@ -20,6 +20,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="managers\RuntimeWidgetFactory.h" />
+    <ClCompile Include="managers\RuntimeWidgetManager.cpp" />
+    <ClCompile Include="runtime_widgets\InputTextWidget.cpp" />
+    <ClCompile Include="runtime_widgets\TableWidget.cpp" />
+    <ClCompile Include="runtime_widgets\TextWidget.cpp" />
+    <ClCompile Include="runtime_widgets\Widget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lib\json.hpp" />
+    <ClInclude Include="managers\RuntimeWidgetManager.h" />
+    <ClInclude Include="runtime_widgets\InputTextWidget.h" />
+    <ClInclude Include="runtime_widgets\TableWidget.h" />
+    <ClInclude Include="runtime_widgets\TextWidget.h" />
+    <ClInclude Include="runtime_widgets\Widget.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

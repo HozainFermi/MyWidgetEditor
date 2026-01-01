@@ -31,6 +31,7 @@
 #endif
 #include <vector>
 #include <iostream>
+#include "managers/RuntimeWidgetManager.h"
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -39,8 +40,10 @@ static void glfw_error_callback(int error, const char* description)
 
 
 // Main code
-int main(int, char**)
+int main(char* filepath)
 {
+    
+
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
@@ -128,7 +131,9 @@ int main(int, char**)
    
     ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
+    rn::RuntimeWidgetManager manager;
+    manager.LoadFromFile(filepath);
+    ImDrawList* drawlist = ImGui::GetWindowDrawList();
     // Main loop
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
@@ -156,13 +161,11 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //отрисовка главного окна       
-        //editor.Render(&show_editor, ImGui::GetMainViewport(), window, templates);
-        if (ImGui::Begin("mainwindow")) {
-            ImGui::SetCursorPos(ImVec2(ImGui::GetContentRegionAvail().x/2, ImGui::GetContentRegionAvail().y / 2));
-            ImGui::Text("Hello");
-            ImGui::End();
-        }
+        //отрисовка главного окна 
+        manager.UpdateAll();
+        manager.RenderAll(drawlist);
+        manager.RenderContentAll();
+        
         
 
 

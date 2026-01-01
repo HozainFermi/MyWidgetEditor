@@ -20,10 +20,117 @@ static void HelpMarker(const char* desc)
 }
 
 
+
+
+void Editor::RenderFileBrowser() {
+    std::cout << "RenderFileBrowser";
+    ImGui::OpenPopup("FileBrowser");
+
+    if (ImGui::BeginPopupModal("FileBrowser", nullptr,
+        ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        std::cout << "RenderFileBrowser1";
+        // Строка поиска
+        static char search_buffer[256] = "";
+
+        // Синхронизируем buffer с search_query_
+        if (ImGui::IsWindowAppearing()) {
+            strncpy_s(search_buffer, search_query_.c_str(), sizeof(search_buffer) - 1);
+        }
+
+        if (ImGui::InputText("##Search", search_buffer, sizeof(search_buffer),
+            ImGuiInputTextFlags_CallbackAlways,
+            &Editor::SearchCallback))
+        {
+            // InputText возвращает true при редактировании
+            SetSearchQuery(search_buffer);
+        }
+
+        // Подсказка
+        ImGui::SameLine();
+        ImGui::TextDisabled("(?)");
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Type to filter files\nPress Enter to open selected");
+        }
+
+        ImGui::Separator();
+
+        // Список файлов
+        const auto& files = GetFilteredFiles();
+        static int selected = -1;
+
+        if (ImGui::BeginChild("FileList", ImVec2(400, 300), true)) {
+            if (files.empty()) {
+                ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1),
+                    search_query_.empty() ?
+                    "No config files found in ./configs/" :
+                    "No files matching '%s'", search_query_.c_str());
+            }
+            else {
+                for (int i = 0; i < files.size(); i++) {
+                    if (ImGui::Selectable(files[i].c_str(), selected == i)) {
+                        selected = i;
+                    }
+
+                    // Двойной клик для быстрого открытия
+                    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
+                        //OnFileSelected(files[i]);
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+            }
+            ImGui::EndChild();
+        }
+
+        // Статистика
+        ImGui::Text("%zu files (%zu total)", files.size(), all_files_.size());
+
+        ImGui::Separator();
+
+        // Кнопки действий
+        if (ImGui::Button("Refresh")) {
+            ScanConfigFiles();
+            selected = -1;
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Open") && selected >= 0 && selected < files.size()) {
+            //OnFileSelected(files[selected]);
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel")) {
+            search_query_.clear();
+            filter_dirty_ = true;
+            strcpy_s(search_buffer, "");
+            ImGui::CloseCurrentPopup();
+        }
+
+        // Горячие клавиши
+        if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive()) {
+            if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+                ImGui::CloseCurrentPopup();
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_Enter) && selected >= 0 && selected < files.size()) {
+                //OnFileSelected(files[selected]);
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
 // Реализация методов класса Editor
 void Editor::RenderMenuBar() {
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Run", "")) {               
+                //RenderFileBrowser();                                
+            }
             if (ImGui::MenuItem("Save", "Ctrl+S")) {
                 widget_manager_.SaveToFile("layout.json");
             }
@@ -52,6 +159,8 @@ void Editor::RenderMenuBar() {
         ImGui::EndMenuBar();
     }
 }
+
+
 
 void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     ImGui::Text("Widget Templates");
@@ -247,6 +356,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
     ImGui::End();
 }
 
+
 // Реализация RenderCanvas (если её нет)
 void Editor::RenderCanvas() {
     ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
@@ -291,9 +401,9 @@ void Editor::RenderCanvas() {
     // Обработка Drag & Drop
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("WIDGET_TEMPLATE")) {
-            const char* widget_type = (const char*)payload->Data;
+            const char* widget_class = (const char*)payload->Data;
             ImVec2 drop_pos = GetMousePosRelativeToCanvas();
-            CreateWidgetFromTemplate(widget_type, drop_pos);
+            CreateWidgetFromTemplate(widget_class, drop_pos);
         }
         ImGui::EndDragDropTarget();
     }

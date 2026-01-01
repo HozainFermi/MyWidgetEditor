@@ -7,7 +7,7 @@
 // - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
 // - Introduction, links and more at the top of imgui.cpp
 
-#include "EditorMainWindowLayout.h"
+//#include "EditorMainWindowLayout.h"
 #include "ui/EditorMainWindowLayout.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

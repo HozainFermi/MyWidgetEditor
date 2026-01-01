@@ -57,7 +57,7 @@ namespace wg {
         std::ifstream file(filename);
         if (file.is_open()) {
             nlohmann::json json;
-            file >> json;
+            file >> json;           
             FromJson(json);
         }
     }
@@ -72,7 +72,8 @@ namespace wg {
 
     void WidgetManager::FromJson(const nlohmann::json& json) {
         widgets_.clear();
-
+        //std::cout << "DEBUG" << " " << WidgetFactory::GetRegisteredTypes().size();
+        
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;
         }
@@ -80,10 +81,14 @@ namespace wg {
         for (const auto& widget_json : json["widgets"]) {
             // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);
-
+            std::cout << "DEBUG" << " " << "WE AFTER FABRICA CREATERD UP" << std::endl;
             if (widget) {
+                std::cout << "DEBUG" << " " << "WE IN IF" << std::endl;              
                 // Виджет уже создан и FromJson уже вызван внутри фабрики
+                widget.get()->FromJson(widget_json);
+                std::cout << "DEBUG" << " " << "WE AFTER widget->FromJson" << std::endl;
                 widgets_.push_back(std::move(widget));
+                std::cout << "DEBUG" << " " << "WE AFTER PUSH BACK WIDGETS_" << std::endl;
             }
             else {
                 std::cout << "Фабрика не смогла создать (старый формат или не зарегистрирован)";
