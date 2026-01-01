@@ -1,10 +1,9 @@
 #pragma once
 #include "Widget.h"
 #include <string>
-#include <vector>
-#include "../src/managers/WidgetFactory.h"
+#include "../managers/RuntimeWidgetFactory.h"
 
-namespace wg {
+namespace rn {
 
     enum class CellContentType {
         TEXT,
@@ -32,8 +31,8 @@ namespace wg {
 
     struct TableColumnConfig {
         std::string header;
-        std::string data_field;  // Поле в JSON/CSV (например: "name", "price")
         float width = 100.0f;
+        std::string data_field;  // Поле в JSON/CSV (например: "name", "price")
         bool sortable = false;
 
         nlohmann::json ToJson() const {
@@ -55,7 +54,7 @@ namespace wg {
 
     class TableWidget : public Widget {
     private:
-        // === КОНФИГУРАЦИЯ (сохраняется в JSON) ===
+        // === КОНФИГУРАЦИЯ ===
         std::vector<TableColumnConfig> columns_;
         DataSourceType data_source_type_ = DataSourceType::NONE;
         std::string data_source_;  // URL или путь к файлу
@@ -84,11 +83,11 @@ namespace wg {
 
     public:
         TableWidget();
-        TableWidget(const std::string& name, const ImVec2& pos);   
-        bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) override;
-        void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
-        void RenderContent(ImVec2& screen_min,ImVec2& screen_max) override;
-       
+        TableWidget(const std::string& name, const ImVec2& pos);
+        bool UpdateInteraction(int widget_id) override;
+        void Render(ImDrawList* draw_list) override;
+        void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
+
         void RenderProperties();
 
         // === КОНФИГУРАЦИОННЫЕ МЕТОДЫ ===
@@ -116,9 +115,6 @@ namespace wg {
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;
 
-    private:
-        // Генерируем тестовые данные для превью в редакторе
-        void GeneratePreviewData();
-        
+   
     };
 }

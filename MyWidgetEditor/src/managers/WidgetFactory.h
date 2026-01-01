@@ -1,10 +1,11 @@
 #pragma once
-#include "Widget.h"
 #include <map>
 #include <functional>
 #include <memory>
 #include <string>
 #include <json.hpp>
+#include "../widgets/Widget.h"
+#include <iostream>
 
 namespace wg {
 
@@ -31,14 +32,14 @@ namespace wg {
         template<typename T>
         static bool RegisterWidget(const std::string& type_name) {
             // Регистрируем создание из JSON
-            GetJsonCreators()[type_name] = [](const nlohmann::json& json) -> std::unique_ptr<Widget> {
-                auto widget = std::make_unique<T>();
-                widget->FromJson(json);                
-                return widget;
+            GetJsonCreators()[type_name] = [](const nlohmann::json& json) -> std::unique_ptr<Widget> {               
+                //auto widget = std::make_unique<T>();
+                //widget->FromJson(json);                
+                return std::make_unique<T>();
                 };
 
             // Регистрируем создание с именем и позицией
-            GetNameCreators()[type_name] = [](const std::string& name, const ImVec2& pos) -> std::unique_ptr<Widget> {
+            GetNameCreators()[type_name] = [](const std::string& name, const ImVec2& pos) -> std::unique_ptr<Widget> {                
                 return std::make_unique<T>(name, pos);
                 };
 
@@ -47,14 +48,15 @@ namespace wg {
 
         // Создание из JSON
         static std::unique_ptr<Widget> CreateFromJson(const nlohmann::json& json) {
-            std::string type = json.value("type", "");
-
-            auto& creators = GetJsonCreators();
+            std::string type = json.value("widget_class", "");
+            std::cout << "DEBUG" << " " << type<< std::endl;
+            auto& creators = GetJsonCreators();           
             auto it = creators.find(type);
+            //if(it == creators.end()){ std::cout << "DEBUG" << " " <<"CANT FIND"<< std::endl; }
             if (it != creators.end()) {
-                return it->second(json);  // Вызываем creator, который сам вызовет FromJson
+                std::cout << "DEBUG" << " " << "WE IN IF" << std::endl;
+                return it->second(json);  // Вызываем creator
             }
-
             return nullptr;
         }
 
@@ -75,7 +77,7 @@ namespace wg {
         static std::vector<std::string> GetRegisteredTypes() {
             std::vector<std::string> types;
             for (const auto& pair : GetJsonCreators()) {
-                types.push_back(pair.first);
+                types.push_back(pair.first);                
             }
             return types;
         }

@@ -18,6 +18,23 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="managers\RuntimeWidgetFactory.h" />
+    <ClCompile Include="managers\RuntimeWidgetManager.cpp" />
+    <ClCompile Include="runtime_widgets\InputTextWidget.cpp" />
+    <ClCompile Include="runtime_widgets\TableWidget.cpp" />
+    <ClCompile Include="runtime_widgets\TextWidget.cpp" />
+    <ClCompile Include="runtime_widgets\Widget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lib\json.hpp" />
+    <ClInclude Include="managers\RuntimeWidgetManager.h" />
+    <ClInclude Include="runtime_widgets\InputTextWidget.h" />
+    <ClInclude Include="runtime_widgets\TableWidget.h" />
+    <ClInclude Include="runtime_widgets\TextWidget.h" />
+    <ClInclude Include="runtime_widgets\Widget.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -120,15 +137,15 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)lib\glfw\include;$(ProjectDir)lib\imgui;$(ProjectDir)lib\imgui\backends;$(ProjectDir)lib\imgui\misc\cpp;$(ProjectDir)lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Drawer.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

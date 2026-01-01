@@ -144,12 +144,9 @@
     <ClInclude Include="lib\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="lib\imgui\misc\single_file\imgui_single_file.h" />
     <ClInclude Include="lib\json.hpp" />
-    <ClInclude Include="src\include\DrawItems.h" />
-    <ClInclude Include="src\include\EditorMainWindowLayout.h" />
-    <ClInclude Include="src\include\Widget.h" />
-    <ClInclude Include="src\include\WidgetInteraction.h" />
     <ClInclude Include="src\managers\WidgetManager.h" />
     <ClInclude Include="src\ui\EditorMainWindowLayout.h" />
+    <ClInclude Include="src\ui\RuntimeWindowProperties.h" />
     <ClInclude Include="src\widgets\InputTextWidget.h" />
     <ClInclude Include="src\widgets\TableWidget.h" />
     <ClInclude Include="src\widgets\TextWidget.h" />

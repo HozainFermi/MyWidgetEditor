@@ -1,4 +1,4 @@
-// Dear ImGui: standalone example application for GLFW + OpenGL 3, using programmable pipeline
+п»ї// Dear ImGui: standalone example application for GLFW + OpenGL 3, using programmable pipeline
 // (GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan/Metal graphics context creation, etc.)
 
 // Learn about Dear ImGui:
@@ -7,8 +7,6 @@
 // - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
 // - Introduction, links and more at the top of imgui.cpp
 
-//#include "EditorMainWindowLayout.h"
-#include "ui/EditorMainWindowLayout.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -33,6 +31,7 @@
 #endif
 #include <vector>
 #include <iostream>
+#include "managers/RuntimeWidgetManager.h"
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -41,8 +40,10 @@ static void glfw_error_callback(int error, const char* description)
 
 
 // Main code
-int main(int, char**)
+int main(char* filepath)
 {
+    
+
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
@@ -127,84 +128,72 @@ int main(int, char**)
     //IM_ASSERT(font != nullptr);
 
     // Our state
-    Editor editor;
-    static bool MAIN_WINDOW_OPENED = true;
-    static bool USE_GRID = false;
-    bool show_editor = true;
-    std::vector<std::string> templates;
-    std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
-    for (const auto& entry : std::filesystem::directory_iterator("./src/widgets")) {
    
-        if (entry.is_regular_file()) {
-            std::filesystem::path filename_path = entry.path().filename();
-            
-            if (filename_path.extension() == ".h") {
-                std::string tempname = filename_path.stem().string();
-                std::cout << tempname << std::endl;
-                if (tempname == "Widget") { continue; }
-                templates.push_back(tempname);
-            }
-        }
-    }
-        ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-        // Main loop
+    ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    rn::RuntimeWidgetManager manager;
+    manager.LoadFromFile(filepath);
+    ImDrawList* drawlist = ImGui::GetWindowDrawList();
+    // Main loop
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
     // You may manually call LoadIniSettingsFromMemory() to load settings from your own storage.
-        io.IniFilename = nullptr;
-        EMSCRIPTEN_MAINLOOP_BEGIN
+    io.IniFilename = nullptr;
+    EMSCRIPTEN_MAINLOOP_BEGIN
 #else
-        while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window))
 #endif
+    {
+        // Poll and handle events (inputs, window resize, etc.)
+        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+        glfwPollEvents();
+        if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
         {
-            // Poll and handle events (inputs, window resize, etc.)
-            // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-            // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-            // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-            // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-            glfwPollEvents();
-            if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
-            {
-                ImGui_ImplGlfw_Sleep(10);
-                continue;
-            }
-
-            // Start the Dear ImGui frame
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-
-            //отрисовка главного окна       
-            editor.Render(&show_editor, ImGui::GetMainViewport(), window, templates);
-
-
-
-
-
-            // Rendering
-            ImGui::Render();
-            int display_w, display_h;
-            glfwGetFramebufferSize(window, &display_w, &display_h);
-            glViewport(0, 0, display_w, display_h);
-            glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-            glClear(GL_COLOR_BUFFER_BIT);
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-            glfwSwapBuffers(window);
+            ImGui_ImplGlfw_Sleep(10);
+            continue;
         }
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        //РѕС‚СЂРёСЃРѕРІРєР° РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР° 
+        manager.UpdateAll();
+        manager.RenderAll(drawlist);
+        manager.RenderContentAll();
+        
+        
+
+
+
+
+
+        // Rendering
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
+    }
 #ifdef __EMSCRIPTEN__
-        EMSCRIPTEN_MAINLOOP_END;
+    EMSCRIPTEN_MAINLOOP_END;
 #endif
 
-        // Cleanup
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
-        glfwDestroyWindow(window);
-        glfwTerminate();
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
-        return 0;
-    }
+    return 0;
+}

@@ -1,8 +1,7 @@
 #include "TableWidget.h"
 #include <imgui_internal.h>
-#include <vector>
 
-namespace wg {
+namespace rn {
 
     REGISTER_WIDGET(TableWidget);
 
@@ -11,9 +10,9 @@ namespace wg {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back(TableColumnConfig{ "ID","id",50.0f, true });
-        columns_.push_back(TableColumnConfig{ "Name","name",150.0f, true });
-        columns_.push_back(TableColumnConfig{ "Value", "value", 100.0f, false });
+        columns_.push_back({ "ID", 50.0f, "id", true });
+        columns_.push_back({ "Name", 150.0f, "name", true });
+        columns_.push_back({ "Value", 100.0f, "value", false });
 
         SetWidgetClass("TableWidget");
     }
@@ -23,27 +22,27 @@ namespace wg {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back(TableColumnConfig{ "ID", "id", 50.0f, true });
-        columns_.push_back(TableColumnConfig{ "Name", "name", 150.0f, true });
-        columns_.push_back(TableColumnConfig{ "Value", "value", 100.0f, false });
+        columns_.push_back({ "ID", 50.0f, "id", true });
+        columns_.push_back({ "Name", 150.0f, "name", true });
+        columns_.push_back({ "Value", 100.0f, "value", false });
 
         SetWidgetClass("TableWidget");
     }
 
-    bool TableWidget::UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id)
+    bool TableWidget::UpdateInteraction(int widget_id)
     {
-        return Widget::UpdateInteraction(canvas_p0,canvas_size,widget_id);
+        return Widget::UpdateInteraction(widget_id);
     }
 
-    void TableWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
-        Widget::Render(draw_list, canvas_p0);
-        
+    void TableWidget::Render(ImDrawList* draw_list) {
+        Widget::Render(draw_list);
+
     }
 
     void TableWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
-        ImVec2 size = ImVec2(screen_max.x - screen_min.x -10,
-            screen_max.y - screen_min.y-10);
-        ImVec2 pos = ImVec2(screen_min.x+5, screen_min.y+5);
+        ImVec2 size = ImVec2(screen_max.x - screen_min.x - 10,
+            screen_max.y - screen_min.y - 10);
+        ImVec2 pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
         // Ограничиваем область таблицы
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
@@ -51,7 +50,7 @@ namespace wg {
         // Используем окно без заголовка для ограничения области
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
-       
+
 
         if (ImGui::BeginChild(("##table_child_" + GetId()).c_str(),
             size,
@@ -62,13 +61,13 @@ namespace wg {
 
             // Получаем доступную область внутри окна
             ImVec2 content_size = ImGui::GetContentRegionAvail();
-           
+
             // Создаём таблицу
             if (ImGui::BeginTable(("##table_" + GetId()).c_str(),
                 (int)columns_.size(),
                 flags_,
                 content_size)) {
-               
+
                 // Устанавливаем заголовки колонок
                 for (const auto& col : columns_) {
                     ImGui::TableSetupColumn(col.header.c_str(),
@@ -82,7 +81,7 @@ namespace wg {
                     ImGui::TableHeadersRow();
                 }
 
-                static char buf[32];                       
+                static char buf[32];
                 // Тестовые данные для превью в редакторе
                 for (int row = 0; row < 5; row++) {
                     ImGui::TableNextRow();
@@ -154,7 +153,7 @@ namespace wg {
             if (ImGui::InputText("##header", header_buf, sizeof(header_buf))) {
                 columns_[i].header = header_buf;
             }
-            
+
             ImGui::SameLine();
             ImGui::SetNextItemWidth(50);
             ImGui::DragFloat("##width", &columns_[i].width, 1.0f, 20.0f, 500.0f);
@@ -204,7 +203,7 @@ namespace wg {
     }
 
     void TableWidget::AddColumn(const std::string& header, float width, const std::string& data_field) {
-        columns_.push_back(TableColumnConfig{ header, data_field,width, false });
+        columns_.push_back({ header, width, data_field, false });
     }
 
     void TableWidget::RemoveColumn(int index) {

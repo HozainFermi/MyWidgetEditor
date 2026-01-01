@@ -356,7 +356,7 @@ namespace wg {
         if (json.contains("id")) id_ = json["id"];
         if (json.contains("name")) name_ = json["name"];
         if (json.contains("widget_class")) {widget_class_ = json["widget_class"];}
-        if (json.contains("type")) {type_ = static_cast<WidgetType>(json["enum_type"].get<int>());}
+        if (json.contains("type")) {type_ = static_cast<WidgetType>(json["type"].get<int>());}
         if (json.contains("position") && json["position"].is_array()) {
             position_.x = json["position"][0];
             position_.y = json["position"][1];
