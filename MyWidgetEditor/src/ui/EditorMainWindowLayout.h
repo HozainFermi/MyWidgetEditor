@@ -3,6 +3,14 @@
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 
+enum class FileBrowserMode {
+    Load,
+    Run,
+    Save,
+    None
+};
+
+
 class Editor {
 private:
     wg::WidgetManager widget_manager_;
@@ -17,11 +25,15 @@ private:
     std::vector<std::string> filtered_files_;
     std::string search_query_;
     bool filter_dirty_ = true;
+    bool filebrowser_open_ = false;
+    bool filesave_open_ = false;
+    FileBrowserMode browsermode;
     static Editor* instance_;
 
 
 
 public:
+
     Editor() {                
     }
     static Editor& Get() {
@@ -30,11 +42,8 @@ public:
     }
 
     void Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates_names);
-    static std::vector<std::string> ReadConfigs();
-   // std::string GetCurrentFile() { return current_file_; }
-   // std::vector<std::string> GetConfigFiles() { return config_files_; }
-   // void EmptyConfigFilesVector() { config_files_.empty(); };
-   // void RefreshConfigFilesVector() { config_files_ = ReadConfigs(); }
+    
+   
     void ScanConfigFiles() {
         all_files_.clear();
         for (const auto& entry : std::filesystem::directory_iterator("./configs")) {
@@ -97,11 +106,14 @@ public:
 
         return 0;
     }
-
+   
+    void OnFileForLoadSelected(std::string filename);
+    void OnFileForRunSelected(std::string filename);
     
 
 private:
-    void RenderFileBrowser();
+    void RenderFileBrowser(FileBrowserMode& mode);
+    void RenderSaveFileMenu();
     void RenderMenuBar();
     void RenderLeftPanel(std::vector<std::string>& templates_names);
     void RenderRightPanel();
