@@ -13,17 +13,20 @@ namespace wg {
 
     void WidgetManager::RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0) {
         for (auto& widget : widgets_) {
+            if (widget) {
             widget->Render(draw_list, canvas_p0);
+            }
         }
     }
 
     void WidgetManager::RenderContentAll(const ImVec2& canvas_p0) {
         for (auto& widget : widgets_) {
-            
+            if (widget) {
             ImVec2 screen_min = widget->GetScreenMin(canvas_p0);
             ImVec2 screen_max = widget->GetScreenMax(canvas_p0); 
 
             widget->RenderContent(screen_min, screen_max);
+            }
         }
     }
 
@@ -72,23 +75,18 @@ namespace wg {
 
     void WidgetManager::FromJson(const nlohmann::json& json) {
         widgets_.clear();
-        //std::cout << "DEBUG" << " " << WidgetFactory::GetRegisteredTypes().size();
-        
+               
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;
         }
 
         for (const auto& widget_json : json["widgets"]) {
             // Пробуем создать виджет через фабрику
-            std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);
-            std::cout << "DEBUG" << " " << "WE AFTER FABRICA CREATERD UP" << std::endl;
-            if (widget) {
-                std::cout << "DEBUG" << " " << "WE IN IF" << std::endl;              
+            std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);            
+            if (widget) {                           
                 // Виджет уже создан и FromJson уже вызван внутри фабрики
-                widget.get()->FromJson(widget_json);
-                std::cout << "DEBUG" << " " << "WE AFTER widget->FromJson" << std::endl;
-                widgets_.push_back(std::move(widget));
-                std::cout << "DEBUG" << " " << "WE AFTER PUSH BACK WIDGETS_" << std::endl;
+                widget.get()->FromJson(widget_json);               
+                widgets_.push_back(std::move(widget));                
             }
             else {
                 std::cout << "Фабрика не смогла создать (старый формат или не зарегистрирован)";
