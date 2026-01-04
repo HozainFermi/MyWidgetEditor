@@ -34,4 +34,23 @@ namespace rn {
 
 
 
+    void Widget::FromJson(const nlohmann::json& json) {
+        if (json.contains("id")) id_ = json["id"];
+        if (json.contains("name")) name_ = json["name"];
+        if (json.contains("widget_class")) { widget_class_ = json["widget_class"]; }
+        if (json.contains("type")) { type_ = static_cast<WidgetType>(json["type"].get<int>()); }
+        if (json.contains("position") && json["position"].is_array()) {
+            position_.x = json["position"][0];
+            position_.y = json["position"][1];
+        }
+        if (json.contains("size") && json["size"].is_array()) {
+            size_.x = json["size"][0];
+            size_.y = json["size"][1];
+        }
+        if (json.contains("bg_color")) bg_color_ = json["bg_color"];
+        if (json.contains("min_width")) min_width_ = json["min_width"];
+        if (json.contains("min_height")) min_height_ = json["min_height"];
+    }
+
+
 }

@@ -65,15 +65,6 @@ namespace rn {
     }
    
 
-    nlohmann::json InputTextWidget::ToJson() const {
-        auto json = Widget::ToJson();
-        json["buffer"] = buffer_;
-        json["label"] = label_;
-        json["hint"] = hint_;
-        json["max_length"] = max_length_;
-        json["is_multiline"] = is_multiline_;
-        return json;
-    }
 
     void InputTextWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);

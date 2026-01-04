@@ -4,6 +4,8 @@
 #include <iostream>
 #include "../widgets/TableWidget.h"
 #include "../src/managers/WidgetFactory.h"
+#include "RuntimeWindowProperties.h"
+#include <filesystem>
 //#include "../widgets/ButtonWidget.h"
 // ... другие виджеты
 
@@ -19,11 +21,24 @@ static void HelpMarker(const char* desc)
     }
 }
 
-void Editor::OnFileForLoadSelected(std::string filename) {
+void Editor::OnFileForLoadSelected(const std::string& filename) {
     widget_manager_.LoadFromFile("./configs/"+filename+".json");
 }
-void Editor::OnFileForRunSelected(std::string filename) {
+void Editor::OnFileForRunSelected(const std::string& filename) {
 
+    std::string relativeStr = "./configs/" + filename + ".json";
+    std::filesystem::path relativePath(relativeStr);
+    std::filesystem::path absPath = std::filesystem::absolute(relativePath);
+
+    std::string command = "Drawer.exe \"" + absPath.string() + "\"";
+
+    std::cout << "Executing: " << command << "\n";
+
+    int result = std::system(command.c_str());
+
+    if (result != 0) {
+        std::cerr << "Error launching second app: " << result << "\n";
+    }
 }
 
 
@@ -79,8 +94,9 @@ void Editor::RenderFileBrowser(FileBrowserMode& mode) {
                         // Двойной клик для быстрого открытия
                         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {                            
                             ImGui::CloseCurrentPopup();
-                            if (mode == FileBrowserMode::Run) {
-                                //OnFileForRunSelected(files[selected]);
+                            if (mode == FileBrowserMode::Run) {                                
+                                OnFileForRunSelected(files[selected]);
+
                             }
                             else if (mode == FileBrowserMode::Load) {
                                 OnFileForLoadSelected(files[selected]);
@@ -110,8 +126,8 @@ void Editor::RenderFileBrowser(FileBrowserMode& mode) {
             if (ImGui::Button("Open") && selected >= 0 && selected < files.size()) {
                 ImGui::CloseCurrentPopup();
                 filebrowser_open_ = false;
-                if (mode == FileBrowserMode::Run) {
-                    //OnFileSelected(files[selected]);
+                if (mode == FileBrowserMode::Run) {                    
+                    OnFileForRunSelected(files[selected]);
                 }
                 else if (mode == FileBrowserMode::Load) {
                     OnFileForLoadSelected(files[selected]);
@@ -266,6 +282,7 @@ void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
     if (selected) {
+        
         ImGui::Text("Properties: %s", selected->GetName().c_str());
         ImGui::Separator();
 
@@ -306,15 +323,31 @@ void Editor::RenderRightPanel() {
             // Логика поднятия наверх
             widget_manager_.BringToFront(selected->GetId());
         }
-        ImGui::Separator();
-        if (selected) {
-        selected->RenderProperties();
-        }
+        ImGui::Separator();        
+        selected->RenderProperties();        
         
     }
-    else {
-        ImGui::Text("No widget selected");
+    else {       
+        static char FRAGbuf[150];
+        static char VERTbuf[150];
+        ImGui::Text("Main window Properties:");
         ImGui::Separator();
+        ImGui::Text("Width: %.0f", canvas_size_.x);
+        ImGui::SameLine();
+        ImGui::Text("Height: %.0f", canvas_size_.y);
+        ImGui::Text("Background color:");
+        ImGui::ColorEdit4("MainWindowColor", (float*)&window_props_.bg_color, ImGuiColorEditFlags_DisplayHSV);
+        ImGui::Checkbox("Always on top", &window_props_.always_on_top);
+
+        if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf))) {
+            window_props_.frag_GLSLshader_file = FRAGbuf;
+        }
+        if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
+            window_props_.vertex_GLSLshader_file = VERTbuf;
+        }
+
+        ImGui::Separator();
+        ImGui::Text("No widget selected");        
         ImGui::Text("Click on a widget to select it");
         ImGui::Text("Right-click for context menu");
     }
@@ -420,7 +453,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
             // Правая панель (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
             wg::Widget* selected = widget_manager_.GetSelectedWidget();
-            if (selected) { RenderRightPanel(); }
+            RenderRightPanel();
             
             if (selected) { selected->SetStaySelected(ImGui::IsWindowHovered()); }
             ImGui::EndChild();

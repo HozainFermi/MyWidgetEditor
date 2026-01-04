@@ -10,9 +10,9 @@ namespace rn {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back({ "ID", 50.0f, "id", true });
-        columns_.push_back({ "Name", 150.0f, "name", true });
-        columns_.push_back({ "Value", 100.0f, "value", false });
+        columns_.push_back({ "ID", "id",50.0f, true });
+        columns_.push_back({ "Name", "name", 150.0f,true });
+        columns_.push_back({ "Value", "value",100.0f, false });
 
         SetWidgetClass("TableWidget");
     }
@@ -22,9 +22,9 @@ namespace rn {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back({ "ID", 50.0f, "id", true });
-        columns_.push_back({ "Name", 150.0f, "name", true });
-        columns_.push_back({ "Value", 100.0f, "value", false });
+        columns_.push_back({ "ID", "id", 50.0f,true });
+        columns_.push_back({ "Name", "name", 150.0f,true });
+        columns_.push_back({ "Value", "value",100.0f, false });
 
         SetWidgetClass("TableWidget");
     }
@@ -114,96 +114,10 @@ namespace rn {
         ImGui::PopStyleVar();
     }
 
-    void TableWidget::RenderProperties() {
-        // Настройки таблицы
-        ImGui::Text("Table Settings");
-        ImGui::Separator();
-
-        ImGui::Checkbox("Show Headers", &show_headers_);
-        ImGui::Checkbox("Alternate Row Colors", &alternate_row_colors_);
-        ImGui::Checkbox("Show Borders", &show_borders_);
-
-        if (show_borders_) {
-            flags_ |= ImGuiTableFlags_Borders;
-        }
-        else {
-            flags_ &= ~ImGuiTableFlags_Borders;
-        }
-
-        if (alternate_row_colors_) {
-            flags_ |= ImGuiTableFlags_RowBg;
-        }
-        else {
-            flags_ &= ~ImGuiTableFlags_RowBg;
-        }
-
-        ImGui::Separator();
-
-        // Настройки колонок
-        ImGui::Text("Columns:");
-        for (size_t i = 0; i < columns_.size(); i++) {
-            ImGui::PushID((int)i);
-
-            ImGui::Text("Column %d:", (int)i + 1);
-            ImGui::SameLine();
-
-            char header_buf[128];
-            strncpy_s(header_buf, columns_[i].header.c_str(), sizeof(header_buf));
-            ImGui::SetNextItemWidth(50);
-            if (ImGui::InputText("##header", header_buf, sizeof(header_buf))) {
-                columns_[i].header = header_buf;
-            }
-
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(50);
-            ImGui::DragFloat("##width", &columns_[i].width, 1.0f, 20.0f, 500.0f);
-
-            ImGui::SameLine();
-            if (ImGui::Button("Remove")) {
-                RemoveColumn((int)i);
-                i--; // Уменьшаем индекс после удаления
-            }
-
-            ImGui::PopID();
-        }
-
-        if (ImGui::Button("Add Column")) {
-            AddColumn("New Column", 100.0f);
-        }
-
-        ImGui::Separator();
-
-        // Настройки источника данных
-        ImGui::Text("Data Source:");
-        const char* source_types[] = { "None", "CSV URL", "JSON URL", "CSV File", "JSON File", "Static Data" };
-        int current_type = (int)data_source_type_;
-        if (ImGui::Combo("Type", &current_type, source_types, IM_ARRAYSIZE(source_types))) {
-            //Widget::stay_selected_ = true;
-            data_source_type_ = (DataSourceType)current_type;
-        }
-
-        if (data_source_type_ != DataSourceType::NONE) {
-            char source_buf[256];
-            strncpy_s(source_buf, data_source_.c_str(), sizeof(source_buf));
-            if (ImGui::InputText("Source", source_buf, sizeof(source_buf))) {
-                data_source_ = source_buf;
-            }
-
-            // Настройки обновления
-            const char* triggers[] = { "None", "Timer", "Button Click", "On Load" };
-            int current_trigger = (int)update_trigger_;
-            if (ImGui::Combo("Update Trigger", &current_trigger, triggers, IM_ARRAYSIZE(triggers))) {
-                update_trigger_ = (UpdateTrigger)current_trigger;
-            }
-
-            if (update_trigger_ == UpdateTrigger::TIMER) {
-                ImGui::DragFloat("Interval (s)", &update_interval_, 0.1f, 0.1f, 60.0f);
-            }
-        }
-    }
+   
 
     void TableWidget::AddColumn(const std::string& header, float width, const std::string& data_field) {
-        columns_.push_back({ header, width, data_field, false });
+        columns_.push_back({ header, data_field,width, false });
     }
 
     void TableWidget::RemoveColumn(int index) {
@@ -226,44 +140,7 @@ namespace rn {
         static_data_ = data;
     }
 
-    nlohmann::json TableWidget::ToJson() const {
-        auto json = Widget::ToJson();
-
-        // Колонки
-        nlohmann::json columns_json = nlohmann::json::array();
-        for (const auto& col : columns_) {
-            columns_json.push_back(col.ToJson());
-        }
-        json["columns"] = columns_json;
-
-        // Источник данных
-        json["data_source_type"] = (int)data_source_type_;
-        json["data_source"] = data_source_;
-        json["update_trigger"] = (int)update_trigger_;
-        json["update_interval"] = update_interval_;
-
-        // Настройки таблицы
-        json["flags"] = flags_;
-        json["show_headers"] = show_headers_;
-        json["show_borders"] = show_borders_;
-        json["alternate_row_colors"] = alternate_row_colors_;
-        json["max_display_rows"] = max_display_rows_;
-
-        // Статические данные (если есть)
-        if (!static_data_.empty()) {
-            json["static_data"] = static_data_;
-        }
-
-        // HTTP настройки
-        if (!api_key_.empty()) {
-            json["api_key"] = api_key_;
-        }
-        if (!custom_headers_.empty()) {
-            json["custom_headers"] = custom_headers_;
-        }
-
-        return json;
-    }
+   
 
     void TableWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);
@@ -330,7 +207,7 @@ namespace rn {
         }
     }
 
-    void TableWidget::GeneratePreviewData() {
+    void TableWidget::GenerateData() {
         // Генерируем тестовые данные для превью
         static_data_.clear();
         for (int i = 0; i < 5; i++) {

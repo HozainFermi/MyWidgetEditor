@@ -19,12 +19,12 @@ namespace rn {
 
     void TextWidget::Render(ImDrawList* draw_list) {
         // Вызываем базовую отрисовку (фон, рамка, имя)
-        Widget::Render(draw_list);
+        //Widget::Render(draw_list);
 
 
         // Отрисовываем текст
         ImVec2 screen_max = GetScreenMax();
-        //screen_max.x*0.5f-text_.length()*0.1f*0.5f, screen_max.y*0.5f
+        
         DrawTextContent(draw_list, ImVec2(screen_max.x - (size_.x * 0.5f) - (text_.length() * 3), screen_max.y - (size_.y) * 0.5f));
     }
 
@@ -38,13 +38,7 @@ namespace rn {
         // Всё рисуется через DrawList
     }
 
-    nlohmann::json TextWidget::ToJson() const {
-        auto json = Widget::ToJson();
-        json["text"] = text_;
-        json["font_scale"] = font_scale_;
-        json["wrap_text"] = wrap_text_;
-        return json;
-    }
+   
 
     void TextWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);

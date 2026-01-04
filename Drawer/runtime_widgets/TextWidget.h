@@ -19,8 +19,7 @@ namespace rn {
         // Специфичные методы
         void SetText(const std::string& text) { text_ = text; }
         const std::string& GetText() const { return text_; }
-
-        nlohmann::json ToJson() const override;
+       
         void FromJson(const nlohmann::json& json) override;
 
     private:
