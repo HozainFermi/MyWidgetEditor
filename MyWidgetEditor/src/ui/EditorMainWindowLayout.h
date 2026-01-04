@@ -2,6 +2,8 @@
 #include "../managers/WidgetManager.h"
 #include <imgui.h>
 #include <GLFW/glfw3.h>
+#include "RuntimeWindowProperties.h"
+#include "RuntimeWindowProperties.h"
 
 enum class FileBrowserMode {
     Load,
@@ -27,19 +29,26 @@ private:
     bool filter_dirty_ = true;
     bool filebrowser_open_ = false;
     bool filesave_open_ = false;
-    FileBrowserMode browsermode;
-    static Editor* instance_;
-
+    FileBrowserMode browsermode= FileBrowserMode::None;
+    wg::RuntimeWindowProperties window_props_;
+    
+    Editor() = default;
 
 
 public:
-
-    Editor() {                
-    }
-    static Editor& Get() {
+    
+    static Editor* Get() {
         static Editor instance;
-        return instance;
+        return &instance;
     }
+    Editor(const Editor&) {
+        throw std::logic_error("Can not copy Editor - it`s singleton");
+    }
+    void operator=(const Editor&) {
+        throw std::logic_error("Can not copy Editor - it`s singleton");
+    }
+    Editor(Editor&&) = delete;
+    void operator=(const Editor&&) = delete;
 
     void Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates_names);
     
@@ -96,19 +105,19 @@ public:
 
     // Callback для ImGui InputText
     static int SearchCallback(ImGuiInputTextCallbackData* data) {
-        auto& editor = Editor::Get();
+        auto editor = Editor::Get();
 
         if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit ||
             data->EventFlag == ImGuiInputTextFlags_CallbackAlways)
         {
-            editor.SetSearchQuery(data->Buf);
+            editor->SetSearchQuery(data->Buf);
         }
 
         return 0;
     }
    
-    void OnFileForLoadSelected(std::string filename);
-    void OnFileForRunSelected(std::string filename);
+    void OnFileForLoadSelected(const std::string& filename);
+    void OnFileForRunSelected(const std::string& filename);
     
 
 private:

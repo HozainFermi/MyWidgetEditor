@@ -72,8 +72,7 @@ namespace rn {
         virtual void OnValueChanged() {}
         virtual void OnClick() {}
 
-        // === Сериализация ===
-        virtual nlohmann::json ToJson() const;
+        // === Сериализация ===        
         virtual void FromJson(const nlohmann::json& json);
 
         // === Геттеры/Сеттеры ===

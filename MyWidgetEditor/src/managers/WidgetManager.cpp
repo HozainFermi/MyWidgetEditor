@@ -67,10 +67,15 @@ namespace wg {
 
     nlohmann::json WidgetManager::ToJson() const {
         nlohmann::json json_array = nlohmann::json::array();
+        nlohmann::json mw_array = nlohmann::json::array();
+        
+
+        
         for (const auto& widget : widgets_) {
             json_array.push_back(widget->ToJson());
         }
-        return { {"widgets", json_array} };
+
+        return { {"MainWindowProps", mw_array },{"widgets", json_array}};
     }
 
     void WidgetManager::FromJson(const nlohmann::json& json) {

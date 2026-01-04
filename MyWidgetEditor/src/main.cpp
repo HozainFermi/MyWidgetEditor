@@ -127,7 +127,7 @@ int main(int, char**)
     //IM_ASSERT(font != nullptr);
 
     // Our state
-    Editor editor;
+    Editor* editor = Editor::Get();
     static bool MAIN_WINDOW_OPENED = true;
     static bool USE_GRID = false;
     bool show_editor = true;
@@ -177,7 +177,7 @@ int main(int, char**)
             ImGui::NewFrame();
 
             //отрисовка главного окна       
-            editor.Render(&show_editor, ImGui::GetMainViewport(), window, templates);
+            editor->Render(&show_editor, ImGui::GetMainViewport(), window, templates);
 
 
 

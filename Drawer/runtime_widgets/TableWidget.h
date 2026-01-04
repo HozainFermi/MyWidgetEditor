@@ -31,19 +31,10 @@ namespace rn {
 
     struct TableColumnConfig {
         std::string header;
-        float width = 100.0f;
         std::string data_field;  // Ïîëå â JSON/CSV (íàïğèìåğ: "name", "price")
+        float width = 100.0f;
         bool sortable = false;
-
-        nlohmann::json ToJson() const {
-            return {
-                {"header", header},
-                {"width", width},
-                {"data_field", data_field},
-                {"sortable", sortable}
-            };
-        }
-
+        
         void FromJson(const nlohmann::json& json) {
             header = json.value("header", "");
             width = json.value("width", 100.0f);
@@ -95,6 +86,7 @@ namespace rn {
             const std::string& data_field = "");
         void RemoveColumn(int index);
 
+        void GenerateData();
         void SetDataSource(const std::string& source, DataSourceType type);
         void SetUpdateTrigger(UpdateTrigger trigger, float interval = 5.0f);
         void SetStaticData(const std::vector<std::vector<std::string>>& data);
@@ -104,15 +96,14 @@ namespace rn {
             custom_headers_[key] = value;
         }
 
-        // === ÃÅÒÒÅĞÛ (äëÿ UI ğåäàêòîğà) ===
+        // === ÃÅÒÒÅĞÛ  ===
         const std::vector<TableColumnConfig>& GetColumns() const { return columns_; }
         DataSourceType GetDataSourceType() const { return data_source_type_; }
         const std::string& GetDataSource() const { return data_source_; }
         UpdateTrigger GetUpdateTrigger() const { return update_trigger_; }
         float GetUpdateInterval() const { return update_interval_; }
 
-        // === ÑÅĞÈÀËÈÇÀÖÈß ===
-        nlohmann::json ToJson() const override;
+        // === ÑÅĞÈÀËÈÇÀÖÈß ===       
         void FromJson(const nlohmann::json& json) override;
 
    
