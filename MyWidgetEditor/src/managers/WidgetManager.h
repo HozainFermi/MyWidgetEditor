@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include "../ui/RuntimeWindowProperties.h"
 
 namespace wg {
     class WidgetManager {
@@ -90,10 +91,10 @@ namespace wg {
         };
 
         // === Сериализация ===
-        nlohmann::json ToJson() const;
+        nlohmann::json ToJson(const wg::RuntimeWindowProperties& mw_props) const;
         void FromJson(const nlohmann::json& json);
-        void SaveToFile(const std::string& filename) const;
-        void LoadFromFile(const std::string& filename);
+        void SaveToFile(const std::string& filename, const wg::RuntimeWindowProperties& w_props) const;
+        void LoadFromFile(const std::string& filename, wg::RuntimeWindowProperties& w_props);
 
     private:
         void BringToFront(Widget* widget);

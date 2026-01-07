@@ -2,6 +2,7 @@
 #include <string>
 #include <imgui.h>
 #include <json.hpp>
+#include <imgui_internal.h>
 
 namespace rn {
 

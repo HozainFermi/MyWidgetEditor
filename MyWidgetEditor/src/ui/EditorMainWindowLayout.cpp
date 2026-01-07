@@ -22,7 +22,7 @@ static void HelpMarker(const char* desc)
 }
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
-    widget_manager_.LoadFromFile("./configs/"+filename+".json");
+    widget_manager_.LoadFromFile("./configs/"+filename+".json", window_props_);
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
 
@@ -30,7 +30,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     std::filesystem::path relativePath(relativeStr);
     std::filesystem::path absPath = std::filesystem::absolute(relativePath);
 
-    std::string command = "Drawer.exe \"" + absPath.string() + "\"";
+    std::string command = "C:\\Users\\dedde\\source\\repos\\MyWidgetEditor\\x64\\Release\\Drawer.exe \"" + absPath.string() + "\"";
 
     std::cout << "Executing: " << command << "\n";
 
@@ -177,11 +177,12 @@ void Editor::RenderSaveFileMenu() {
         if (ImGui::BeginPopupModal("SaveFile", NULL,
             ImGuiWindowFlags_AlwaysAutoResize)) {
 
-            if (ImGui::BeginChild("SaveFileChild", ImVec2(400, 300), true)) {
+            if (ImGui::BeginChild("SaveFileChild", ImVec2(400, 80), true)) {
 
                 ImGui::InputText("", savefile_buffer,IM_ARRAYSIZE(savefile_buffer));
                 ImGui::SameLine();
-                ImGui::Text(".json");               
+                ImGui::Text(".json");    
+                ImGui::Dummy(ImVec2(0,10));
                 std::string temp;
                 if (ImGui::Button("Save")) {
                     temp = savefile_buffer;
@@ -190,7 +191,9 @@ void Editor::RenderSaveFileMenu() {
                         ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1), "Config file with name '%s' already exists", it );
                     }
                     else {
-                        widget_manager_.SaveToFile("./configs/"+temp+".json");
+                        widget_manager_.SaveToFile("./configs/"+temp+".json",window_props_);
+                        filebrowser_open_ = false;
+                        filesave_open_ = false;
                     }
                 }
                 ImGui::SameLine();
@@ -281,6 +284,37 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
+    static char FRAGbuf[150];
+    static char VERTbuf[150];
+    ImGui::Text("Main window Properties:");
+    ImGui::Separator();
+    ImGui::Text("Width: %.0f", canvas_size_.x);
+    ImGui::SameLine();
+    ImGui::Text("Height: %.0f", canvas_size_.y);
+    ImGui::Text("Background color:");
+
+    ImVec4 color = ImGui::ColorConvertU32ToFloat4(window_props_.bg_color);
+    memcpy(window_props_.bg_color_float, &color, sizeof(float) * 4);
+
+    if (ImGui::ColorEdit4("MainWindowColor", window_props_.bg_color_float, ImGuiColorEditFlags_DisplayHSV)) {
+
+        window_props_.bg_color = ImGui::ColorConvertFloat4ToU32(
+            ImVec4(window_props_.bg_color_float[0],
+                window_props_.bg_color_float[1],
+                window_props_.bg_color_float[2],
+                window_props_.bg_color_float[3]));
+    }
+    ImGui::Checkbox("Always on top", &window_props_.always_on_top);
+    ImGui::Checkbox("Moveble", &window_props_.moveble);
+
+    if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf))) {
+        window_props_.frag_GLSLshader_file = FRAGbuf;
+    }
+    if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
+        window_props_.vertex_GLSLshader_file = VERTbuf;
+    }
+    ImGui::Separator();
+
     if (selected) {
         
         ImGui::Text("Properties: %s", selected->GetName().c_str());
@@ -328,24 +362,7 @@ void Editor::RenderRightPanel() {
         
     }
     else {       
-        static char FRAGbuf[150];
-        static char VERTbuf[150];
-        ImGui::Text("Main window Properties:");
-        ImGui::Separator();
-        ImGui::Text("Width: %.0f", canvas_size_.x);
-        ImGui::SameLine();
-        ImGui::Text("Height: %.0f", canvas_size_.y);
-        ImGui::Text("Background color:");
-        ImGui::ColorEdit4("MainWindowColor", (float*)&window_props_.bg_color, ImGuiColorEditFlags_DisplayHSV);
-        ImGui::Checkbox("Always on top", &window_props_.always_on_top);
-
-        if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf))) {
-            window_props_.frag_GLSLshader_file = FRAGbuf;
-        }
-        if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
-            window_props_.vertex_GLSLshader_file = VERTbuf;
-        }
-
+        
         ImGui::Separator();
         ImGui::Text("No widget selected");        
         ImGui::Text("Click on a widget to select it");
@@ -464,7 +481,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 }
 
 
-// Реализация RenderCanvas (если её нет)
+// Реализация RenderCanvas 
 void Editor::RenderCanvas() {
     ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
     ImGui::Text("Grid size");
@@ -496,8 +513,9 @@ void Editor::RenderCanvas() {
     // DrawList для отрисовки
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
+    //IM_COL32(40, 40, 40, 255)
     // Фон канваса
-    draw_list->AddRectFilled(canvas_p0_, canvas_p1, IM_COL32(40, 40, 40, 255));
+    draw_list->AddRectFilled(canvas_p0_, canvas_p1, window_props_.bg_color);
 
     // Сетка
     DrawGrid(draw_list);

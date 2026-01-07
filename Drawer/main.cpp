@@ -7,6 +7,8 @@
 // - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
 // - Introduction, links and more at the top of imgui.cpp
 
+//#include "EditorMainWindowLayout.h"
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -31,7 +33,13 @@
 #endif
 #include <vector>
 #include <iostream>
-#include "managers/RuntimeWidgetManager.h"
+#include "ui/MainWindowLayout.h"
+
+#ifdef _WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <windows.h>
+#endif
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -40,11 +48,8 @@ static void glfw_error_callback(int error, const char* description)
 
 
 // Main code
-int main(int argc, char* argv[])
+int main(int, char**)
 {
-    rn::RuntimeWidgetManager manager;
-    manager.LoadFromFile(argv[0]);
-
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
@@ -75,6 +80,10 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Без стандартной рамки
+    //glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // Запрет изменения размера
+    glfwWindowHint(GLFW_FLOATING, GLFW_FALSE); // По умолчанию не поверх всех окон
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
@@ -82,9 +91,18 @@ int main(int argc, char* argv[])
     // Create window with graphics context
     //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
-    GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "Run GLFW+OpenGL3", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
     if (window == nullptr)
         return 1;
+
+    glfwShowWindow(window);
+
+#ifdef _WIN32
+    HWND hwnd = glfwGetWin32Window(window);
+    // Убираем из панели задач
+    SetWindowLong(hwnd, GWL_EXSTYLE,
+        GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_TOOLWINDOW);
+#endif
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
@@ -130,10 +148,11 @@ int main(int argc, char* argv[])
 
     // Our state
    
+    rn::MainWindowLayout mw;
+    bool mw_open = true;
     ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    
-    ImDrawList* drawlist = ImGui::GetWindowDrawList();
+
     // Main loop
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
@@ -161,16 +180,13 @@ int main(int argc, char* argv[])
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //отрисовка главного окна 
-        manager.UpdateAll();
-        manager.RenderAll(drawlist);
-        manager.RenderContentAll();
+       
         
-        
+        mw.Render(&mw_open,main_viewport,window);
 
-
-
-
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
 
         // Rendering
         ImGui::Render();

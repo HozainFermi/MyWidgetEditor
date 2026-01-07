@@ -1,0 +1,56 @@
+{
+    "widgets": [
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_0",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TextWidget1",
+            "position": [
+                81.0,
+                108.0
+            ],
+            "size": [
+                150.0,
+                60.0
+            ],
+            "text": "Sample text",
+            "type": 0,
+            "widget_class": "TextWidget",
+            "wrap_text": false
+        },
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_1",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TextWidget2",
+            "position": [
+                323.0,
+                105.0
+            ],
+            "size": [
+                150.0,
+                60.0
+            ],
+            "text": "Sample text",
+            "type": 0,
+            "widget_class": "TextWidget",
+            "wrap_text": false
+        }
+    ],
+    "window": {
+        "always_on_top": true,
+        "bg_color": [
+            0.35686275362968445,
+            0.11764706671237946,
+            0.11764706671237946,
+            1.0
+        ],
+        "frag_shader": "someshader",
+        "height": 300,
+        "moveble": true
+    }
+}

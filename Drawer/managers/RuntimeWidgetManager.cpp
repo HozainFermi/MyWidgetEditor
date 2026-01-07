@@ -49,6 +49,9 @@ namespace rn {
     
 
     void RuntimeWidgetManager::LoadFromFile(const std::string& filename) {
+        if (filename.empty()) {
+            return;
+        }
         std::ifstream file(filename);
         if (file.is_open()) {
             nlohmann::json json;

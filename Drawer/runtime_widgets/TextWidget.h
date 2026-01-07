@@ -1,6 +1,7 @@
 #pragma once
 #include "Widget.h"
 #include <string>
+#include "../managers/RuntimeWidgetFactory.h"
 
 namespace rn {
     class TextWidget : public Widget {

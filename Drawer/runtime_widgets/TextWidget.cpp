@@ -1,7 +1,6 @@
 #include "TextWidget.h"
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include "../managers/RuntimeWidgetFactory.h"
 
 namespace rn {
 
