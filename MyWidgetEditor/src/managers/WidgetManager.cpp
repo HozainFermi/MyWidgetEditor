@@ -48,15 +48,15 @@ namespace wg {
         }
     }
 
-    void WidgetManager::SaveToFile(const std::string& filename) const {
-        nlohmann::json json = ToJson();
+    void WidgetManager::SaveToFile(const std::string& filename, const wg::RuntimeWindowProperties& mw_props) const {
+        nlohmann::json json = ToJson(mw_props);
         std::ofstream file(filename);
         if (file.is_open()) {
             file << json.dump(4);
         }
     }
 
-    void WidgetManager::LoadFromFile(const std::string& filename) {
+    void WidgetManager::LoadFromFile(const std::string& filename, wg::RuntimeWindowProperties& mw_props) {
         std::ifstream file(filename);
         if (file.is_open()) {
             nlohmann::json json;
@@ -65,17 +65,26 @@ namespace wg {
         }
     }
 
-    nlohmann::json WidgetManager::ToJson() const {
+    nlohmann::json WidgetManager::ToJson(const wg::RuntimeWindowProperties& mw_props) const {
         nlohmann::json json_array = nlohmann::json::array();
-        nlohmann::json mw_array = nlohmann::json::array();
+        nlohmann::json window;
         
+        window["height"] = mw_props.height;
+        window["bg_color"] = nlohmann::json::array({
+                mw_props.bg_color_float[0],
+                mw_props.bg_color_float[1],
+                mw_props.bg_color_float[2],
+                mw_props.bg_color_float[3]
+            });       
+        window["moveble"] = mw_props.moveble;
+        window["always_on_top"] = mw_props.always_on_top;
+        window["frag_shader"] = mw_props.frag_GLSLshader_file;
 
-        
         for (const auto& widget : widgets_) {
             json_array.push_back(widget->ToJson());
         }
-
-        return { {"MainWindowProps", mw_array },{"widgets", json_array}};
+                
+        return { {"window", window},{"widgets", json_array}};
     }
 
     void WidgetManager::FromJson(const nlohmann::json& json) {

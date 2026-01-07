@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 #include "RuntimeWindowProperties.h"
-#include "RuntimeWindowProperties.h"
+
 
 enum class FileBrowserMode {
     Load,
