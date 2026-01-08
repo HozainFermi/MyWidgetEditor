@@ -32,9 +32,7 @@ namespace wg {
         template<typename T>
         static bool RegisterWidget(const std::string& type_name) {
             // Регистрируем создание из JSON
-            GetJsonCreators()[type_name] = [](const nlohmann::json& json) -> std::unique_ptr<Widget> {               
-                //auto widget = std::make_unique<T>();
-                //widget->FromJson(json);                
+            GetJsonCreators()[type_name] = [](const nlohmann::json& json) -> std::unique_ptr<Widget> {                                       
                 return std::make_unique<T>();
                 };
 
@@ -48,13 +46,12 @@ namespace wg {
 
         // Создание из JSON
         static std::unique_ptr<Widget> CreateFromJson(const nlohmann::json& json) {
-            std::string type = json.value("widget_class", "");
-            std::cout << "DEBUG" << " " << type<< std::endl;
+            std::string type = json.value("widget_class", "");           
             auto& creators = GetJsonCreators();           
             auto it = creators.find(type);
-            //if(it == creators.end()){ std::cout << "DEBUG" << " " <<"CANT FIND"<< std::endl; }
+          
             if (it != creators.end()) {
-                std::cout << "DEBUG" << " " << "WE IN IF" << std::endl;
+                
                 return it->second(json);  // Вызываем creator
             }
             return nullptr;

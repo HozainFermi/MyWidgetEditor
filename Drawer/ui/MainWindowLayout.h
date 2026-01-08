@@ -6,12 +6,26 @@
 
 namespace rn {
 
-	static class MainWindowLayout {
-	public:
-		RuntimeWidgetManager widget_manager;
+	 class MainWindowLayout {
 
-
-		static void Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window);				
+     private:
+         MainWindowLayout() = default;
+	     
+     public:		
+        static MainWindowLayout* Get() {
+            static MainWindowLayout instance;
+            return &instance;
+        }
+        MainWindowLayout(const MainWindowLayout&) {
+            throw std::logic_error("Can not copy Editor - it`s singleton");
+        }
+        void operator=(const MainWindowLayout&) {
+            throw std::logic_error("Can not copy Editor - it`s singleton");
+        }
+        MainWindowLayout(MainWindowLayout&&) = delete;
+        void operator=(const MainWindowLayout&&) = delete;
+                                                                                       
+		void Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, RuntimeWidgetManager* manager);
 
 	};
 }

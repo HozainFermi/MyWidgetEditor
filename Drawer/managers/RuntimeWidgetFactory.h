@@ -20,19 +20,18 @@ namespace rn {
             static std::map<std::string, CreatorFromJson> creators;
             return creators;
         }     
+        
 
     public:
+
         // Регистрация класса виджета
         template<typename T>
         static bool RegisterWidget(const std::string& type_name) {
             // Регистрируем создание из JSON
             GetJsonCreators()[type_name] = [](const nlohmann::json& json) -> std::unique_ptr<Widget> {
-                auto widget = std::make_unique<T>();
-                widget->FromJson(json);
-                return widget;
+                return std::make_unique<T>();
                 };
             
-
             return true;
         }
 

@@ -61,7 +61,7 @@ namespace wg {
         if (file.is_open()) {
             nlohmann::json json;
             file >> json;           
-            FromJson(json);
+            FromJson(json, mw_props);
         }
     }
 
@@ -69,6 +69,7 @@ namespace wg {
         nlohmann::json json_array = nlohmann::json::array();
         nlohmann::json window;
         
+        window["width"] = mw_props.width;
         window["height"] = mw_props.height;
         window["bg_color"] = nlohmann::json::array({
                 mw_props.bg_color_float[0],
@@ -87,13 +88,30 @@ namespace wg {
         return { {"window", window},{"widgets", json_array}};
     }
 
-    void WidgetManager::FromJson(const nlohmann::json& json) {
+    void WidgetManager::FromJson(const nlohmann::json& json, wg::RuntimeWindowProperties& mw_props) {
         widgets_.clear();
                
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;
         }
+        if (!json.contains("window")) {            
+            return;
+        }
 
+       const nlohmann::json& windowjs = json["window"];
+
+       mw_props.always_on_top = windowjs.value("always_on_top",false);
+      if (windowjs.contains("bg_color") && windowjs["bg_color"].is_array()) {
+          mw_props.bg_color_float[0] = windowjs["bg_color"].at(0).get<float>();
+          mw_props.bg_color_float[1] = windowjs["bg_color"].at(1).get<float>();
+          mw_props.bg_color_float[2] = windowjs["bg_color"].at(2).get<float>();
+          mw_props.bg_color_float[3] = windowjs["bg_color"].at(3).get<float>();
+      }
+       mw_props.frag_GLSLshader_file = windowjs.value("frag_shader", "");
+       mw_props.width = windowjs.value("width", 150);
+       mw_props.height = windowjs.value("height", 300);
+       mw_props.moveble = windowjs.value("moveble", true);
+      
         for (const auto& widget_json : json["widgets"]) {
             // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);            

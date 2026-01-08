@@ -1,13 +1,9 @@
 #include "EditorMainWindowLayout.h"
-#include "../widgets/TextWidget.h"
-#include "../widgets/InputTextWidget.h"
 #include <iostream>
-#include "../widgets/TableWidget.h"
 #include "../src/managers/WidgetFactory.h"
 #include "RuntimeWindowProperties.h"
 #include <filesystem>
-//#include "../widgets/ButtonWidget.h"
-// ... другие виджеты
+
 
 static void HelpMarker(const char* desc)
 {
@@ -22,7 +18,7 @@ static void HelpMarker(const char* desc)
 }
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
-    widget_manager_.LoadFromFile("./configs/"+filename+".json", window_props_);
+    widget_manager_.LoadFromFile("./configs/"+filename+".json", window_props_);                
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
 
@@ -273,6 +269,10 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     }
 
     ImGui::Separator();
+    ImGui::Text("Used Widgets");
+    ImGui::SameLine();
+    HelpMarker("Click to select");
+    ImGui::Separator();
     auto widgetsptrs = widget_manager_.GetAllWidgets();
     for (int i = 0; i < widget_manager_.GetCount(); i++) {
        if(ImGui::Selectable(widgetsptrs[i]->GetId().c_str(), widgetsptrs[i]->IsSelected())) {
@@ -293,8 +293,8 @@ void Editor::RenderRightPanel() {
     ImGui::Text("Height: %.0f", canvas_size_.y);
     ImGui::Text("Background color:");
 
-    ImVec4 color = ImGui::ColorConvertU32ToFloat4(window_props_.bg_color);
-    memcpy(window_props_.bg_color_float, &color, sizeof(float) * 4);
+   // ImVec4 color = ImGui::ColorConvertU32ToFloat4(window_props_.bg_color);
+   // memcpy(window_props_.bg_color_float, &color, sizeof(float) * 4);
 
     if (ImGui::ColorEdit4("MainWindowColor", window_props_.bg_color_float, ImGuiColorEditFlags_DisplayHSV)) {
 
@@ -515,7 +515,15 @@ void Editor::RenderCanvas() {
 
     //IM_COL32(40, 40, 40, 255)
     // Фон канваса
-    draw_list->AddRectFilled(canvas_p0_, canvas_p1, window_props_.bg_color);
+    ImVec4 to_im32
+    { 
+        window_props_.bg_color_float[0] * 255,
+        window_props_.bg_color_float[1] * 255,
+        window_props_.bg_color_float[2] * 255,
+        window_props_.bg_color_float[3] * 255 
+    };
+    ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);
+    draw_list->AddRectFilled(canvas_p0_, canvas_p1, col);
 
     // Сетка
     DrawGrid(draw_list);
