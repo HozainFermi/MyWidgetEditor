@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include "../runtime_widgets/Widget.h"
+#include "../ui/RuntimeWindowProperties.h"
 
 namespace rn {
     class RuntimeWidgetManager {
@@ -10,8 +11,25 @@ namespace rn {
         std::vector<std::unique_ptr<Widget>> widgets_;
         std::unordered_map<std::string, Widget*> widgets_by_id_;
         int selected_widget_id_ = -1;
+        RuntimeWidgetManager() = default;
 
     public:
+        rn::RuntimeWindowProperties window_props_;
+
+        static RuntimeWidgetManager* Get() {
+            static RuntimeWidgetManager instance;
+            return &instance;
+        }
+        RuntimeWidgetManager(const RuntimeWidgetManager&) {
+            throw std::logic_error("Can not copy WidgetManager - it`s singleton");
+        }
+        void operator=(const RuntimeWidgetManager&) {
+            throw std::logic_error("Can not copy WidgetManager - it`s singleton");
+        }
+        RuntimeWidgetManager(RuntimeWidgetManager&&) = delete;
+        void operator=(const RuntimeWidgetManager&&) = delete;
+
+
         // === Управление виджетами ===
         template<typename T, typename... Args>
         T* CreateWidget(Args&&... args) {

@@ -8,8 +8,8 @@ namespace rn {
 
     Widget::Widget()
         : name_("Unnamed"), position_(0, 0), size_(100, 50) {
-        static int next_id = 0;
-        id_ = "widget_" + std::to_string(next_id++);
+        //static int next_id = 0;
+        id_ = "widget_" + std::to_string(next_id_++);
         widget_class_ = "Widget";  // Базовый класс
     }
 
@@ -20,7 +20,7 @@ namespace rn {
 
     bool Widget::UpdateInteraction(int widget_id)
     {
-        return false;
+        return true;
     }
 
     void Widget::Render(ImDrawList* draw_list)

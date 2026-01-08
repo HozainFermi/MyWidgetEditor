@@ -45,9 +45,7 @@ namespace rn {
             }
         }
     }
-
-    
-
+        
     void RuntimeWidgetManager::LoadFromFile(const std::string& filename) {
         if (filename.empty()) {
             return;
@@ -55,7 +53,7 @@ namespace rn {
         std::ifstream file(filename);
         if (file.is_open()) {
             nlohmann::json json;
-            file >> json;
+            file >> json;            
             FromJson(json);
         }
     }
@@ -65,16 +63,35 @@ namespace rn {
         widgets_.clear();
 
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
+            return;        
+        }
+        if (!json.contains("window")) {
             return;
         }
+        const nlohmann::json& windowjs = json["window"];
+
+        window_props_.always_on_top = windowjs.value("always_on_top", false);
+        if (windowjs.contains("bg_color") && windowjs["bg_color"].is_array()) {
+            window_props_.bg_color_float[0] = windowjs["bg_color"].at(0).get<float>();
+            window_props_.bg_color_float[1] = windowjs["bg_color"].at(1).get<float>();
+            window_props_.bg_color_float[2] = windowjs["bg_color"].at(2).get<float>();
+            window_props_.bg_color_float[3] = windowjs["bg_color"].at(3).get<float>();
+        }
+        window_props_.frag_GLSLshader_file = windowjs.value("frag_shader", "");
+        window_props_.width = windowjs.value("width", 150);
+        window_props_.height = windowjs.value("height", 300);
+        window_props_.moveble = windowjs.value("moveble", true);
+        window_props_.FloatToImU32();
 
         for (const auto& widget_json : json["widgets"]) {
             // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = RuntimeWidgetFactory::CreateFromJson(widget_json);
 
             if (widget) {
-                // Виджет уже создан и FromJson уже вызван внутри фабрики
+                
+                widget.get()->FromJson(widget_json);
                 widgets_.push_back(std::move(widget));
+                std::cout << widgets_.size() <<std::endl;
             }
             else {
                 std::cerr << "Фабрика не смогла создать (неверный формат или не зарегистрирован)";

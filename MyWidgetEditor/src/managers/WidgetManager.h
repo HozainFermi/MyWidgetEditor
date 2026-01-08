@@ -92,7 +92,7 @@ namespace wg {
 
         // === Сериализация ===
         nlohmann::json ToJson(const wg::RuntimeWindowProperties& mw_props) const;
-        void FromJson(const nlohmann::json& json);
+        void FromJson(const nlohmann::json& json, wg::RuntimeWindowProperties& mw_props);
         void SaveToFile(const std::string& filename, const wg::RuntimeWindowProperties& w_props) const;
         void LoadFromFile(const std::string& filename, wg::RuntimeWindowProperties& w_props);
 

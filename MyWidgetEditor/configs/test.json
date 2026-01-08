@@ -8,28 +8,8 @@
             "min_width": 30.0,
             "name": "TextWidget1",
             "position": [
-                72.0,
-                94.0
-            ],
-            "size": [
-                150.0,
-                60.0
-            ],
-            "text": "Sample text",
-            "type": 0,
-            "widget_class": "TextWidget",
-            "wrap_text": false
-        },
-        {
-            "bg_color": 4283443240,
-            "font_scale": 1.0,
-            "id": "widget_1",
-            "min_height": 20.0,
-            "min_width": 30.0,
-            "name": "TextWidget2",
-            "position": [
-                270.0,
-                95.0
+                28.0,
+                16.0
             ],
             "size": [
                 150.0,
@@ -63,28 +43,41 @@
                     "width": 100.0
                 }
             ],
-            "data_source": "http://somedata.org/json",
+            "data_source": "https://some.org/somedata",
             "data_source_type": 2,
             "flags": 1984,
-            "id": "widget_2",
+            "id": "widget_1",
             "max_display_rows": 100,
             "min_height": 20.0,
             "min_width": 30.0,
-            "name": "TableWidget3",
+            "name": "TableWidget2",
             "position": [
-                58.0,
-                189.0
+                25.600006103515625,
+                90.0
             ],
             "show_borders": true,
             "show_headers": true,
             "size": [
-                595.0,
-                115.0
+                429.9999694824219,
+                126.0
             ],
             "type": 8,
-            "update_interval": 5.0,
+            "update_interval": 13.399999618530273,
             "update_trigger": 1,
             "widget_class": "TableWidget"
         }
-    ]
+    ],
+    "window": {
+        "always_on_top": false,
+        "bg_color": [
+            0.3686274588108063,
+            0.16470588743686676,
+            0.16470588743686676,
+            1.0
+        ],
+        "frag_shader": "",
+        "height": 300,
+        "moveble": true,
+        "width": 150
+    }
 }
