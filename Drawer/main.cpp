@@ -45,7 +45,7 @@ int main(int argc, char* argv)
 
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-       manager->LoadFromFile("C:\\Users\\dedde\\source\\repos\\MyWidgetEditor\\MyWidgetEditor\\configs\\test.json");
+       //manager->LoadFromFile("C:\\Users\\dedde\\source\\repos\\MyWidgetEditor\\MyWidgetEditor\\configs\\test.json");!!!!!!!
     if (argc>1) {
         manager->LoadFromFile(std::to_string(argv[1]));
     }
