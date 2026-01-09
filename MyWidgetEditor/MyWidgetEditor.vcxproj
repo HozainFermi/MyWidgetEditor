@@ -144,6 +144,7 @@
     <ClInclude Include="lib\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="lib\imgui\misc\single_file\imgui_single_file.h" />
     <ClInclude Include="lib\json.hpp" />
+    <ClInclude Include="src\include\independent_launcher.h" />
     <ClInclude Include="src\managers\WidgetManager.h" />
     <ClInclude Include="src\ui\EditorMainWindowLayout.h" />
     <ClInclude Include="src\ui\RuntimeWindowProperties.h" />

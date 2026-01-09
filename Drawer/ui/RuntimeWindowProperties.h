@@ -15,13 +15,13 @@ namespace rn {
 		int height = 500;
 
 		void FloatToImU32() {
-			int temp[4] = {
-				static_cast<int>(bg_color_float[0] * 255),
-				static_cast<int>(bg_color_float[1] * 255),
-				static_cast<int>(bg_color_float[2] * 255),
-				static_cast<int>(bg_color_float[3] * 255)
+			ImVec4 temp = {
+				bg_color_float[0] * 255,
+				bg_color_float[1] * 255,
+				bg_color_float[2] * 255,
+				bg_color_float[3] * 255
 			};
-			bg_color = IM_COL32(temp[0], temp[1], temp, temp[2], temp[3]);
+			bg_color = IM_COL32(temp.x, temp.y, temp.z, temp.w);
 		}
 	};
 

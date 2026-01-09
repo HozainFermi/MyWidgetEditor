@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../src/managers/WidgetFactory.h"
 #include "RuntimeWindowProperties.h"
+#include "independent_launcher.h"
 #include <filesystem>
 
 
@@ -21,19 +22,31 @@ void Editor::OnFileForLoadSelected(const std::string& filename) {
     widget_manager_.LoadFromFile("./configs/"+filename+".json", window_props_);                
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
+    std::filesystem::path relfilePath("./configs/" + filename + ".json");
+    std::filesystem::path relDrawer("../x64/Release/Drawer.exe");
 
-    std::string relativeStr = "./configs/" + filename + ".json";
-    std::filesystem::path relativePath(relativeStr);
-    std::filesystem::path absPath = std::filesystem::absolute(relativePath);
+    std::filesystem::path absExePath = std::filesystem::absolute(relDrawer);
+    std::filesystem::path absConfigPath = std::filesystem::absolute(relfilePath);
 
-    std::string command = "C:\\Users\\dedde\\source\\repos\\MyWidgetEditor\\x64\\Release\\Drawer.exe \"" + absPath.string() + "\"";
+    // Проверка существования файлов
+    if (!std::filesystem::exists(absExePath)) {
+        std::cerr << "Error: Executable not found: " << absExePath << "\n";
+        return;
+    }
 
-    std::cout << "Executing: " << command << "\n";
+    if (!std::filesystem::exists(absConfigPath)) {
+        std::cerr << "Error: Config file not found: " << absConfigPath << "\n";
+        return;
+    }
 
-    int result = std::system(command.c_str());
+    std::string exePath = "\"" + absExePath.string() + "\"";
+    std::string configPath = "\"" + absConfigPath.string() + "\""; 
 
-    if (result != 0) {
-        std::cerr << "Error launching second app: " << result << "\n";
+    std::cout << "Executing: " << exePath << " " << configPath << "\n";
+
+    // Вариант 1: Раздельная передача
+    if (!IndependentLauncher::launch(exePath,configPath)) {
+        std::cerr << "Failed to launch process\n";
     }
 }
 

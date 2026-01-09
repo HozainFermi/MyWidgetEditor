@@ -37,7 +37,7 @@ static void glfw_error_callback(int error, const char* description)
 
 
 // Main code
-int main(int argc, char* argv)
+int main(int argc, char** argv)
 {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -45,9 +45,9 @@ int main(int argc, char* argv)
 
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-       //manager->LoadFromFile("C:\\Users\\dedde\\source\\repos\\MyWidgetEditor\\MyWidgetEditor\\configs\\test.json");!!!!!!!
+       
     if (argc>1) {
-        manager->LoadFromFile(std::to_string(argv[1]));
+        manager->LoadFromFile(argv[1]);
     }
 
     
