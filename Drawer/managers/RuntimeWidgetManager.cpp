@@ -83,15 +83,14 @@ namespace rn {
         window_props_.moveble = windowjs.value("moveble", true);
         window_props_.FloatToImU32();
 
+
         for (const auto& widget_json : json["widgets"]) {
             // ѕробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = RuntimeWidgetFactory::CreateFromJson(widget_json);
 
-            if (widget) {
-                
+            if (widget) {                
                 widget.get()->FromJson(widget_json);
-                widgets_.push_back(std::move(widget));
-                std::cout << widgets_.size() <<std::endl;
+                widgets_.push_back(std::move(widget));               
             }
             else {
                 std::cerr << "‘абрика не смогла создать (неверный формат или не зарегистрирован)";
