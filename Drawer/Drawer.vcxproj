@@ -39,6 +39,7 @@
   <ItemGroup>
     <ClInclude Include="lib\glfw\include\GLFW\glfw3.h" />
     <ClInclude Include="lib\glfw\include\GLFW\glfw3native.h" />
+    <ClInclude Include="lib\httplib.h" />
     <ClInclude Include="lib\imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="lib\imgui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="lib\imgui\backends\imgui_impl_opengl3_loader.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="lib\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="lib\json.hpp" />
     <ClInclude Include="managers\RuntimeWidgetManager.h" />
+    <ClInclude Include="runtime_widgets\httplib_config.h" />
     <ClInclude Include="runtime_widgets\InputTextWidget.h" />
     <ClInclude Include="runtime_widgets\TableWidget.h" />
     <ClInclude Include="runtime_widgets\TextWidget.h" />
@@ -168,13 +170,13 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)lib\glfw\include;$(ProjectDir)lib\imgui;$(ProjectDir)lib\imgui\backends;$(ProjectDir)lib\imgui\misc\cpp;$(ProjectDir)lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)lib\glfw\include;$(ProjectDir)lib\imgui;$(ProjectDir)lib\imgui\backends;$(ProjectDir)lib\imgui\misc\cpp;$(ProjectDir)lib;C:\Program Files\OpenSSL-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\glfw\lib-vc2022;C:\Program Files\OpenSSL-Win64\lib\VC\x64\MD;C:\Program Files\OpenSSL-Win64\lib\VC\x64\MDd;C:\Program Files\OpenSSL-Win64\lib\VC\x64\MT;C:\Program Files\OpenSSL-Win64\lib\VC\x64\MTd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

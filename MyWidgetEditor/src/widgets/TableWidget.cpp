@@ -11,9 +11,9 @@ namespace wg {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back(TableColumnConfig{ "ID","id",50.0f, true });
-        columns_.push_back(TableColumnConfig{ "Name","name",150.0f, true });
-        columns_.push_back(TableColumnConfig{ "Value", "value", 100.0f, false });
+        columns_.push_back(TableColumnConfig{ "ID","id",50, true });
+        columns_.push_back(TableColumnConfig{ "Name","name",150, true });
+        columns_.push_back(TableColumnConfig{ "Value", "value", 100, false });
 
         SetWidgetClass("TableWidget");
     }
@@ -23,9 +23,9 @@ namespace wg {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back(TableColumnConfig{ "ID", "id", 50.0f, true });
-        columns_.push_back(TableColumnConfig{ "Name", "name", 150.0f, true });
-        columns_.push_back(TableColumnConfig{ "Value", "value", 100.0f, false });
+        columns_.push_back(TableColumnConfig{ "ID", "id", 50, true });
+        columns_.push_back(TableColumnConfig{ "Name", "name", 150, true });
+        columns_.push_back(TableColumnConfig{ "Value", "value", 100, false });
 
         SetWidgetClass("TableWidget");
     }
@@ -198,7 +198,7 @@ namespace wg {
             }
 
             if (update_trigger_ == UpdateTrigger::TIMER) {
-                ImGui::DragFloat("Interval (s)", &update_interval_, 0.1f, 0.1f, 60.0f);
+                ImGui::DragInt("Interval (seconds)", &update_interval_, 10, 5, 3600);
             }
         }
     }
@@ -218,7 +218,7 @@ namespace wg {
         data_source_type_ = type;
     }
 
-    void TableWidget::SetUpdateTrigger(UpdateTrigger trigger, float interval) {
+    void TableWidget::SetUpdateTrigger(UpdateTrigger trigger, int interval) {
         update_trigger_ = trigger;
         update_interval_ = interval;
     }
@@ -290,7 +290,7 @@ namespace wg {
             update_trigger_ = (UpdateTrigger)json["update_trigger"].get<int>();
         }
         if (json.contains("update_interval")) {
-            update_interval_ = json["update_interval"].get<float>();
+            update_interval_ = json["update_interval"].get<int>();
         }
 
         // Настройки таблицы

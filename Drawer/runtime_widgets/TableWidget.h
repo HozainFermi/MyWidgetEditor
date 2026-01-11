@@ -1,4 +1,5 @@
 #pragma once
+#include "httplib_config.h"
 #include "Widget.h"
 #include <string>
 #include "../managers/RuntimeWidgetFactory.h"
@@ -46,13 +47,18 @@ namespace rn {
     class TableWidget : public Widget {
     private:
         // === КОНФИГУРАЦИЯ ===
-        std::vector<TableColumnConfig> columns_;
+        std::vector < std::pair<TableColumnConfig, std::vector<std::string>> > columns_;
         DataSourceType data_source_type_ = DataSourceType::NONE;
         std::string data_source_;  // URL или путь к файлу
         UpdateTrigger update_trigger_ = UpdateTrigger::NONE;
-        float update_interval_ = 5.0f;  // в секундах (если TIMER)
+        int update_interval_ = 10;  // в секундах (если TIMER)
+        std::chrono::milliseconds update_interval_millisec_{10000};
+        std::chrono::steady_clock::time_point last_update_;
+        std::chrono::steady_clock::time_point now_;
+        
 
-        // Статические данные (если источник STATIC_DATA)
+
+        // Статические данные 
         std::vector<std::vector<std::string>> static_data_;
 
         // Настройки таблицы
@@ -95,15 +101,19 @@ namespace rn {
         void AddCustomHeader(const std::string& key, const std::string& value) {
             custom_headers_[key] = value;
         }
+        httplib::Result LoadTableData();
+        bool UpdateTableData();
+
 
         // === ГЕТТЕРЫ  ===
-        const std::vector<TableColumnConfig>& GetColumns() const { return columns_; }
+        const  std::vector < std::pair<TableColumnConfig, std::vector<std::string>> >& GetColumns() const { return columns_; }
         DataSourceType GetDataSourceType() const { return data_source_type_; }
         const std::string& GetDataSource() const { return data_source_; }
         UpdateTrigger GetUpdateTrigger() const { return update_trigger_; }
         float GetUpdateInterval() const { return update_interval_; }
 
         // === СЕРИАЛИЗАЦИЯ ===       
+        void FromResponseJsonToColumns(const std::string& body);
         void FromJson(const nlohmann::json& json) override;
 
    
