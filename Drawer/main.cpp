@@ -11,6 +11,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
 
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-       
+    manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/tabletest.json");
     if (argc>1) {
         manager->LoadFromFile(argv[1]);
     }
@@ -115,14 +116,7 @@ int main(int argc, char** argv)
     ImGui_ImplOpenGL3_Init(glsl_version);
 
    static bool open = true;
-   //rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
-   //rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-
-   //if (argc>1) {
-   //    manager->LoadFromFile(std::to_string(argv[1]));
-   //}
     
-  
     //ImGuiViewport* main_viewport = ImGui::GetMainViewport();   
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 

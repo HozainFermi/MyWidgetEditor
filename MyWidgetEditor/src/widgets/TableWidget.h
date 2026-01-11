@@ -60,7 +60,7 @@ namespace wg {
         DataSourceType data_source_type_ = DataSourceType::NONE;
         std::string data_source_;  // URL или путь к файлу
         UpdateTrigger update_trigger_ = UpdateTrigger::NONE;
-        float update_interval_ = 5.0f;  // в секундах (если TIMER)
+        int update_interval_ = 5;  // seconds (TIMER)
 
         // Статические данные (если источник STATIC_DATA)
         std::vector<std::vector<std::string>> static_data_;
@@ -97,7 +97,7 @@ namespace wg {
         void RemoveColumn(int index);
 
         void SetDataSource(const std::string& source, DataSourceType type);
-        void SetUpdateTrigger(UpdateTrigger trigger, float interval = 5.0f);
+        void SetUpdateTrigger(UpdateTrigger trigger, int interval = 500);
         void SetStaticData(const std::vector<std::vector<std::string>>& data);
 
         void SetApiKey(const std::string& api_key) { api_key_ = api_key; }

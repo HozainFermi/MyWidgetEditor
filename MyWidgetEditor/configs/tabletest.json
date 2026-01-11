@@ -1,0 +1,63 @@
+{
+    "widgets": [
+        {
+            "alternate_row_colors": true,
+            "bg_color": 4283443240,
+            "columns": [
+                {
+                    "data_field": "id",
+                    "header": "ID",
+                    "sortable": true,
+                    "width": 50.0
+                },
+                {
+                    "data_field": "name",
+                    "header": "Product",
+                    "sortable": true,
+                    "width": 150.0
+                },
+                {
+                    "data_field": "value",
+                    "header": "Price",
+                    "sortable": false,
+                    "width": 100.0
+                }
+            ],
+            "data_source": "https://my.api.mockaroo.com/mock_product_price.json?key=31d42050",
+            "data_source_type": 2,
+            "flags": 1984,
+            "id": "widget_0",
+            "max_display_rows": 100,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TableWidget1",
+            "position": [
+                57.399993896484375,
+                35.79998779296875
+            ],
+            "show_borders": true,
+            "show_headers": true,
+            "size": [
+                415.0,
+                123.0
+            ],
+            "type": 8,
+            "update_interval": 10,
+            "update_trigger": 1,
+            "widget_class": "TableWidget"
+        }
+    ],
+    "window": {
+        "always_on_top": false,
+        "bg_color": [
+            0.33910033106803894,
+            0.6176470518112183,
+            0.6094544529914856,
+            1.0
+        ],
+        "frag_shader": "",
+        "height": 500,
+        "moveble": true,
+        "width": 500
+    }
+}

@@ -125,6 +125,12 @@
     <ClInclude Include="ui\RuntimeWindowProperties.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="lib\httplib.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="runtime_widgets\httplib_config.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lib\glfw\lib-vc2022\glfw3.dll" />

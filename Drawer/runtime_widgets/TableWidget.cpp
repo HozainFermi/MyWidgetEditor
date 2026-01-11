@@ -1,7 +1,6 @@
 #include "TableWidget.h"
 #include <imgui_internal.h>
 
-
 namespace rn {
 
     REGISTER_WIDGET(TableWidget);
@@ -11,9 +10,9 @@ namespace rn {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back({ "ID", "id",50.0f, true });
-        columns_.push_back({ "Name", "name", 150.0f,true });
-        columns_.push_back({ "Value", "value",100.0f, false });
+        //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id",50.0f, true }, std::vector < std::string>{}));
+        //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
+        //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
 
         SetWidgetClass("TableWidget");
     }
@@ -23,9 +22,9 @@ namespace rn {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
         // Инициализируем тестовые колонки для превью
-        columns_.push_back({ "ID", "id", 50.0f,true });
-        columns_.push_back({ "Name", "name", 150.0f,true });
-        columns_.push_back({ "Value", "value",100.0f, false });
+       //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id", 50.0f,true }, std::vector < std::string>{}) );
+       //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
+       //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
 
         SetWidgetClass("TableWidget");
     }
@@ -51,11 +50,13 @@ namespace rn {
         // Используем окно без заголовка для ограничения области
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
-
+        if (update_trigger_!=UpdateTrigger::NONE) {
+            UpdateTableData();
+        }
 
         if (ImGui::BeginChild(("##table_child_" + GetId()).c_str(),
             size,
-            false, // No border (мы сами рисуем)
+            false, 
             ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_AlwaysUseWindowPadding)) {
@@ -71,10 +72,10 @@ namespace rn {
 
                 // Устанавливаем заголовки колонок
                 for (const auto& col : columns_) {
-                    ImGui::TableSetupColumn(col.header.c_str(),
-                        col.sortable ? ImGuiTableColumnFlags_None :
+                    ImGui::TableSetupColumn(col.first.header.c_str(),
+                        col.first.sortable ? ImGuiTableColumnFlags_None :
                         ImGuiTableColumnFlags_NoSort,
-                        col.width);
+                        col.first.width);
                 }
 
                 if (show_headers_) {
@@ -82,26 +83,17 @@ namespace rn {
                     ImGui::TableHeadersRow();
                 }
 
-                static char buf[32];
+                static char buf[256];
                 // Тестовые данные для превью в редакторе
-                for (int row = 0; row < 5; row++) {
+                for (int row = 0; row < max_display_rows_; row++) {
                     ImGui::TableNextRow();
 
                     for (int col = 0; col < (int)columns_.size(); col++) {
-                        ImGui::TableSetColumnIndex(col);
-                        // Тестовые данные
-                        if (col == 0) {
-                            sprintf_s(buf, "ID_%d", row + 1);
-                            ImGui::Selectable(buf, column_selected[col]);
-                        }
-                        else if (col == 1) {
-                            sprintf_s(buf, "Item_%d", row + 1);
-                            ImGui::Selectable(buf, column_selected[col]);
-                        }
-                        else if (col == 2) {
-                            sprintf_s(buf, "%.2f", (row + 1) * 10.0f);
-                            ImGui::Selectable(buf, column_selected[col]);
-                        }
+                        ImGui::TableSetColumnIndex(col);                       
+                        sprintf_s(buf, columns_[col].second[row].c_str());
+                        ImGui::PushID(row*10+col);
+                        ImGui::Selectable(buf, column_selected[col]);
+                        ImGui::PopID();
                     }
                 }
 
@@ -118,7 +110,7 @@ namespace rn {
    
 
     void TableWidget::AddColumn(const std::string& header, float width, const std::string& data_field) {
-        columns_.push_back({ header, data_field,width, false });
+        columns_.push_back(std::pair(TableColumnConfig{ header, data_field,width, false }, std::vector < std::string>{}) );
     }
 
     void TableWidget::RemoveColumn(int index) {
@@ -141,7 +133,121 @@ namespace rn {
         static_data_ = data;
     }
 
+    httplib::Result TableWidget::LoadTableData()
+    {
+        for (auto& element : columns_) {
+            element.second.clear();
+        }
+        std::string scheme_host_port;
+        if(data_source_type_!=DataSourceType::NONE && data_source_type_ != DataSourceType::STATIC_DATA){
+            
+            size_t protocolEnd = data_source_.find("://");
+            if (protocolEnd == std::string::npos) {                
+                throw std::invalid_argument("Invalid link: " + data_source_);
+            }
+            
+            size_t domainStart = protocolEnd + 3; 
+            size_t pathStart = data_source_.substr(domainStart,data_source_.length()).find('/')+domainStart;
+
+            if (pathStart == std::string::npos) {                
+                scheme_host_port = data_source_;
+            }
+            else {
+                scheme_host_port =  data_source_.substr(0, pathStart);
+            }
+            //scheme_host_port
+            //data_source_.substr(pathStart,data_source_.length()
+            httplib::Client cli("https://my.api.mockaroo.com");
+            if (auto res = cli.Get("/mock_product_price.json?key=31d42050")) {
+                if (data_source_type_==DataSourceType::JSON_URL) {
+                    std::cout <<"RESPONSE"<< res->body.substr(0, 15) << std::endl;
+                    FromResponseJsonToColumns(res->body);
+                }
+                return res;
+            }
+            else {
+                throw std::invalid_argument("Cant get data: " + res->status);
+            }        
+        }
+        else {
+            return  httplib::Result{};
+        }
+    }
+
+    bool TableWidget::UpdateTableData()
+    {
+       
+        switch (update_trigger_) {
+        case UpdateTrigger::TIMER:
+            now_ = std::chrono::steady_clock::now();
+            auto time_since_last_update = now_ - last_update_;
+
+            if (time_since_last_update >= update_interval_millisec_) {
+                if (LoadTableData()) {
+                    last_update_ = now_;
+                    return true;
+                }
+            }            
+            break;
+        case UpdateTrigger::BUTTON_CLICK:
+            break;
+        case UpdateTrigger::ON_LOAD:
+            if (last_update_.time_since_epoch().count() == 0) {
+                if (LoadTableData()) {
+                    last_update_ = now_;
+                    return true;
+                }
+            }
+            break;
+       }       
+        return false;
+    }
+
    
+
+    void TableWidget::FromResponseJsonToColumns(const std::string& body)
+    {
+        try {
+          
+            nlohmann::json json = nlohmann::json::parse(body);
+
+            if (json.is_array()) {
+                max_display_rows_ = json.size();
+                if (columns_.empty()) {
+                    for (auto& [key, value] : json[0].items()) {
+                        columns_.push_back(std::pair{ TableColumnConfig{ key, key,50.0f, false }, std::vector<std::string>{} });
+                    }
+                }
+                for (auto& line : json) {
+                                      
+                    if (line.is_object()) {                                               
+                        // Проверяем соответствие количества полей
+                        if (line.size() == columns_.size()) {                            
+                            int i = 0;
+                            for (auto& [key, value] : line.items()) {
+                                columns_[i].second.push_back(value.dump());
+                                i++;
+                            }
+                        }
+                        else {
+                            std::cout << "Line has " << line.size() << " fields, but table has " << columns_.size() << " columns" << std::endl;
+                            throw std::invalid_argument("Response body object is not the same size as the table");
+                        }
+                    }
+                    else {
+                        throw std::invalid_argument("Element in array is not an object");
+                    }
+                }
+            }
+            else {
+                throw std::invalid_argument("Response body is not an array");
+            }
+        }
+        catch (const nlohmann::json::parse_error& e) {
+            std::cout << "JSON parse error: " << e.what() << std::endl;
+            throw std::invalid_argument("Invalid JSON format");
+        }
+    }
 
     void TableWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);
@@ -152,7 +258,7 @@ namespace rn {
             for (const auto& col_json : json["columns"]) {
                 TableColumnConfig col;
                 col.FromJson(col_json);
-                columns_.push_back(col);
+                columns_.push_back(std::pair{ col,std::vector<std::string>{} });
             }
         }
 
@@ -167,7 +273,8 @@ namespace rn {
             update_trigger_ = (UpdateTrigger)json["update_trigger"].get<int>();
         }
         if (json.contains("update_interval")) {
-            update_interval_ = json["update_interval"].get<float>();
+            update_interval_ = json["update_interval"].get<int>();
+            update_interval_millisec_= std::chrono::milliseconds{ update_interval_ * 1000 };
         }
 
         // Настройки таблицы
