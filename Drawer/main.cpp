@@ -46,13 +46,12 @@ int main(int argc, char** argv)
 
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-    manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/tabletest.json");
+    //manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/tabletest.json");
     if (argc>1) {
         manager->LoadFromFile(argv[1]);
     }
 
     
-
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100 (WebGL 1.0)
@@ -78,7 +77,11 @@ int main(int argc, char** argv)
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
+    //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);  // Без декораций
+    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // Прозрачность
+    if (manager->window_props_.always_on_top) {
+        glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);  // Поверх всех окон
+    }
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
@@ -118,8 +121,8 @@ int main(int argc, char** argv)
    static bool open = true;
     
     //ImGuiViewport* main_viewport = ImGui::GetMainViewport();   
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
+    //ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
     // Main loop
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
@@ -140,9 +143,8 @@ int main(int argc, char** argv)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
        
-        //отрисовка главного окна            
+       //отрисовка главного окна            
        mainwindow->Render(&open, ImGui::GetMainViewport(), window, manager);
 
         // Rendering

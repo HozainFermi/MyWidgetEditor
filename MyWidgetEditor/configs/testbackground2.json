@@ -8,13 +8,13 @@
                     "data_field": "id",
                     "header": "ID",
                     "sortable": true,
-                    "width": 50.0
+                    "width": 20.0
                 },
                 {
                     "data_field": "name",
                     "header": "Product",
                     "sortable": true,
-                    "width": 150.0
+                    "width": 38.0
                 },
                 {
                     "data_field": "value",
@@ -32,14 +32,14 @@
             "min_width": 30.0,
             "name": "TableWidget1",
             "position": [
-                57.399993896484375,
+                4.399993896484375,
                 35.79998779296875
             ],
             "show_borders": true,
             "show_headers": true,
             "size": [
-                415.0,
-                123.0
+                518.0,
+                267.0
             ],
             "type": 8,
             "update_interval": 10,
@@ -50,10 +50,10 @@
     "window": {
         "always_on_top": false,
         "bg_color": [
-            0.33910033106803894,
-            0.6176470518112183,
-            0.6094544529914856,
-            0.8824
+            0.33725491166114807,
+            0.6196078658103943,
+            0.6078431606292725,
+            0.6666666865348816
         ],
         "frag_shader": "",
         "height": 500,
