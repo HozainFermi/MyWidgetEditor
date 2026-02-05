@@ -3,6 +3,7 @@
 #include "Widget.h"
 #include <string>
 #include "../managers/RuntimeWidgetFactory.h"
+#include <future>
 
 namespace rn {
 
@@ -55,8 +56,10 @@ namespace rn {
         std::chrono::milliseconds update_interval_millisec_{10000};
         std::chrono::steady_clock::time_point last_update_;
         std::chrono::steady_clock::time_point now_;
-        
-
+                   
+        std::future<bool> async_load_future_;
+        std::atomic<bool> is_loading_{ false };
+        std::string latest_json_response_;
 
         // Статические данные 
         std::vector<std::vector<std::string>> static_data_;
@@ -77,6 +80,81 @@ namespace rn {
         // HTTP настройки (если URL)
         std::string api_key_;
         std::map<std::string, std::string> custom_headers_;
+
+
+        bool LoadDataInBackground() {
+            try {
+                // Копируем нужные данные для работы в фоновом потоке
+                auto data_source = data_source_;
+                auto data_source_type = data_source_type_;
+
+                // Парсинг URL
+                size_t protocolEnd = data_source.find("://");
+                if (protocolEnd == std::string::npos) {
+                    return false;
+                }
+
+                size_t domainStart = protocolEnd + 3;
+                size_t pathStart = data_source.find('/', domainStart);
+
+                std::string scheme_host_port;
+                std::string path_query;
+
+                if (pathStart == std::string::npos) {
+                    scheme_host_port = data_source;
+                    path_query = "/";
+                }
+                else {
+                    scheme_host_port = data_source.substr(0, pathStart);
+                    path_query = data_source.substr(pathStart);
+                }
+
+                // Создание клиента и выполнение запроса
+                httplib::Client cli(scheme_host_port.c_str());
+                if (auto res = cli.Get(path_query.c_str())) {
+                    if (data_source_type == DataSourceType::JSON_URL) {
+                        latest_json_response_ = res->body;
+                        return true;
+                    }
+                }
+            }
+            catch (...) {
+                // Игнорируем исключения в фоновом потоке
+            }
+            return false;
+        }
+
+        // Новая функция для запуска асинхронной загрузки
+        void StartAsyncLoad() {
+            if (is_loading_) return; // Уже грузится
+
+            is_loading_ = true;
+            async_load_future_ = std::async(std::launch::async, [this]() {
+                return LoadDataInBackground();
+                });
+        }
+
+        // Функция проверки завершения загрузки
+        bool CheckAsyncLoadComplete() {
+            if (!is_loading_) return false;
+
+            if (async_load_future_.valid() &&
+                async_load_future_.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+
+                bool success = async_load_future_.get();
+                is_loading_ = false;
+
+                if (success && data_source_type_ == DataSourceType::JSON_URL) {
+                    FromResponseJsonToColumns(latest_json_response_);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+   
+
+
 
     public:
         TableWidget();
@@ -116,6 +194,12 @@ namespace rn {
         void FromResponseJsonToColumns(const std::string& body);
         void FromJson(const nlohmann::json& json) override;
 
-   
+        
+        ~TableWidget() {
+            if (async_load_future_.valid()) {
+                async_load_future_.wait();
+            }
+        }
+
     };
 }

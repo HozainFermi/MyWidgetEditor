@@ -117,7 +117,7 @@ namespace wg {
 
     void TableWidget::RenderProperties() {
         // Настройки таблицы
-        ImGui::Text("Table Settings");
+        ImGui::Text("==Table Settings==");
         ImGui::Separator();
 
         ImGui::Checkbox("Show Headers", &show_headers_);

@@ -299,7 +299,7 @@ void Editor::RenderRightPanel() {
 
     static char FRAGbuf[150];
     static char VERTbuf[150];
-    ImGui::Text("Main window Properties:");
+    ImGui::Text("==Main window Properties:==");
     ImGui::Separator();
     ImGui::Text("Width: %.0f", canvas_size_.x);
     ImGui::SameLine();

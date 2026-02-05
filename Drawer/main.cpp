@@ -79,6 +79,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);  // Без декораций
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // Прозрачность
+
     if (manager->window_props_.always_on_top) {
         glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);  // Поверх всех окон
     }
