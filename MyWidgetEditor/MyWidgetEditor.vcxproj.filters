@@ -81,6 +81,21 @@
     <ClInclude Include="src\include\independent_launcher.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="src\OpenGLHelpers\Camera.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGLHelpers\MeshLoader.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGLHelpers\Shader.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGLHelpers\TextureContainer.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\styles\Background.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\imgui\imgui.cpp">
@@ -131,11 +146,24 @@
     <ClCompile Include="src\managers\WidgetFactory.h">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\styles\Background.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGLHelpers\MeshLoader.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGLHelpers\Shader.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGLHelpers\TextureContainer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="lib\imgui\LICENSE.txt" />
     <Text Include="lib\imgui\backends\vulkan\build_instructions.txt" />
     <Text Include="lib\imgui\backends\sdlgpu3\build_instructions.txt" />
+    <Text Include="src\OpenGLHelpers\text.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="lib\glfw\lib-vc2022\glfw3.dll" />

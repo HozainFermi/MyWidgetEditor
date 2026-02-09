@@ -397,7 +397,6 @@ ImVec2 Editor::GetMousePosRelativeToCanvas() const {
         relative_pos.y < 0 || relative_pos.y > canvas_size_.y) {
         return ImVec2(0, 0);
     }
-
     return relative_pos;
 }
 
@@ -447,7 +446,7 @@ void Editor::DrawGrid(ImDrawList* draw_list) const {
     }
 }
 
-// Реализация основного метода Render (если его нет)
+// Реализация основного метода Render
 void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates) {
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);

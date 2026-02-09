@@ -146,6 +146,11 @@
     <ClInclude Include="lib\json.hpp" />
     <ClInclude Include="src\include\independent_launcher.h" />
     <ClInclude Include="src\managers\WidgetManager.h" />
+    <ClInclude Include="src\OpenGLHelpers\Camera.h" />
+    <ClInclude Include="src\OpenGLHelpers\MeshLoader.hpp" />
+    <ClInclude Include="src\OpenGLHelpers\Shader.hpp" />
+    <ClInclude Include="src\OpenGLHelpers\TextureContainer.hpp" />
+    <ClInclude Include="src\styles\Background.hpp" />
     <ClInclude Include="src\ui\EditorMainWindowLayout.h" />
     <ClInclude Include="src\ui\RuntimeWindowProperties.h" />
     <ClInclude Include="src\widgets\InputTextWidget.h" />
@@ -165,6 +170,10 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\managers\WidgetFactory.h" />
     <ClCompile Include="src\managers\WidgetManager.cpp" />
+    <ClCompile Include="src\OpenGLHelpers\MeshLoader.cpp" />
+    <ClCompile Include="src\OpenGLHelpers\Shader.cpp" />
+    <ClCompile Include="src\OpenGLHelpers\TextureContainer.cpp" />
+    <ClCompile Include="src\styles\Background.cpp" />
     <ClCompile Include="src\ui\EditorMainWindowLayout.cpp" />
     <ClCompile Include="src\widgets\InputTextWidget.cpp" />
     <ClCompile Include="src\widgets\TableWidget.cpp" />
@@ -175,6 +184,7 @@
     <Text Include="lib\imgui\backends\sdlgpu3\build_instructions.txt" />
     <Text Include="lib\imgui\backends\vulkan\build_instructions.txt" />
     <Text Include="lib\imgui\LICENSE.txt" />
+    <Text Include="src\OpenGLHelpers\text.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="lib\glfw\lib-vc2022\glfw3.dll" />
