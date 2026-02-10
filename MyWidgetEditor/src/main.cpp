@@ -30,6 +30,8 @@
 #endif
 #include <vector>
 #include <iostream>
+//#include <WidgetFactory.h>
+
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -112,21 +114,24 @@ int main(int, char**)
     static bool MAIN_WINDOW_OPENED = true;
     static bool USE_GRID = false;
     bool show_editor = true;
-    std::vector<std::string> templates;
+    std::vector<std::string> templates;// wg::WidgetFactory::GetRegisteredTypes();
+    std::filesystem::path widgetsPath = std::string(PROJECT_SOURCE_DIR) + "/src/widgets";
+
     std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
-    for (const auto& entry : std::filesystem::directory_iterator("./src/widgets")) {
-        std::cout << "What the hell is happening here";
+
+    for (const auto& entry : std::filesystem::directory_iterator(widgetsPath)) {       
         if (entry.is_regular_file()) {
             std::filesystem::path filename_path = entry.path().filename();
             
             if (filename_path.extension() == ".h") {
                 std::string tempname = filename_path.stem().string();
-                std::cout << tempname << std::endl;
                 if (tempname == "Widget") { continue; }
+                std::cout << tempname << std::endl;
                 templates.push_back(tempname);
             }
         }
-    }
+    }    
+
         ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 

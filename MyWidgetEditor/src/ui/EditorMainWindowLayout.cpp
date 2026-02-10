@@ -267,16 +267,15 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     HelpMarker("Drag widgets to canvas");
     ImGui::Separator();
 
-       
+    
     for (int i = 0; i < templates.size(); i++) {
         if (ImGui::Selectable(templates[i].c_str(), selected_template_ == i)) {
             selected_template_ = i;
         }
-       
         // Drag & Drop источник
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover)) {
             ImGui::SetDragDropPayload("WIDGET_TEMPLATE", templates[i].c_str(), strlen(templates[i].c_str()) + 1);
-            ImGui::Text("Add %s", templates[i]);
+            ImGui::Text("Add %s", templates[i].c_str());
             ImGui::EndDragDropSource();
         }
     }
@@ -471,6 +470,8 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 
             ImGui::SameLine();
 
+           
+
             // Центральная панель (60%)
             ImGui::BeginChild("CanvasPanel", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, 0),
                 ImGuiChildFlags_ResizeX |ImGuiChildFlags_ResizeY | ImGuiChildFlags_Borders);
@@ -478,14 +479,14 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
             ImGui::EndChild();
 
             ImGui::SameLine();
-
+            
             // Правая панель (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
             wg::Widget* selected = widget_manager_.GetSelectedWidget();
             RenderRightPanel();
             
             if (selected) { selected->SetStaySelected(ImGui::IsWindowHovered()); }
-            ImGui::EndChild();
+            ImGui::EndChild();            
         }
         ImGui::EndChild();
     }
@@ -495,15 +496,17 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 
 // Реализация RenderCanvas 
 void Editor::RenderCanvas() {
+    
     ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
     ImGui::Text("Grid size");
     
     ImGui::Checkbox("Grid", &show_grid_);
-    ImGui::SameLine();    
-    ImGui::DragFloat("", &grid_size_, 1.0f, 5.0f, 100.0f);
+    ImGui::SameLine();     
+    ImGui::DragFloat(" ", &grid_size_, 1.0f, 5.0f, 100.0f);
+    
     ImGui::Spacing();
     ImVec2 curmouse= GetMousePosRelativeToCanvas();
-    
+
     // Информация о канвасе
     ImGui::Text("Canvas: %.0fx%.0f", canvas_size_.x, canvas_size_.y);
     ImGui::SameLine();
@@ -536,10 +539,10 @@ void Editor::RenderCanvas() {
     };
     ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);
     draw_list->AddRectFilled(canvas_p0_, canvas_p1, col);
-
+    
     // Сетка
     DrawGrid(draw_list);
-
+  
     // Рамка канваса
     draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
 

@@ -8,7 +8,7 @@ namespace wg {
 
     TableWidget::TableWidget() :
         Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // Ѕольший размер по умолчанию
-        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
 
         // »нициализируем тестовые колонки дл€ превью
         columns_.push_back(TableColumnConfig{ "ID","id",50, true });
@@ -20,7 +20,7 @@ namespace wg {
 
     TableWidget::TableWidget(const std::string& name, const ImVec2& pos) :
         Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // Ѕольший размер по умолчанию
-        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
 
         // »нициализируем тестовые колонки дл€ превью
         columns_.push_back(TableColumnConfig{ "ID", "id", 50, true });
