@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <json.hpp>
-#include "../widgets/Widget.h"
+#include "Widget.h"
 #include <iostream>
 
 namespace wg {

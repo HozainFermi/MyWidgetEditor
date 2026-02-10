@@ -3,84 +3,128 @@ cmake_minimum_required(VERSION 3.10)
 project(MyWidgetEditor)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Source files
-set(SOURCES
+
+# Main Source files
+set(MAIN_SOURCES
     src/main.cpp
-    src/managers/WidgetManager.cpp
-    src/widgets/Widget.cpp
-    src/widgets/TextWidget.cpp
-    src/widgets/InputTextWidget.cpp
-    src/widgets/TableWidget.cpp
-    src/ui/EditorMainWindowLayout.cpp
+    src/glad-impl.cpp
+    src/stb.cpp
+)
+# Файлы из папки Helpers
+file(GLOB HELPERS_SOURCES
+    "src/OpenGLHelpers/*.cpp"
+    "src/OpenGLHelpers/*.c"
 )
 
-# Header files
-set(HEADERS
-    src/include/independent_launcher.h
-    src/managers/WidgetFactory.h
-    src/managers/WidgetManager.h
-    src/widgets/Widget.h
-    src/widgets/TextWidget.h
-    src/widgets/InputTextWidget.h
-    src/widgets/TableWidget.h
-    src/ui/EditorMainWindowLayout.h
-    src/ui/RuntimeWindowProperties.h
+file(GLOB HELPERS_HEADERS
+    "src/OpenGLHelpers/*.hpp"
+    "src/OpenGLHelpers/*.h"
+)
+
+# Файлы из папки widgets
+file(GLOB WIDGETS_SOURCES
+    "src/widgets/*.cpp"
+    "src/widgets/*.c"
+)
+
+file(GLOB WIDGETS_HEADERS
+    "src/widgets/*.hpp"
+    "src/widgets/*.h"
+)
+
+# Файлы из папки ui
+file(GLOB UI_SOURCES
+    "src/ui/*.cpp"
+    "src/ui/*.c"
+)
+
+file(GLOB UI_HEADERS
+    "src/ui/*.hpp"
+    "src/ui/*.h"
+)
+
+# Файлы из папки styles
+file(GLOB STYLES_SOURCES
+    "src/styles/*.cpp"
+    "src/styles/*.c"
+)
+
+file(GLOB STYLES_HEADERS
+    "src/styles/*.hpp"
+    "src/styles/*.h"
+)
+
+# Файлы из папки managers
+file(GLOB MANAGERS_SOURCES
+    "src/managers/*.cpp"
+    "src/managers/*.c"
+)
+
+file(GLOB MANAGERS_HEADERS
+    "src/managers/*.hpp"
+    "src/managers/*.h"
+)
+
+# Файлы из папки include
+file(GLOB INCLUDE_HEADERS
+    "src/include/*.cpp"
+    "src/include/*.c"
+)
+
+
+# Объединяем все
+set(ALL_SOURCES
+    ${MAIN_SOURCES}
+    ${HELPERS_SOURCES}
+    ${WIDGETS_SOURCES}
+    ${UI_SOURCES}
+    ${STYLES_SOURCES}
+    ${MANAGERS_SOURCES}
+    
+)
+
+set(ALL_HEADERS
+    ${HELPERS_HEADERS}
+    ${WIDGETS_HEADERS}
+    ${UI_HEADERS}
+    ${STYLES_HEADERS}
+    ${MANAGERS_HEADERS}
 )
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_executable(MyWidgetEditor ${ALL_SOURCES} ${ALL_HEADERS} ${IMGUI_SOURCES})
 
 # Include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/managers
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
+target_include_directories(MyWidgetEditor PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/managers"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OpenGLHelpers"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/styles"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ui"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/widgets"
+
+    ${EXTERNAL_DIR}
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${IMGUI_DIR}/misc/cpp
+    ${GLM_DIR}
+    ${GLFW_DIR}/include
+    #${GLAD_DIR}
+    ${HTTPLIB_DIR}
+    ${JSON_DIR}
+    ${STB_DIR}    
 )
 
-# Link external libraries (from external/CMakeLists.txt)
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    imgui
-    glfw
-    json
-    httplib
+target_link_libraries(MyWidgetEditor PRIVATE 
+    "${GLFW_DIR}/lib-vc2022/glfw3.lib" 
+    opengl32
 )
-
-# Platform-specific settings
-if(WIN32)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        _CRT_SECURE_NO_WARNINGS
-        GL_SILENCE_DEPRECATION
-    )
-    
-    # Link Windows libraries
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        opengl32
-    )
-    
-    if(MSVC)
-        target_compile_options(${PROJECT_NAME} PRIVATE
-            /W4
-            /permissive-
-        )
-    endif()
-endif()
 
 # Copy configs directory to output
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/configs 
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
      FILES_MATCHING PATTERN "*.json")
 
-# Copy GLFW DLL to output directory
-# Use the GLFW_LIB_DIR variable set in external/CMakeLists.txt
-if(WIN32 AND DEFINED GLFW_LIB_DIR)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${GLFW_LIB_DIR}/glfw3.dll"
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    )
-endif()

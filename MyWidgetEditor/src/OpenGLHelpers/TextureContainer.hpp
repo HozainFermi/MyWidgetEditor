@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
-#include "../thirdparty/include/glad/gl.h"
+#include "glad/gl.h"
 #include <string>
-#include <glm.hpp>
+#include "glm/glm.hpp"
 
 namespace Helpers {
 

@@ -1,6 +1,6 @@
 #include "WidgetManager.h"
-#include "../widgets/TextWidget.h"
-#include "../widgets/InputTextWidget.h"
+#include "TextWidget.h"
+#include "InputTextWidget.h"
 #include <fstream>
 #include <iostream>
 

@@ -1,6 +1,6 @@
 #include "EditorMainWindowLayout.h"
 #include <iostream>
-#include "../src/managers/WidgetFactory.h"
+#include "WidgetFactory.h"
 #include "RuntimeWindowProperties.h"
 #include "independent_launcher.h"
 #include <filesystem>

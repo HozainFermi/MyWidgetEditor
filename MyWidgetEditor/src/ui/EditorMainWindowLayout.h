@@ -1,5 +1,5 @@
 #pragma once
-#include "../managers/WidgetManager.h"
+#include "WidgetManager.h"
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 #include "RuntimeWindowProperties.h"

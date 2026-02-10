@@ -1,12 +1,12 @@
 #pragma once
-#include "../thirdparty/include/glad/gl.h"
-#include <span>
+#include "glad/gl.h"
 #include <vector>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 #include <iostream>
+#include <span>
 
 namespace Helpers {
 

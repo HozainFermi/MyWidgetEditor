@@ -1,9 +1,9 @@
 #pragma once
-#include "../widgets/Widget.h"
+#include "Widget.h"
 #include <memory>
 #include <vector>
 #include <unordered_map>
-#include "../ui/RuntimeWindowProperties.h"
+#include "RuntimeWindowProperties.h"
 
 namespace wg {
     class WidgetManager {

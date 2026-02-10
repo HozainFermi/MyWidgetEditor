@@ -2,7 +2,7 @@
 #include "Widget.h"
 #include <string>
 #include <vector>
-#include "../src/managers/WidgetFactory.h"
+#include "WidgetFactory.h"
 
 namespace wg {
 

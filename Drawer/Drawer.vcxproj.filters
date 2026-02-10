@@ -63,6 +63,12 @@
     <ClCompile Include="ui\MainWindowLayout.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="glad-impl.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="stb.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="runtime_widgets\Widget.h">
@@ -139,5 +145,8 @@
     <Library Include="lib\glfw\lib-vc2022\glfw3.lib" />
     <Library Include="lib\glfw\lib-vc2022\glfw3_mt.lib" />
     <Library Include="lib\glfw\lib-vc2022\glfw3dll.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
 </Project>

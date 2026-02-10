@@ -1,5 +1,5 @@
 #include "TextureContainer.hpp"
-#include "../thirdparty/include/stb/stb_image.h"
+#include <stb/stb_image.h>
 #include <iostream>
 namespace Helpers {
 

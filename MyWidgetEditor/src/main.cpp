@@ -115,7 +115,7 @@ int main(int, char**)
     std::vector<std::string> templates;
     std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
     for (const auto& entry : std::filesystem::directory_iterator("./src/widgets")) {
-   
+        std::cout << "What the hell is happening here";
         if (entry.is_regular_file()) {
             std::filesystem::path filename_path = entry.path().filename();
             
