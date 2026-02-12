@@ -6,9 +6,10 @@ namespace Helpers {
     MeshLoader::MeshLoader(std::span<float> verticies, short stride)
         : points(verticies.begin(), verticies.end()), stride(stride)
 	{				
+
 		glGenVertexArrays(1, &VAO);		
 		glGenBuffers(1, &VBO);
-		
+        
         glBindVertexArray(VAO);  
         glBindBuffer(GL_ARRAY_BUFFER, VBO);  
         
@@ -24,7 +25,7 @@ namespace Helpers {
         points(verticies.begin(), verticies.end())
     {
         glGenVertexArrays(1, &VAO);        
-
+      
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
     }
@@ -36,9 +37,12 @@ namespace Helpers {
         indices(inds.begin(), inds.end())
     {
         glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &EBO);
 
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), indices.data(), GL_STATIC_DRAW);
     }
 
     MeshLoader::MeshLoader(std::span<float> verticies, std::span<int> inds)
@@ -71,7 +75,7 @@ namespace Helpers {
         while (std::getline(file, line)) {
             // Проверяем, что строка не пустая и не содержит только пробелы
             if (line.empty() || std::all_of(line.begin(), line.end(), ::isspace)) {
-                continue; // Пропускаем пустые строки
+                continue; 
             }
 
             std::istringstream iss(line);
@@ -90,7 +94,7 @@ namespace Helpers {
                 catch (const std::exception& e) {
                     std::cerr << "Warning: Cannot parse float from token: " << token
                         << " in line: " << line << std::endl;
-                    // Можно выбрасывать исключение или игнорировать
+                    
                 }
             }
         }
@@ -110,6 +114,7 @@ namespace Helpers {
 	}
 	MeshLoader::MeshLoader()
 	{
+
 	}
 	MeshLoader::~MeshLoader()
 	{

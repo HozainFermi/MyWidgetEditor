@@ -19,6 +19,8 @@ namespace Helpers {
 		unsigned int VAO=0;
 		unsigned int VBO=0;
 		unsigned int EBO=0;
+		unsigned int FBO = 0;
+
 		std::vector<float> points;
 		std::vector<int> indices;
 
@@ -30,6 +32,7 @@ namespace Helpers {
 		MeshLoader();		
 		~MeshLoader();
 		
+		//AddEBO
 		void AddAttribPointer(GLint size, GLsizei stride, const void* offset);
 		void Draw();
 		
