@@ -7,14 +7,16 @@ namespace wg {
 
 
 	RenderWidget::RenderWidget()
+		:Widget("Unnamed", WidgetType::IMAGE, ImVec2(20, 20), ImVec2(400, 300))
 	{
 
 		SetWidgetClass("RenderWidget");
 	}
 
 	RenderWidget::RenderWidget(const std::string& name, const ImVec2& pos)
+		:Widget("Unnamed", WidgetType::IMAGE, pos, ImVec2(400, 300))
 	{
-
+		
 		SetWidgetClass("RenderWidget");
 	}
 
@@ -36,7 +38,15 @@ namespace wg {
 		scene.Draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+		if (ImGui::BeginTable(("##render_" + GetId()).c_str(),
+			(int)columns_.size(),
+			flags_,
+			content_size)) {
+
 		ImGui::Image((void*)(intptr_t)FBO, widget_size, ImVec2(0, 1), ImVec2(1, 0));
+		}
+
 
 	}
 
