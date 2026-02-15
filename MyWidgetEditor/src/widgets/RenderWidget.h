@@ -9,28 +9,7 @@ namespace wg {
 
     
 
-    /*struct RenderColumnConfig {
-        std::string header;
-        std::string data_field;  
-        float width = 100.0f;
-        bool sortable = false;
-
-        nlohmann::json ToJson() const {
-            return {
-                {"header", header},
-                {"width", width},
-                {"data_field", data_field},
-                {"sortable", sortable}
-            };
-        }
-
-        void FromJson(const nlohmann::json& json) {
-            header = json.value("header", "");
-            width = json.value("width", 100.0f);
-            data_field = json.value("data_field", "");
-            sortable = json.value("sortable", false);
-        }
-    };*/
+    
 
     class RenderWidget : public Widget {
     private:
@@ -54,5 +33,28 @@ namespace wg {
     private:
         void GeneratePreviewData();
 
+    
+        /*struct RenderColumnConfig {
+            std::string header;
+            std::string data_field;
+            float width = 100.0f;
+            bool sortable = false;
+
+            nlohmann::json ToJson() const {
+                return {
+                    {"header", header},
+                    {"width", width},
+                    {"data_field", data_field},
+                    {"sortable", sortable}
+                };
+            }
+
+            void FromJson(const nlohmann::json& json) {
+                header = json.value("header", "");
+                width = json.value("width", 100.0f);
+                data_field = json.value("data_field", "");
+                sortable = json.value("sortable", false);
+            }
+        };*/
     };
 }

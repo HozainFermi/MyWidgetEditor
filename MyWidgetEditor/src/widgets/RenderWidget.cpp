@@ -9,15 +9,14 @@ namespace wg {
 	RenderWidget::RenderWidget()
 		:Widget("Unnamed", WidgetType::IMAGE, ImVec2(20, 20), ImVec2(400, 300)),
 		scene_()
-	{
-		
+	{		
 		SetWidgetClass("RenderWidget");
 	}
 
 	RenderWidget::RenderWidget(const std::string& name, const ImVec2& pos)
-		:Widget("Unnamed", WidgetType::IMAGE, pos, ImVec2(400, 300))
-	{
-		
+		:Widget(name, WidgetType::IMAGE, pos, ImVec2(400, 300)),
+		 scene_()
+	{		
 		SetWidgetClass("RenderWidget");
 	}
 
@@ -38,12 +37,13 @@ namespace wg {
 		glViewport(0, 0, widget_size.x, widget_size.y);
 		scene_.Draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-		if (ImGui::BeginChild(("##render_" + GetId()).c_str(),widget_size)) {
-			ImGui::Image((void*)(intptr_t)scene_.FBO, ImVec2(widget_size.x-5, widget_size.y - 5), ImVec2(0, 1), ImVec2(1, 0));
-
+		std::cout << "TEST";
+		if (ImGui::BeginChild("##render", widget_size)) {
+			ImGui::Image((void*)(intptr_t)scene_.textureColorBuffer,
+				ImVec2(widget_size.x, widget_size.y),
+				ImVec2(0, 1), ImVec2(1, 0));
 		}
+		ImGui::EndChild();
 
 
 	}

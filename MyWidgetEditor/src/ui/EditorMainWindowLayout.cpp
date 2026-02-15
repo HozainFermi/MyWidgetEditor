@@ -359,6 +359,9 @@ void Editor::RenderRightPanel() {
         // Кнопки действий
         if (ImGui::Button("Delete", ImVec2(-1, 0))) {
             widget_manager_.DeleteWidget(selected->GetId());
+            selected = nullptr;
+            widget_manager_.SelectWidget(-1);
+            widget_manager_.DeselectAll();
         }
 
         if (ImGui::Button("Duplicate", ImVec2(-1, 0))) {
@@ -369,8 +372,10 @@ void Editor::RenderRightPanel() {
             // Логика поднятия наверх
             widget_manager_.BringToFront(selected->GetId());
         }
-        ImGui::Separator();        
-        selected->RenderProperties();        
+        ImGui::Separator();
+        if (selected) {
+            selected->RenderProperties();        
+        }
         
     }
     else {       

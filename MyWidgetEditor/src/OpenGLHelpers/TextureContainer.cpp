@@ -78,10 +78,10 @@ void TextureContainer::SetProperties()
 
 void TextureContainer::ActivateAndBind()
 {	
-	for (unsigned int i = GL_TEXTURE0, j = 0; j <= counter; j++, i++) {
-		glActiveTexture(i);
-		glBindTexture(GL_TEXTURE_2D, textures[j]);
-	}
+	//for (unsigned int i = GL_TEXTURE0, j = 0; j <= counter; j++, i++) {
+	//	glActiveTexture(i);
+	//	glBindTexture(GL_TEXTURE_2D, textures[j]);
+	//}
 }
 
 }

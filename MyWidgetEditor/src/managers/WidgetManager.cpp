@@ -30,10 +30,22 @@ namespace wg {
         }
     }
 
-    Widget* WidgetManager::GetSelectedWidget() const {
-        for (auto& widget : widgets_) {
-            if (widget->IsSelected()) {
-                return widget.get();
+    void WidgetManager::SelectWidget(int index)
+    {
+        selected_widget_index_ = index;
+    }
+
+    void WidgetManager::DeselectAll()
+    {
+
+    }
+
+    Widget* WidgetManager::GetSelectedWidget() {
+        
+        for (int i = 0; i < widgets_.size();++i) {
+            if (widgets_[i]->IsSelected()) {
+                selected_widget_index_ = i;
+                return widgets_[i].get();
             }
         }
         return nullptr;

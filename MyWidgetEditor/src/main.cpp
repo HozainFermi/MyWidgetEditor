@@ -8,6 +8,7 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 //#include "EditorMainWindowLayout.h"
+#include <glad/gl.h>
 #include "ui/EditorMainWindowLayout.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -30,7 +31,8 @@
 #endif
 #include <vector>
 #include <iostream>
-//#include <WidgetFactory.h>
+
+
 
 
 static void glfw_error_callback(int error, const char* description)
@@ -85,6 +87,12 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
+    if (!gladLoadGL(glfwGetProcAddress)) {
+        std::cerr << "GLAD BROKE!" << std::endl;
+        glfwTerminate();
+        return -2;
+    }
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -114,7 +122,8 @@ int main(int, char**)
     static bool MAIN_WINDOW_OPENED = true;
     static bool USE_GRID = false;
     bool show_editor = true;
-    std::vector<std::string> templates;// wg::WidgetFactory::GetRegisteredTypes();
+
+    std::vector<std::string> templates;
     std::filesystem::path widgetsPath = std::string(PROJECT_SOURCE_DIR) + "/src/widgets";
 
     std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
