@@ -20,9 +20,9 @@ namespace Styles {
 
 	class Scene {
 	private:
-		std::vector<MeshData> _meshes;
-		std::unique_ptr<Helpers::Camera> _camera;
-		std::unique_ptr<Helpers::TextureContainer> _textures;		
+		std::vector<MeshData> meshes_;
+		std::unique_ptr<Helpers::Camera> camera_;
+		std::unique_ptr<Helpers::TextureContainer> textures_;		
 		
 	public:
 		float time;
@@ -30,6 +30,7 @@ namespace Styles {
 		float lastFrame;
 		unsigned int FBO=0;
 
+		Scene();
 		Scene(std::vector<MeshData>& meshes, std::unique_ptr<Helpers::Camera> camera,std::unique_ptr<Helpers::TextureContainer> textures);
 		~Scene();
 		

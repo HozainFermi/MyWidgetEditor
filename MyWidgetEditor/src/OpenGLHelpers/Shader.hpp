@@ -1,6 +1,10 @@
 #include "glad/gl.h"
 #include <string>
 #include "glm/glm.hpp"
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <filesystem>
 
 namespace Helpers {
 
@@ -9,6 +13,7 @@ namespace Helpers {
         GLuint program;
 
         Shader(const char* vertexSource, const char* fragmentSource);
+        Shader(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
         ~Shader();
 
         void Use() const;

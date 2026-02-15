@@ -7,9 +7,10 @@ namespace wg {
 
 
 	RenderWidget::RenderWidget()
-		:Widget("Unnamed", WidgetType::IMAGE, ImVec2(20, 20), ImVec2(400, 300))
+		:Widget("Unnamed", WidgetType::IMAGE, ImVec2(20, 20), ImVec2(400, 300)),
+		scene_()
 	{
-
+		
 		SetWidgetClass("RenderWidget");
 	}
 
@@ -33,18 +34,15 @@ namespace wg {
 	void RenderWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
 	{
 		ImVec2 widget_size = GetSize();
-		glBindFramebuffer(GL_FRAMEBUFFER, scene.FBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, scene_.FBO);
 		glViewport(0, 0, widget_size.x, widget_size.y);
-		scene.Draw();
+		scene_.Draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-		if (ImGui::BeginTable(("##render_" + GetId()).c_str(),
-			(int)columns_.size(),
-			flags_,
-			content_size)) {
+		if (ImGui::BeginChild(("##render_" + GetId()).c_str(),widget_size)) {
+			ImGui::Image((void*)(intptr_t)scene_.FBO, ImVec2(widget_size.x-5, widget_size.y - 5), ImVec2(0, 1), ImVec2(1, 0));
 
-		ImGui::Image((void*)(intptr_t)FBO, widget_size, ImVec2(0, 1), ImVec2(1, 0));
 		}
 
 

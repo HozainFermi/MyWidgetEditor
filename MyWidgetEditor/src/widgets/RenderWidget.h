@@ -34,7 +34,7 @@ namespace wg {
 
     class RenderWidget : public Widget {
     private:
-        Styles::Scene scene;
+        Styles::Scene scene_;
 
     public:
         RenderWidget();

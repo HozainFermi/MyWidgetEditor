@@ -13,6 +13,42 @@ namespace Helpers {
         glDeleteShader(fragmentShader);
     }
 
+    Shader::Shader(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath)
+    {
+        std::string shaderSource;
+        std::stringstream buff;
+        GLuint vertexShader;
+        GLuint fragmentShader;
+
+        std::ifstream file(vertexPath, std::ios::in | std::ios::binary);
+        if (!file.is_open()) {           
+            std::cout << "Failed to open shader file: " << vertexPath.string() << std::endl;
+        }
+        buff << file.rdbuf();
+        shaderSource = buff.str();
+        vertexShader = compileShader(GL_VERTEX_SHADER, shaderSource.c_str());
+
+        file.close();
+        file.clear();
+        
+        file.open(fragmentPath);
+        if (!file.is_open()) {
+            std::cout << "Failed to open shader file: " << fragmentPath.string() << std::endl;
+        }        
+        buff << file.rdbuf();
+        shaderSource = buff.str();
+        fragmentShader = compileShader(GL_VERTEX_SHADER, shaderSource.c_str());
+
+        file.close();
+        file.clear();
+    
+        program = linkProgram(vertexShader, fragmentShader);
+
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+    }
+
+
     Shader::~Shader() {
         glDeleteProgram(program);
     }
