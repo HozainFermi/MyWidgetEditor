@@ -19,7 +19,7 @@ namespace Styles {
 	};
 
 	class Scene {
-	private:
+	public:
 		std::vector<MeshData> meshes_;
 		std::unique_ptr<Helpers::Camera> camera_;
 		std::unique_ptr<Helpers::TextureContainer> textures_;		

@@ -128,7 +128,7 @@ namespace wg {
             // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);            
             if (widget) {                           
-                // Виджет уже создан и FromJson уже вызван внутри фабрики
+                // Виджет уже создан и FromJson 
                 widget.get()->FromJson(widget_json);               
                 widgets_.push_back(std::move(widget));                
             }

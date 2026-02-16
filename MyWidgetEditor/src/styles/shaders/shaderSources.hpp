@@ -38,7 +38,7 @@ uniform sampler2D texture2;
 uniform float u_time;
 
 void main(){
-	FragColor = vec4(1.0);	
+	FragColor = vec4(100.0/255, 20.0/255, 150.0/255 ,1.0);	
 	
 }
 )row";

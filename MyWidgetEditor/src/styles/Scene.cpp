@@ -6,7 +6,7 @@ namespace Styles {
 	Scene::Scene()
 	{		
 		MeshData data;
-		camera_ = std::make_unique<Helpers::Camera>(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), Helpers::YAW, Helpers::PITCH);
+		camera_ = std::make_unique<Helpers::Camera>(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), Helpers::YAW, Helpers::PITCH);
 		textures_ = std::make_unique<Helpers::TextureContainer>();
 
 		data.loader = std::make_unique<Helpers::MeshLoader>(Shapes::cube,5);
@@ -14,8 +14,7 @@ namespace Styles {
 		data.loader.get()->AddAttribPointer(2, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
 		data.shader = std::make_unique<Helpers::Shader>(ShaderSources::Test_vertex, ShaderSources::Test_fragment);
-		data.model = glm::mat4(1.0f);
-
+		data.model = glm::translate(data.model, glm::vec3(0.0f, 0.0f, -1.0f));
 		meshes_.push_back(std::move(data));
 
 		glGenFramebuffers(1, &FBO);

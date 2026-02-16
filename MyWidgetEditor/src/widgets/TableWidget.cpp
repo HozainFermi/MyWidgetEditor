@@ -74,8 +74,7 @@ namespace wg {
                     ImGui::TableSetupColumn(col.header.c_str(),
                         col.sortable ? ImGuiTableColumnFlags_None :
                         ImGuiTableColumnFlags_NoSort,
-                        col.width);
-                }
+                        0.0f);                }
 
                 if (show_headers_) {
                     ImGui::TableSetupScrollFreeze(0, 1); // Заголовок фиксирован при скролле
