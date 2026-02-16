@@ -75,7 +75,7 @@ namespace rn {
                     ImGui::TableSetupColumn(col.first.header.c_str(),
                         col.first.sortable ? ImGuiTableColumnFlags_None :
                         ImGuiTableColumnFlags_NoSort,
-                        col.first.width);
+                        0.0f);//col.first.width
                 }
 
                 if (show_headers_) {

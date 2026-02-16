@@ -8,7 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB_RECURSE RUNTIME_SOURCES "runtime_widgets/*.*")
 set(MANAGERS_FILES managers/RuntimeWidgetManager.cpp managers/RuntimeWidgetManager.h managers/RuntimeWidgetFactory.h)
 set(UI_FILES ui/MainWindowLayout.cpp ui/MainWindowLayout.h ui/RuntimeWindowProperties.h)
+set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
 
+find_package(OpenSSL REQUIRED)
 
 add_executable(Drawer 
     main.cpp 
@@ -32,10 +34,14 @@ target_include_directories(Drawer PRIVATE
     ${HTTPLIB_DIR}
     ${JSON_DIR}
     ${STB_DIR}  
+    ${OPENSSL_INCLUDE_DIR}
 )
+
 
 # Линковка
 target_link_libraries(Drawer PRIVATE 
      "${GLFW_DIR}/lib-vc2022/glfw3.lib" 
     opengl32
+    OpenSSL::SSL 
+    OpenSSL::Crypto
 )

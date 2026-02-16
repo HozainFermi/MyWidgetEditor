@@ -22,9 +22,9 @@ void Editor::OnFileForLoadSelected(const std::string& filename) {
     widget_manager_.LoadFromFile("./configs/"+filename+".json", window_props_);                
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
-    std::filesystem::path relfilePath("./configs/" + filename + ".json");
-    std::filesystem::path relDrawer("../x64/Release/Drawer.exe");
-
+    std::filesystem::path relfilePath("../../../../MyWidgetEditor/configs/" + filename + ".json");
+    std::filesystem::path relDrawer("../Drawer/Drawer.exe");
+    //C:\Users\Hoz\Desktop\MyWidgetEditor\out\build\x64-debug\Drawer
     std::filesystem::path absExePath = std::filesystem::absolute(relDrawer);
     std::filesystem::path absConfigPath = std::filesystem::absolute(relfilePath);
 

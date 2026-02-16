@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-    //manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/tabletest.json");
+    //manager->LoadFromFile("C:/Users/Hoz/Desktop/MyWidgetEditor/MyWidgetEditor/configs/tabletest.json");
     if (argc>1) {
         manager->LoadFromFile(argv[1]);
     }
