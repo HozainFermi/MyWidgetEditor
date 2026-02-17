@@ -37,6 +37,9 @@ target_include_directories(Drawer PRIVATE
     ${OPENSSL_INCLUDE_DIR}
 )
 
+target_compile_definitions(Drawer PRIVATE 
+    PROJECT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
 
 # Линковка
 target_link_libraries(Drawer PRIVATE 
