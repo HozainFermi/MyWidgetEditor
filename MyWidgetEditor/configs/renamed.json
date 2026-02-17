@@ -12,13 +12,13 @@
                 },
                 {
                     "data_field": "name",
-                    "header": "Price",
+                    "header": "Product",
                     "sortable": true,
                     "width": 38.0
                 },
                 {
                     "data_field": "value",
-                    "header": "Product",
+                    "header": "Price",
                     "sortable": false,
                     "width": 100.0
                 }

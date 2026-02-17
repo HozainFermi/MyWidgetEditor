@@ -51,7 +51,9 @@ namespace rn {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
         if (update_trigger_!=UpdateTrigger::NONE) {
-            UpdateTableData();
+            if(!is_loading_){
+               UpdateTableData();
+            }
         }
 
         if (ImGui::BeginChild(("##table_child_" + GetId()).c_str(),
@@ -84,7 +86,6 @@ namespace rn {
                 }
 
                 static char buf[256];
-                // “естовые данные дл€ превью в редакторе
                 for (int row = 0; row < max_display_rows_; row++) {
                     ImGui::TableNextRow();
 
@@ -135,6 +136,8 @@ namespace rn {
 
     httplib::Result TableWidget::LoadTableData()
     {
+        is_loading_ = true;
+
         for (auto& element : columns_) {
             element.second.clear();
         }
@@ -171,6 +174,7 @@ namespace rn {
                 if (data_source_type_ == DataSourceType::JSON_URL) {
                     std::cout << "RESPONSE: " << res->body.substr(0, 15) << std::endl;
                     FromResponseJsonToColumns(res->body);
+                    is_loading_ = false;
                 }
                 return res;
             }
@@ -184,26 +188,21 @@ namespace rn {
         }
     }
 
+
+
     bool TableWidget::UpdateTableData()
     {
-      // if (CheckAsyncLoadComplete()) {
-      //     last_update_ = std::chrono::steady_clock::now();
-      //     return true;
-      // }
-      //
-      // if (is_loading_) {
-      //     return false;
-      // }
-
-       
+        
         switch (update_trigger_) {
         case UpdateTrigger::TIMER:
             now_ = std::chrono::steady_clock::now();
             auto time_since_last_update = now_ - last_update_;
 
             if (time_since_last_update >= update_interval_millisec_) {
-                //StartAsyncLoad();
-                LoadTableData();
+                if (!is_loading_) {
+                  //current_thread_ = std::jthread(&rn::TableWidget::LoadTableData, this);
+                    LoadTableData();
+                }
                 last_update_= std::chrono::steady_clock::now();
                 return true;
             }            
@@ -212,12 +211,14 @@ namespace rn {
             break;
         case UpdateTrigger::ON_LOAD:
             if (last_update_.time_since_epoch().count() == 0) {
-                //StartAsyncLoad();
+                
                 LoadTableData();
             }
             break;
        }       
         return false;
+
+        
     }
 
    
@@ -258,7 +259,7 @@ namespace rn {
             }
             else {
                 throw std::invalid_argument("Response body is not an array");
-            }
+            }            
         }
         catch (const nlohmann::json::parse_error& e) {
             std::cout << "JSON parse error: " << e.what() << std::endl;

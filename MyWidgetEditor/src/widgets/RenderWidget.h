@@ -4,18 +4,20 @@
 #include <vector>
 #include "Scene.hpp"
 #include "WidgetFactory.h"
+#include <shapes/cube.hpp>
+#include <shapes/plane.hpp>
+#include <shaders/shaderSources.hpp>
 
 namespace wg {
 
-    
-
-    
-
+   
     class RenderWidget : public Widget {
     private:
         Styles::Scene scene_;
 
     public:
+        int selectedMeshIndex=-1;
+
         RenderWidget();
         RenderWidget(const std::string& name, const ImVec2& pos);
         bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) override;
@@ -23,6 +25,8 @@ namespace wg {
         void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
 
         void RenderProperties();
+
+        void RenderSelectedMeshProps(int index);
         
         void AddItem();
         void RemoveItem();

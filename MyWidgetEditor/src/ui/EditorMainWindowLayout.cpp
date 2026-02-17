@@ -19,7 +19,7 @@ static void HelpMarker(const char* desc)
 }
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
-    widget_manager_.LoadFromFile("./configs/"+filename+".json", window_props_);                
+    widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+filename+".json", window_props_);                
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
     std::filesystem::path relfilePath(std::string(PROJECT_SOURCE_DIR)+"/configs/" + filename + ".json");
@@ -188,7 +188,7 @@ void Editor::RenderSaveFileMenu() {
 
             if (ImGui::BeginChild("SaveFileChild", ImVec2(400, 80), true)) {
 
-                ImGui::InputText("", savefile_buffer,IM_ARRAYSIZE(savefile_buffer));
+                ImGui::InputText("l", savefile_buffer,IM_ARRAYSIZE(savefile_buffer));
                 ImGui::SameLine();
                 ImGui::Text(".json");    
                 ImGui::Dummy(ImVec2(0,10));
@@ -200,7 +200,7 @@ void Editor::RenderSaveFileMenu() {
                         ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1), "Config file with name '%s' already exists", it );
                     }
                     else {
-                        widget_manager_.SaveToFile("./configs/"+temp+".json",window_props_);
+                        widget_manager_.SaveToFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+temp+".json",window_props_);
                         filebrowser_open_ = false;
                         filesave_open_ = false;
                     }

@@ -9,9 +9,10 @@ namespace Styles {
 		camera_ = std::make_unique<Helpers::Camera>(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), Helpers::YAW, Helpers::PITCH);
 		textures_ = std::make_unique<Helpers::TextureContainer>();
 
-		data.loader = std::make_unique<Helpers::MeshLoader>(Shapes::cube,5);
+		data.loader = std::make_unique<Helpers::MeshLoader>(Shapes::Cube::cube, 5);
 		data.loader.get()->AddAttribPointer(3, 5 * sizeof(float), nullptr);
 		data.loader.get()->AddAttribPointer(2, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		data.meshType = Shapes::Cube::type;
 
 		data.shader = std::make_unique<Helpers::Shader>(ShaderSources::Test_vertex, ShaderSources::Test_fragment);
 		data.model = glm::translate(data.model, glm::vec3(0.0f, 0.0f, -1.0f));
@@ -78,8 +79,8 @@ namespace Styles {
 		{
 			textures_.get()->ActivateAndBind();
 			
-			auto projection = glm::perspective(glm::radians(camera_.get()->Zoom), (float)800 / (float)600, 0.1f, 100.0f);
-			auto view = camera_.get()->GetViewMatrix();			
+			projection = glm::perspective(glm::radians(camera_.get()->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+			view = camera_.get()->GetViewMatrix();			
 
 			meshes_[i].shader->Use();
 			meshes_[i].shader->setFloat("u_time", (float)glfwGetTime());			

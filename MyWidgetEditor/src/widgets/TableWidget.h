@@ -31,8 +31,8 @@ namespace wg {
     };
 
     struct TableColumnConfig {
-        std::string header;
-        std::string data_field;  // Поле в JSON/CSV (например: "name", "price")
+        std::string header;      // Имя столбца в ImGui
+        std::string data_field;  // Поле в JSON/CSV
         float width = 100.0f;
         bool sortable = false;
 

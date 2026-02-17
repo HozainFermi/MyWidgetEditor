@@ -1,7 +1,10 @@
 #pragma once
 namespace Shapes {
+	namespace Plane {
 
-float[] fullscreen = {
+		inline const char* type = "Plane";
+
+		inline  float plane[] = {
 
 	//coordinates		//TEX
 	-1.f,1.f,0.0f,		0.0f,1.0f,
@@ -9,7 +12,9 @@ float[] fullscreen = {
 	-1.f,-1.f,0.0f,		0.0f,0.0f,
 	 1.0f,-1.f,0.0f,	1.0f,0.0f,
 
-};
+	};
+
+	}
 
 
 }

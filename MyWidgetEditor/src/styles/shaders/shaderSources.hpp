@@ -3,7 +3,7 @@
 
 namespace ShaderSources {
 
-	const char* Test_vertex= R"row(
+	inline	const char* Test_vertex= R"row(
 #version 330 core
 
 layout(location = 0) in vec3 aPos;
@@ -25,7 +25,7 @@ void main(){
 
 	
 
-	const char* Test_fragment = R"row(
+	inline	const char* Test_fragment = R"row(
 #version 330 core
 
 out vec4 FragColor;
@@ -45,7 +45,7 @@ void main(){
 	//mix(texture(texture1, TexCoord), texture(texture2, vec2(1-TexCoord.x, TexCoord.y)), 0.2);
 	//texture(texture1, vec2(TexCoord.x+desturbTex.r*sin(u_time), TexCoord.y) )
 
-	const char* LightShader_vertex = R"row(
+	inline	const char* LightShader_vertex = R"row(
 #version 330 core
 
 layout(location = 0) in vec3 aPos;
@@ -67,7 +67,7 @@ void main(){
 
 
 
-	const char* LightShader_fragment = R"row(
+	inline	const char* LightShader_fragment = R"row(
 #version 330 core
 out vec4 FragColor;
   
@@ -81,7 +81,7 @@ void main()
 )row";
 
 
-	const char* Test_fragmentYellow = R"row(
+	inline	const char* Test_fragmentYellow = R"row(
 #version 330 core
 
 out vec4 FragColor;

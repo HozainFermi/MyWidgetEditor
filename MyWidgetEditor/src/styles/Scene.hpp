@@ -14,15 +14,23 @@ namespace Styles {
 	struct MeshData {
 		std::unique_ptr<Helpers::MeshLoader> loader;
 		std::unique_ptr<Helpers::Shader> shader;
-
 		glm::mat4 model = glm::mat4(1.0f);
+		
+		std::string meshType;
+		//bool isSelected=false;
 	};
 
 	class Scene {
 	public:
 		std::vector<MeshData> meshes_;
 		std::unique_ptr<Helpers::Camera> camera_;
-		std::unique_ptr<Helpers::TextureContainer> textures_;		
+		std::unique_ptr<Helpers::TextureContainer> textures_;
+
+		glm::mat4 projection;
+		glm::mat4 view;
+
+		unsigned int SCR_WIDTH=400;
+		unsigned int SCR_HEIGHT=300;
 		
 	public:
 		float time;
