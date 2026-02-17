@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="glad-impl.cpp" />
     <ClCompile Include="lib\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="lib\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="lib\imgui\imgui.cpp" />
@@ -34,6 +35,7 @@
     <ClCompile Include="runtime_widgets\TableWidget.cpp" />
     <ClCompile Include="runtime_widgets\TextWidget.cpp" />
     <ClCompile Include="runtime_widgets\Widget.cpp" />
+    <ClCompile Include="stb.cpp" />
     <ClCompile Include="ui\MainWindowLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +69,9 @@
     <Library Include="lib\glfw\lib-vc2022\glfw3.lib" />
     <Library Include="lib\glfw\lib-vc2022\glfw3dll.lib" />
     <Library Include="lib\glfw\lib-vc2022\glfw3_mt.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

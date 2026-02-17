@@ -3,6 +3,7 @@
 #include "Widget.h"
 #include <string>
 #include "../managers/RuntimeWidgetFactory.h"
+#include <future>
 
 namespace rn {
 
@@ -55,8 +56,10 @@ namespace rn {
         std::chrono::milliseconds update_interval_millisec_{10000};
         std::chrono::steady_clock::time_point last_update_;
         std::chrono::steady_clock::time_point now_;
-        
-
+                   
+       
+        std::atomic<bool> is_loading_{ false };
+        std::string latest_json_response_;
 
         // Статические данные 
         std::vector<std::vector<std::string>> static_data_;
@@ -77,6 +80,11 @@ namespace rn {
         // HTTP настройки (если URL)
         std::string api_key_;
         std::map<std::string, std::string> custom_headers_;
+
+
+       
+
+
 
     public:
         TableWidget();
@@ -116,6 +124,8 @@ namespace rn {
         void FromResponseJsonToColumns(const std::string& body);
         void FromJson(const nlohmann::json& json) override;
 
-   
+        
+        ~TableWidget() = default;
+
     };
 }

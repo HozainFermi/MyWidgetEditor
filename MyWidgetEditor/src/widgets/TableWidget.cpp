@@ -8,7 +8,7 @@ namespace wg {
 
     TableWidget::TableWidget() :
         Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // Больший размер по умолчанию
-        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable;
 
         // Инициализируем тестовые колонки для превью
         columns_.push_back(TableColumnConfig{ "ID","id",50, true });
@@ -17,10 +17,10 @@ namespace wg {
 
         SetWidgetClass("TableWidget");
     }
-
+    //ImGuiTableFlags_SizingFixedFit
     TableWidget::TableWidget(const std::string& name, const ImVec2& pos) :
         Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // Больший размер по умолчанию
-        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+        flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg| ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable;
 
         // Инициализируем тестовые колонки для превью
         columns_.push_back(TableColumnConfig{ "ID", "id", 50, true });
@@ -74,8 +74,7 @@ namespace wg {
                     ImGui::TableSetupColumn(col.header.c_str(),
                         col.sortable ? ImGuiTableColumnFlags_None :
                         ImGuiTableColumnFlags_NoSort,
-                        col.width);
-                }
+                        0.0f);                }
 
                 if (show_headers_) {
                     ImGui::TableSetupScrollFreeze(0, 1); // Заголовок фиксирован при скролле
@@ -117,7 +116,7 @@ namespace wg {
 
     void TableWidget::RenderProperties() {
         // Настройки таблицы
-        ImGui::Text("Table Settings");
+        ImGui::Text("==Table Settings==");
         ImGui::Separator();
 
         ImGui::Checkbox("Show Headers", &show_headers_);

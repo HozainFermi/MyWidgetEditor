@@ -8,6 +8,7 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 //#include "EditorMainWindowLayout.h"
+#include <glad/gl.h>
 #include "ui/EditorMainWindowLayout.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -30,6 +31,9 @@
 #endif
 #include <vector>
 #include <iostream>
+
+
+
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -83,6 +87,12 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
+    if (!gladLoadGL(glfwGetProcAddress)) {
+        std::cerr << "GLAD BROKE!" << std::endl;
+        glfwTerminate();
+        return -2;
+    }
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -112,21 +122,25 @@ int main(int, char**)
     static bool MAIN_WINDOW_OPENED = true;
     static bool USE_GRID = false;
     bool show_editor = true;
+
     std::vector<std::string> templates;
+    std::filesystem::path widgetsPath = std::string(PROJECT_SOURCE_DIR) + "/src/widgets";
+
     std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
-    for (const auto& entry : std::filesystem::directory_iterator("./src/widgets")) {
-   
+
+    for (const auto& entry : std::filesystem::directory_iterator(widgetsPath)) {       
         if (entry.is_regular_file()) {
             std::filesystem::path filename_path = entry.path().filename();
             
             if (filename_path.extension() == ".h") {
                 std::string tempname = filename_path.stem().string();
-                std::cout << tempname << std::endl;
                 if (tempname == "Widget") { continue; }
+                std::cout << tempname << std::endl;
                 templates.push_back(tempname);
             }
         }
-    }
+    }    
+
         ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -137,6 +151,7 @@ int main(int, char**)
         io.IniFilename = nullptr;
         EMSCRIPTEN_MAINLOOP_BEGIN
 #else
+        glEnable(GL_DEPTH_TEST);
         while (!glfwWindowShouldClose(window))
 #endif
         {            
@@ -161,7 +176,7 @@ int main(int, char**)
             glfwGetFramebufferSize(window, &display_w, &display_h);
             glViewport(0, 0, display_w, display_h);
             glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
             glfwSwapBuffers(window);

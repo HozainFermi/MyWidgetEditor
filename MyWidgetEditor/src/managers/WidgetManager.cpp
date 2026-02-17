@@ -1,6 +1,6 @@
 #include "WidgetManager.h"
-#include "../widgets/TextWidget.h"
-#include "../widgets/InputTextWidget.h"
+#include "TextWidget.h"
+#include "InputTextWidget.h"
 #include <fstream>
 #include <iostream>
 
@@ -30,10 +30,22 @@ namespace wg {
         }
     }
 
-    Widget* WidgetManager::GetSelectedWidget() const {
-        for (auto& widget : widgets_) {
-            if (widget->IsSelected()) {
-                return widget.get();
+    void WidgetManager::SelectWidget(int index)
+    {
+        selected_widget_index_ = index;
+    }
+
+    void WidgetManager::DeselectAll()
+    {
+
+    }
+
+    Widget* WidgetManager::GetSelectedWidget() {
+        
+        for (int i = 0; i < widgets_.size();++i) {
+            if (widgets_[i]->IsSelected()) {
+                selected_widget_index_ = i;
+                return widgets_[i].get();
             }
         }
         return nullptr;
@@ -116,7 +128,7 @@ namespace wg {
             // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);            
             if (widget) {                           
-                // Виджет уже создан и FromJson уже вызван внутри фабрики
+                // Виджет уже создан и FromJson 
                 widget.get()->FromJson(widget_json);               
                 widgets_.push_back(std::move(widget));                
             }

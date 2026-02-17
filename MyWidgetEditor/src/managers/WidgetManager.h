@@ -1,9 +1,9 @@
 #pragma once
-#include "../widgets/Widget.h"
+#include "Widget.h"
 #include <memory>
 #include <vector>
 #include <unordered_map>
-#include "../ui/RuntimeWindowProperties.h"
+#include "RuntimeWindowProperties.h"
 
 namespace wg {
     class WidgetManager {
@@ -11,6 +11,7 @@ namespace wg {
         std::vector<std::unique_ptr<Widget>> widgets_;
         std::unordered_map<std::string, Widget*> widgets_by_id_;
         int selected_widget_id_ = -1;
+        int selected_widget_index_ = -1;
 
     public:
         // === Управление виджетами ===
@@ -62,7 +63,7 @@ namespace wg {
         void SelectWidget(const std::string& id);
         void SelectWidget(int index);
         void DeselectAll();
-        Widget* GetSelectedWidget() const;
+        Widget* GetSelectedWidget();
 
         // === Обновление и отрисовка ===
         void UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size);

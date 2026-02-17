@@ -1,6 +1,6 @@
 #include "EditorMainWindowLayout.h"
 #include <iostream>
-#include "../src/managers/WidgetFactory.h"
+#include "WidgetFactory.h"
 #include "RuntimeWindowProperties.h"
 #include "independent_launcher.h"
 #include <filesystem>
@@ -19,12 +19,12 @@ static void HelpMarker(const char* desc)
 }
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
-    widget_manager_.LoadFromFile("./configs/"+filename+".json", window_props_);                
+    widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+filename+".json", window_props_);                
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
-    std::filesystem::path relfilePath("./configs/" + filename + ".json");
-    std::filesystem::path relDrawer("../x64/Release/Drawer.exe");
-
+    std::filesystem::path relfilePath(std::string(PROJECT_SOURCE_DIR)+"/configs/" + filename + ".json");
+    std::filesystem::path relDrawer("../Drawer/Drawer.exe");
+    //C:\Users\Hoz\Desktop\MyWidgetEditor\out\build\x64-debug\Drawer
     std::filesystem::path absExePath = std::filesystem::absolute(relDrawer);
     std::filesystem::path absConfigPath = std::filesystem::absolute(relfilePath);
 
@@ -188,7 +188,7 @@ void Editor::RenderSaveFileMenu() {
 
             if (ImGui::BeginChild("SaveFileChild", ImVec2(400, 80), true)) {
 
-                ImGui::InputText("", savefile_buffer,IM_ARRAYSIZE(savefile_buffer));
+                ImGui::InputText("l", savefile_buffer,IM_ARRAYSIZE(savefile_buffer));
                 ImGui::SameLine();
                 ImGui::Text(".json");    
                 ImGui::Dummy(ImVec2(0,10));
@@ -200,7 +200,7 @@ void Editor::RenderSaveFileMenu() {
                         ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1), "Config file with name '%s' already exists", it );
                     }
                     else {
-                        widget_manager_.SaveToFile("./configs/"+temp+".json",window_props_);
+                        widget_manager_.SaveToFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+temp+".json",window_props_);
                         filebrowser_open_ = false;
                         filesave_open_ = false;
                     }
@@ -267,16 +267,15 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     HelpMarker("Drag widgets to canvas");
     ImGui::Separator();
 
-       
+    
     for (int i = 0; i < templates.size(); i++) {
         if (ImGui::Selectable(templates[i].c_str(), selected_template_ == i)) {
             selected_template_ = i;
         }
-       
         // Drag & Drop источник
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover)) {
             ImGui::SetDragDropPayload("WIDGET_TEMPLATE", templates[i].c_str(), strlen(templates[i].c_str()) + 1);
-            ImGui::Text("Add %s", templates[i]);
+            ImGui::Text("Add %s", templates[i].c_str());
             ImGui::EndDragDropSource();
         }
     }
@@ -299,7 +298,7 @@ void Editor::RenderRightPanel() {
 
     static char FRAGbuf[150];
     static char VERTbuf[150];
-    ImGui::Text("Main window Properties:");
+    ImGui::Text("==Main window Properties:==");
     ImGui::Separator();
     ImGui::Text("Width: %.0f", canvas_size_.x);
     ImGui::SameLine();
@@ -360,6 +359,9 @@ void Editor::RenderRightPanel() {
         // Кнопки действий
         if (ImGui::Button("Delete", ImVec2(-1, 0))) {
             widget_manager_.DeleteWidget(selected->GetId());
+            selected = nullptr;
+            widget_manager_.SelectWidget(-1);
+            widget_manager_.DeselectAll();
         }
 
         if (ImGui::Button("Duplicate", ImVec2(-1, 0))) {
@@ -370,8 +372,10 @@ void Editor::RenderRightPanel() {
             // Логика поднятия наверх
             widget_manager_.BringToFront(selected->GetId());
         }
-        ImGui::Separator();        
-        selected->RenderProperties();        
+        ImGui::Separator();
+        if (selected) {
+            selected->RenderProperties();        
+        }
         
     }
     else {       
@@ -397,7 +401,6 @@ ImVec2 Editor::GetMousePosRelativeToCanvas() const {
         relative_pos.y < 0 || relative_pos.y > canvas_size_.y) {
         return ImVec2(0, 0);
     }
-
     return relative_pos;
 }
 
@@ -447,7 +450,7 @@ void Editor::DrawGrid(ImDrawList* draw_list) const {
     }
 }
 
-// Реализация основного метода Render (если его нет)
+// Реализация основного метода Render
 void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates) {
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -472,6 +475,8 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 
             ImGui::SameLine();
 
+           
+
             // Центральная панель (60%)
             ImGui::BeginChild("CanvasPanel", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, 0),
                 ImGuiChildFlags_ResizeX |ImGuiChildFlags_ResizeY | ImGuiChildFlags_Borders);
@@ -479,14 +484,14 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
             ImGui::EndChild();
 
             ImGui::SameLine();
-
+            
             // Правая панель (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
             wg::Widget* selected = widget_manager_.GetSelectedWidget();
             RenderRightPanel();
             
             if (selected) { selected->SetStaySelected(ImGui::IsWindowHovered()); }
-            ImGui::EndChild();
+            ImGui::EndChild();            
         }
         ImGui::EndChild();
     }
@@ -496,15 +501,17 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 
 // Реализация RenderCanvas 
 void Editor::RenderCanvas() {
+    
     ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
     ImGui::Text("Grid size");
     
     ImGui::Checkbox("Grid", &show_grid_);
-    ImGui::SameLine();    
-    ImGui::DragFloat("", &grid_size_, 1.0f, 5.0f, 100.0f);
+    ImGui::SameLine();     
+    ImGui::DragFloat(" ", &grid_size_, 1.0f, 5.0f, 100.0f);
+    
     ImGui::Spacing();
     ImVec2 curmouse= GetMousePosRelativeToCanvas();
-    
+
     // Информация о канвасе
     ImGui::Text("Canvas: %.0fx%.0f", canvas_size_.x, canvas_size_.y);
     ImGui::SameLine();
@@ -537,10 +544,10 @@ void Editor::RenderCanvas() {
     };
     ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);
     draw_list->AddRectFilled(canvas_p0_, canvas_p1, col);
-
+    
     // Сетка
     DrawGrid(draw_list);
-
+  
     // Рамка канваса
     draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
 

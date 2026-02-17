@@ -51,7 +51,9 @@ namespace rn {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
         if (update_trigger_!=UpdateTrigger::NONE) {
-            UpdateTableData();
+            if(!is_loading_){
+               UpdateTableData();
+            }
         }
 
         if (ImGui::BeginChild(("##table_child_" + GetId()).c_str(),
@@ -75,7 +77,7 @@ namespace rn {
                     ImGui::TableSetupColumn(col.first.header.c_str(),
                         col.first.sortable ? ImGuiTableColumnFlags_None :
                         ImGuiTableColumnFlags_NoSort,
-                        col.first.width);
+                        0.0f);//col.first.width
                 }
 
                 if (show_headers_) {
@@ -84,7 +86,6 @@ namespace rn {
                 }
 
                 static char buf[256];
-                // Тестовые данные для превью в редакторе
                 for (int row = 0; row < max_display_rows_; row++) {
                     ImGui::TableNextRow();
 
@@ -135,72 +136,89 @@ namespace rn {
 
     httplib::Result TableWidget::LoadTableData()
     {
+        is_loading_ = true;
+
         for (auto& element : columns_) {
             element.second.clear();
         }
-        std::string scheme_host_port;
-        if(data_source_type_!=DataSourceType::NONE && data_source_type_ != DataSourceType::STATIC_DATA){
-            
-            size_t protocolEnd = data_source_.find("://");
-            if (protocolEnd == std::string::npos) {                
-                throw std::invalid_argument("Invalid link: " + data_source_);
-            }
-            
-            size_t domainStart = protocolEnd + 3; 
-            size_t pathStart = data_source_.substr(domainStart,data_source_.length()).find('/')+domainStart;
 
-            if (pathStart == std::string::npos) {                
+        if (data_source_type_ != DataSourceType::NONE &&
+            data_source_type_ != DataSourceType::STATIC_DATA) {
+
+            // Парсинг URL
+            size_t protocolEnd = data_source_.find("://");
+            if (protocolEnd == std::string::npos) {
+                throw std::invalid_argument("Invalid URL: " + data_source_);
+            }
+
+            size_t domainStart = protocolEnd + 3;
+            size_t pathStart = data_source_.find('/', domainStart);
+
+            std::string scheme_host_port;
+            std::string path_query;
+
+            if (pathStart == std::string::npos) {
                 scheme_host_port = data_source_;
+                path_query = "/";  // Путь по умолчанию
             }
             else {
-                scheme_host_port =  data_source_.substr(0, pathStart);
+                scheme_host_port = data_source_.substr(0, pathStart);
+                path_query = data_source_.substr(pathStart);
             }
-            //scheme_host_port
-            //data_source_.substr(pathStart,data_source_.length()
-            httplib::Client cli("https://my.api.mockaroo.com");
-            if (auto res = cli.Get("/mock_product_price.json?key=31d42050")) {
-                if (data_source_type_==DataSourceType::JSON_URL) {
-                    std::cout <<"RESPONSE"<< res->body.substr(0, 15) << std::endl;
+
+            // Создание клиента с извлеченным хостом
+            httplib::Client cli(scheme_host_port.c_str());
+
+            // Использование извлеченного пути
+            if (auto res = cli.Get(path_query.c_str())) {
+                if (data_source_type_ == DataSourceType::JSON_URL) {
+                    std::cout << "RESPONSE: " << res->body.substr(0, 15) << std::endl;
                     FromResponseJsonToColumns(res->body);
+                    is_loading_ = false;
                 }
                 return res;
             }
             else {
-                throw std::invalid_argument("Cant get data: " + res->status);
-            }        
+                throw std::runtime_error("Can't get data. Error: " +
+                    std::string(httplib::to_string(res.error())));
+            }
         }
         else {
-            return  httplib::Result{};
+            return httplib::Result{};
         }
     }
 
+
+
     bool TableWidget::UpdateTableData()
     {
-       
+        
         switch (update_trigger_) {
         case UpdateTrigger::TIMER:
             now_ = std::chrono::steady_clock::now();
             auto time_since_last_update = now_ - last_update_;
 
             if (time_since_last_update >= update_interval_millisec_) {
-                if (LoadTableData()) {
-                    last_update_ = now_;
-                    return true;
+                if (!is_loading_) {
+                  //current_thread_ = std::jthread(&rn::TableWidget::LoadTableData, this);
+                    LoadTableData();
                 }
+                last_update_= std::chrono::steady_clock::now();
+                return true;
             }            
             break;
         case UpdateTrigger::BUTTON_CLICK:
             break;
         case UpdateTrigger::ON_LOAD:
             if (last_update_.time_since_epoch().count() == 0) {
-                if (LoadTableData()) {
-                    last_update_ = now_;
-                    return true;
-                }
+                
+                LoadTableData();
             }
             break;
        }       
         return false;
+
+        
     }
 
    
@@ -241,7 +259,7 @@ namespace rn {
             }
             else {
                 throw std::invalid_argument("Response body is not an array");
-            }
+            }            
         }
         catch (const nlohmann::json::parse_error& e) {
             std::cout << "JSON parse error: " << e.what() << std::endl;

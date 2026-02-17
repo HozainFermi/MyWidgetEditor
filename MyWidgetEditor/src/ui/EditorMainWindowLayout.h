@@ -1,5 +1,5 @@
 #pragma once
-#include "../managers/WidgetManager.h"
+#include "WidgetManager.h"
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 #include "RuntimeWindowProperties.h"
@@ -55,7 +55,7 @@ public:
    
     void ScanConfigFiles() {
         all_files_.clear();
-        for (const auto& entry : std::filesystem::directory_iterator("./configs")) {
+        for (const auto& entry : std::filesystem::directory_iterator(std::string(PROJECT_SOURCE_DIR)+"/configs")) {
             if (entry.is_regular_file() && entry.path().extension() == ".json") {
                 all_files_.push_back(entry.path().stem().string());
             }

@@ -96,7 +96,7 @@ private:
         }
     }
 
-    //Альтернативный способ через ShellExecute (проще)
+    //Альтернативный способ через ShellExecute 
     static bool launchWindowsShell(const std::string& executablePath, const std::string& arguments) {
         HINSTANCE result = ShellExecuteA(
             NULL,           // hwnd
@@ -146,7 +146,9 @@ private:
 
 #else
     static bool launchUnix(const std::string& command) {
-        // ... существующий Unix код ...
+        
+        
+        //!!!NOT DONE
         pid_t pid = fork();
 
         if (pid == 0) {
@@ -170,4 +172,4 @@ private:
 #endif
 };
 
-#endif // INDEPENDENT_LAUNCHER_H
+#endif

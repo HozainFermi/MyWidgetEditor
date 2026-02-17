@@ -46,9 +46,12 @@ int main(int argc, char** argv)
 
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-    //manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/tabletest.json");
     if (argc>1) {
         manager->LoadFromFile(argv[1]);
+    }
+    else {
+    manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/testbackground2.json");
+
     }
 
     
@@ -79,6 +82,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);  // Без декораций
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // Прозрачность
+
     if (manager->window_props_.always_on_top) {
         glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);  // Поверх всех окон
     }

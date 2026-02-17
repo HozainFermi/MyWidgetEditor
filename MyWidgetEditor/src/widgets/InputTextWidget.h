@@ -1,6 +1,6 @@
 #pragma once
 #include "Widget.h"
-#include "../src/managers/WidgetFactory.h"
+#include "WidgetFactory.h"
 #include <string>
 
 namespace wg {
