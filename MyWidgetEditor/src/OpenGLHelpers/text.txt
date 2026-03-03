@@ -1,4 +1,4 @@
-/*unsigned int VAO;
+unsigned int VAO;
 	unsigned int VBO;
 	
 	glGenVertexArrays(1, &VAO);
@@ -28,4 +28,4 @@
 	glDeleteShader(fragmentShader);
 
 	unsigned int locationUniform = glGetUniformLocation(program, "u_time");
-	glUniform1f(locationUniform, time);*/
+	glUniform1f(locationUniform, time);

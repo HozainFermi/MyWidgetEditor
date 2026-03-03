@@ -1,6 +1,7 @@
 #include "Widget.h"
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <iostream>
 
 namespace wg {
     
@@ -300,40 +301,48 @@ namespace wg {
 
     bool Widget::IsWidgetInCanvas(const ImVec2& canvas_p0, const ImVec2& canvas_size, ImRect& screen_rect) {
       
-        if (screen_rect.GetTL().x < canvas_p0.x || screen_rect.GetTL().y < canvas_p0.y) {
+        ImVec2 canvas_p1{ canvas_p0.x + canvas_size.x,canvas_p0.y + canvas_size.y };
+        ImRect local_rect{ 
+          ImVec2{screen_rect.Min.x - canvas_p0.x,screen_rect.Min.y - canvas_p0.y},
+          ImVec2{screen_rect.Max.x - canvas_p0.x,screen_rect.Max.y - canvas_p0.y} 
+        };
+
+        if (screen_rect.GetTL().x <= canvas_p0.x || screen_rect.GetBL().x <= canvas_p0.x) {
             
            is_dragging_ = false;
            is_resizing_ = false;
            active_handle_ = ResizeHandle::NONE;
-           position_ = ImVec2(canvas_p0.x+canvas_size.x/5, canvas_p0.y + canvas_size.y/5);
+           position_ = ImVec2(1, std::clamp(local_rect.GetTL().y,1.f,canvas_size.y-1));           
            return false;
             
         }
-        if (screen_rect.GetTR().x > canvas_p0.x + canvas_size.x || screen_rect.GetTR().y < canvas_p0.y) {
-            
-           is_dragging_ = false;
-           is_resizing_ = false;
-           active_handle_ = ResizeHandle::NONE;
-           position_ = ImVec2(canvas_p0.x + canvas_size.x / 5, canvas_p0.y + canvas_size.y / 5);           
-           return false;
-            
-        }
-        if (screen_rect.GetBL().x < canvas_p0.x || screen_rect.GetBL().y > canvas_p0.y + canvas_size.y) {
-            
-             is_dragging_ = false;
-             is_resizing_ = false;
-             active_handle_ = ResizeHandle::NONE;
-             position_ = ImVec2(canvas_p0.x + canvas_size.x / 5, canvas_p0.y + canvas_size.y /5);            
-             return false;            
-        }
-        if (screen_rect.GetBR().x > canvas_p0.x + canvas_size.x || screen_rect.GetBR().y > canvas_p0.y + canvas_size.y) {
-            
+        if (screen_rect.GetTL().y <= canvas_p0.y || screen_rect.GetTR().y <= canvas_p0.y) {
             is_dragging_ = false;
             is_resizing_ = false;
             active_handle_ = ResizeHandle::NONE;
-            position_ = ImVec2(canvas_p0.x + canvas_size.x / 5, canvas_p0.y + canvas_size.y / 5);           
-            return false;            
+            position_ = ImVec2(std::clamp(local_rect.GetTL().x, 1.f, canvas_size.x-1), 1);
+            return false;
         }
+
+        if (screen_rect.GetTR().x >= canvas_p1.x || screen_rect.GetBR().x >= canvas_p1.x) {
+            
+           is_dragging_ = false;
+           is_resizing_ = false;
+           active_handle_ = ResizeHandle::NONE;
+           position_ = ImVec2(local_rect.Min.x-10, std::clamp(local_rect.GetTR().y, 1.f, canvas_size.y - 1));
+           return false;            
+        }
+               
+        if (screen_rect.GetBL().y >= canvas_p1.y || screen_rect.GetBR().y >= canvas_p1.y) {
+            is_dragging_ = false;
+            is_resizing_ = false;
+            active_handle_ = ResizeHandle::NONE;
+            position_ = ImVec2(std::clamp(local_rect.GetBL().x, 1.f, canvas_size.x-1), local_rect.Min.y-10);
+            return false;
+        }
+
+        
+        
         
         return true;
     }
