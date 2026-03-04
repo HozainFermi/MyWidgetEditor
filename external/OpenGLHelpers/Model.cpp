@@ -1,5 +1,4 @@
 #include "Model.hpp"
-#include "Model.hpp"
 #include <iostream>
 #include <filesystem>
 #include "stb/stb_image.h"
@@ -143,10 +142,9 @@ namespace Helpers {
 		return textures;
 	}
 
-	unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)
+	unsigned int Model::TextureFromFile(std::string path, std::string directory)
 	{
-		string filename = string(path);
-		filename = directory + '/' + filename;
+		string filename = directory + '/' + path;
 
 		unsigned int textureID;
 		glGenTextures(1, &textureID);
