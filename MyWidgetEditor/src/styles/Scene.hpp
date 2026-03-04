@@ -6,25 +6,25 @@
 #include <TextureContainer.hpp>
 #include <GLFW/glfw3.h>
 #include <Shader.hpp>
+#include <Model.hpp>
 
 
 namespace Styles {
 
 	
-	struct MeshData {
-		std::unique_ptr<Helpers::MeshLoader> loader;
+	struct ModelData {
+		std::unique_ptr<Helpers::Model> model;
 		std::unique_ptr<Helpers::Shader> shader;
-		glm::mat4 model = glm::mat4(1.0f);
-		
-		std::string meshType;
+		glm::mat4 model_mat = glm::mat4(1.0f);
+				
 		//bool isSelected=false;
 	};
 
 	class Scene {
 	public:
-		std::vector<MeshData> meshes_;
+		std::vector<std::unique_ptr<Helpers::Model>> models_;
 		std::unique_ptr<Helpers::Camera> camera_;
-		std::unique_ptr<Helpers::TextureContainer> textures_;
+		
 
 		glm::mat4 projection;
 		glm::mat4 view;

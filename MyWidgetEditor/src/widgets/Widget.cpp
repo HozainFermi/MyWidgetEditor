@@ -340,10 +340,7 @@ namespace wg {
             position_ = ImVec2(std::clamp(local_rect.GetBL().x, 1.f, canvas_size.x-1), local_rect.Min.y-10);
             return false;
         }
-
-        
-        
-        
+                        
         return true;
     }
 
