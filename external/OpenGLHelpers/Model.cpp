@@ -145,6 +145,7 @@ namespace Helpers {
 	unsigned int Model::TextureFromFile(std::string path, std::string directory)
 	{
 		string filename = directory + '/' + path;
+		std::cout << filename;
 
 		unsigned int textureID;
 		glGenTextures(1, &textureID);

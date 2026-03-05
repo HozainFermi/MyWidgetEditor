@@ -29,7 +29,7 @@ namespace Styles {
 		glm::mat4 view;
 
 		unsigned int SCR_WIDTH = 400;
-		unsigned int SCR_HEIGHT = 300;
+		unsigned int SCR_HEIGHT = 400;
 
 	public:
 		float time = 0.0f;

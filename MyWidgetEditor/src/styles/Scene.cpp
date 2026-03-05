@@ -40,7 +40,8 @@ namespace Styles {
 		data.path = path;
 		data.name = name.empty() ? path.filename().string() : name;
 		data.model = std::make_unique<Helpers::Model>(path);
-		data.shader = std::make_unique<Helpers::Shader>(ShaderSources::Test_vertex, ShaderSources::Test_fragment);
+		data.shader = std::make_unique<Helpers::Shader>(std::filesystem::path("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"),
+														std::filesystem::path("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag"));
 		data.model_mat = glm::mat4(1.0f);
 		models_.push_back(std::move(data));
 	}
@@ -77,5 +78,6 @@ namespace Styles {
 
 	void Scene::ProcessInputData()
 	{
+
 	}
 }

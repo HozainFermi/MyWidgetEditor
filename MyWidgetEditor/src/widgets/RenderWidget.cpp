@@ -79,7 +79,7 @@ namespace wg {
 		static int selected_idx = 0;
 		static float Xoffset = 0.0f;
 		static float Yoffset = 0.0f;
-		static char modelPath[260] = "assets/models/backpack/backpack.obj";
+		static char modelPath[260] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj";
 
 		ImGui::Text("==Render Settings==");
 		ImGui::Separator();
