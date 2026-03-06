@@ -46,7 +46,12 @@ namespace wg {
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		scene_.meshes_[0].model = glm::rotate(scene_.meshes_[0].model, glm::radians(sin((float)glfwGetTime()) ), glm::vec3(0.0f, 1.0f, 0.0f));
+		if (!scene_.models_.empty()) {
+			scene_.models_[0].model_mat =
+				glm::rotate(scene_.models_[0].model_mat,
+					glm::radians(sin(static_cast<float>(glfwGetTime()))),
+					glm::vec3(0.0f, 1.0f, 0.0f));
+		}
 
 		scene_.Draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -72,80 +77,64 @@ namespace wg {
 	void RenderWidget::RenderProperties()
 	{
 		static int selected_idx = 0;
-		static float Xoffset;
-		static float Yoffset;
-		const char* preview_value = scene_.meshes_[selected_idx].meshType.c_str();
-		std::string meshID;
+		static float Xoffset = 0.0f;
+		static float Yoffset = 0.0f;
+		static char modelPath[260] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj";
 
 		ImGui::Text("==Render Settings==");
 		ImGui::Separator();
 
-		if (ImGui::BeginCombo("Select Mesh", preview_value)) {
-			for (int i = 0; i < scene_.meshes_.size(); ++i) {
-				const bool is_selected = (selected_idx == i);
-				meshID = scene_.meshes_[i].meshType + "##" + std::to_string(i);
-
-				// Рисуем элемент и проверяем, не кликнули ли по нему
-				if (ImGui::Selectable(meshID.c_str(), is_selected)) {
-					selected_idx = i;
-					//scene_.meshes_[i].isSelected = true;
-				}
-
-				// Устанавливаем фокус на выбранный элемент 
-				if (is_selected) {
-					ImGui::SetItemDefaultFocus();
-				}
+		ImGui::InputText("Model path", modelPath, IM_ARRAYSIZE(modelPath));
+		if (ImGui::Button("Load model")) {
+			scene_.AddModel(modelPath, "");
+			if (!scene_.models_.empty()) {
+				selected_idx = static_cast<int>(scene_.models_.size()) - 1;
 			}
-			ImGui::EndCombo();
-
 		}
-		
-		if (ImGui::Button("Add Mesh")) {
-			ImGui::OpenPopup("mesh_selector"); 
-		}
-		
-		if (ImGui::BeginPopup("mesh_selector")) {
-			static const char* items[] = { "Cube", "Plane", "Teapot" };
-			static const float* arrays[] = {Shapes::Cube::cube, Shapes::Plane::plane};
 
-			for (int i = 0; i < IM_ARRAYSIZE(items); i++) {
-				if (ImGui::Selectable(items[i])) {
-					
-					Styles::MeshData data;
-					data.loader = std::make_unique<Helpers::MeshLoader>(Shapes::Cube::cube, 5);
-					data.loader.get()->AddAttribPointer(3, 5 * sizeof(float), nullptr);
-					data.loader.get()->AddAttribPointer(2, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-					data.meshType = Shapes::Cube::type;
-
-					data.shader = std::make_unique<Helpers::Shader>(ShaderSources::Test_vertex, ShaderSources::Test_fragment);
-					data.model = glm::translate(scene_.meshes_[scene_.meshes_.size()-1].model, glm::vec3(0.0f, 0.0f, -1.0f));
-					scene_.meshes_.push_back(std::move(data));
-
-					printf("Selected: %s\n", items[i]);
-				}
+		if (!scene_.models_.empty()) {
+			if (selected_idx >= static_cast<int>(scene_.models_.size())) {
+				selected_idx = static_cast<int>(scene_.models_.size()) - 1;
 			}
-			ImGui::EndPopup();
+
+			const char* preview_value = scene_.models_[selected_idx].name.c_str();
+
+			if (ImGui::BeginCombo("Select Model", preview_value)) {
+				for (int i = 0; i < static_cast<int>(scene_.models_.size()); ++i) {
+					const bool is_selected = (selected_idx == i);
+					std::string label = scene_.models_[i].name + "##" + std::to_string(i);
+
+					if (ImGui::Selectable(label.c_str(), is_selected)) {
+						selected_idx = i;
+					}
+
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+		} else {
+			ImGui::Text("No models loaded");
 		}
 
-		RenderSelectedMeshProps(selected_idx);
+		ImGui::Separator();
+		ImGui::Text("Camera");
+		ImGui::Separator();
 
-			ImGui::Separator();
-			ImGui::Text("Camera");
-			ImGui::Separator();
-
+		if (scene_.camera_) {
 			ImGui::DragFloat("Zoom:", &scene_.camera_.get()->Zoom, scene_.camera_->MouseSensitivity);
 			if (ImGui::DragFloat("X offset:", &Xoffset, scene_.camera_->MouseSensitivity)) {
-				scene_.camera_->ProcessMouseMovement(Xoffset,Yoffset);
+				scene_.camera_->ProcessMouseMovement(Xoffset, Yoffset);
 			}
 			if (ImGui::DragFloat("Y offset:", &Yoffset, scene_.camera_->MouseSensitivity)) {
 				scene_.camera_->ProcessMouseMovement(Xoffset, Yoffset);
 			}
-			
+
 			ImGui::Text("Camera Position:");
 			ImGui::DragFloat("X:", &scene_.camera_.get()->Position.x, 0.01f);
 			ImGui::DragFloat("Y:", &scene_.camera_.get()->Position.y, 0.01f);
-
-
+		}
 	}
 
 	void RenderWidget::RenderSelectedMeshProps(int index) {

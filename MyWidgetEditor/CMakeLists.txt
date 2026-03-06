@@ -13,18 +13,9 @@ set(MAIN_SOURCES
     src/glad-impl.cpp
     src/stb.cpp
 )
-# Файлы из папки Helpers
-file(GLOB HELPERS_SOURCES
-    "src/OpenGLHelpers/*.cpp"
-    "src/OpenGLHelpers/*.c"
-)
 
-file(GLOB HELPERS_HEADERS
-    "src/OpenGLHelpers/*.hpp"
-    "src/OpenGLHelpers/*.h"
-)
 
-# Файлы из папки widgets
+# пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ widgets
 file(GLOB WIDGETS_SOURCES
     "src/widgets/*.cpp"
     "src/widgets/*.c"
@@ -35,7 +26,7 @@ file(GLOB WIDGETS_HEADERS
     "src/widgets/*.h"
 )
 
-# Файлы из папки ui
+# пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ ui
 file(GLOB UI_SOURCES
     "src/ui/*.cpp"
     "src/ui/*.c"
@@ -46,7 +37,7 @@ file(GLOB UI_HEADERS
     "src/ui/*.h"
 )
 
-# Файлы из папки styles
+# пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ styles
 file(GLOB STYLES_SOURCES
     "src/styles/*.cpp"
     "src/styles/*.c"
@@ -57,7 +48,7 @@ file(GLOB STYLES_HEADERS
     "src/styles/*.h"
 )
 
-# Файлы из папки managers
+# пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ managers
 file(GLOB MANAGERS_SOURCES
     "src/managers/*.cpp"
     "src/managers/*.c"
@@ -68,14 +59,22 @@ file(GLOB MANAGERS_HEADERS
     "src/managers/*.h"
 )
 
-# Файлы из папки include
+# пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ include
 file(GLOB INCLUDE_HEADERS
     "src/include/*.cpp"
     "src/include/*.c"
 )
 
+# пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ Helpers
+file(GLOB GLHELPERS_SOURCES
+    "${GLHELPERS_DIR}/*.cpp"
+)
+file(GLOB GLHELPERS_HEADERS
+    "${GLHELPERS_DIR}/*.hpp"
+    "${GLHELPERS_DIR}/*.h"
+)
 
-# Объединяем все
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 set(ALL_SOURCES
     ${MAIN_SOURCES}
     ${HELPERS_SOURCES}
@@ -83,6 +82,7 @@ set(ALL_SOURCES
     ${UI_SOURCES}
     ${STYLES_SOURCES}
     ${MANAGERS_SOURCES}
+    ${GLHELPERS_SOURCES}
     
 )
 
@@ -92,6 +92,7 @@ set(ALL_HEADERS
     ${UI_HEADERS}
     ${STYLES_HEADERS}
     ${MANAGERS_HEADERS}
+    ${GLHELPERS_HEADERS}
 )
 
 # Create executable
@@ -111,17 +112,24 @@ target_include_directories(MyWidgetEditor PRIVATE
     ${IMGUI_DIR}/backends
     ${IMGUI_DIR}/misc/cpp
     ${GLM_DIR}
+    ${GLHELPERS_DIR}  
     ${GLFW_DIR}/include
-    #${GLAD_DIR}
+    ${ASSIMP_DIR}/include
     ${HTTPLIB_DIR}
     ${JSON_DIR}
     ${STB_DIR}    
 )
 
 target_link_libraries(MyWidgetEditor PRIVATE 
-    "${GLFW_DIR}/lib-vc2022/glfw3.lib" 
+    "${GLFW_DIR}/lib-vc2022/glfw3.lib"     
     opengl32
+    assimp
 )
+
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE) # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ .lib, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ .dll
+
 
 # Copy configs directory to output
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/configs 

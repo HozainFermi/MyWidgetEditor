@@ -4,7 +4,7 @@ project(Drawer)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Собираем все исходники 
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 file(GLOB_RECURSE RUNTIME_SOURCES "runtime_widgets/*.*")
 set(MANAGERS_FILES managers/RuntimeWidgetManager.cpp managers/RuntimeWidgetManager.h managers/RuntimeWidgetFactory.h)
 set(UI_FILES ui/MainWindowLayout.cpp ui/MainWindowLayout.h ui/RuntimeWindowProperties.h)
@@ -41,10 +41,11 @@ target_compile_definitions(Drawer PRIVATE
     PROJECT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-# Линковка
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 target_link_libraries(Drawer PRIVATE 
      "${GLFW_DIR}/lib-vc2022/glfw3.lib" 
     opengl32
     OpenSSL::SSL 
     OpenSSL::Crypto
+    assimp
 )

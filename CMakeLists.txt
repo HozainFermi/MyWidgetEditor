@@ -1,15 +1,25 @@
 ﻿cmake_minimum_required(VERSION 3.10)
 project(ParentProject)
 
-# Глобальные пути к либам
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
+set(ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
+set(MODELS_DIR "${ASSETS_DIR}/models")
+set(SHADERS_DIR "${ASSETS_DIR}/shaders")
+set(SHAPES_DIR "${ASSETS_DIR}/shapes")
+set(TEXTURES_DIR "${ASSETS_DIR}/textures")
+
+# Глобальные пути к либам
 set(GLFW_DIR "${EXTERNAL_DIR}/glfw")
+set(ASSIMP_DIR "${EXTERNAL_DIR}/assimp")
+set(GLHELPERS_DIR "${EXTERNAL_DIR}/OpenGLHelpers")
 set(IMGUI_DIR "${EXTERNAL_DIR}/imgui")
 set(GLM_DIR "${EXTERNAL_DIR}/glm")
 #set(GLAD_DIR "${EXTERNAL_DIR}/glad")
 set(HTTPLIB_DIR "${EXTERNAL_DIR}/httplib")
 set(JSON_DIR "${EXTERNAL_DIR}/json")
 set(STB_DIR "${EXTERNAL_DIR}/stb")
+
 
 # Собираем список файлов ImGui один раз для всех
 set(IMGUI_SOURCES
@@ -23,5 +33,6 @@ set(IMGUI_SOURCES
 )
 
 # Подключаем подпроекты
+add_subdirectory(${ASSIMP_DIR} assimp_build)
 add_subdirectory(MyWidgetEditor)
 add_subdirectory(Drawer)

@@ -36,7 +36,7 @@ namespace wg {
         WidgetType type_;
         std::string widget_class_="None";
 
-        ImVec2 position_;      // Левый верхний угол относительно канваса
+        ImVec2 position_;      // Левый верхний угол относительно канваса (локальные координаты в канвасе)
         ImVec2 size_;          // Ширина и высота
 
         // Состояние

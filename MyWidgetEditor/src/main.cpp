@@ -31,6 +31,7 @@
 #endif
 #include <vector>
 #include <iostream>
+#include <stb_image.h>
 
 
 
@@ -151,6 +152,7 @@ int main(int, char**)
         io.IniFilename = nullptr;
         EMSCRIPTEN_MAINLOOP_BEGIN
 #else
+        stbi_set_flip_vertically_on_load(true);
         glEnable(GL_DEPTH_TEST);
         while (!glfwWindowShouldClose(window))
 #endif
