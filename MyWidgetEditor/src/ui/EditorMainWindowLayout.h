@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 #include "RuntimeWindowProperties.h"
 
-
 enum class FileBrowserMode {
     Load,
     Run,
@@ -16,6 +15,26 @@ enum class FileBrowserMode {
 class Editor {
 private:
     wg::WidgetManager widget_manager_;
+   
+    // Связи между виджетами
+    struct PortRef {
+        std::string widget_id;
+        std::string port;
+    };
+    struct Connection {
+        PortRef from;
+        PortRef to;
+    };
+    std::vector<Connection> connections_;
+    // для отрисовки и взаимодействия
+    struct PortVisual {
+        PortRef ref;
+        ImVec2  pos;
+        bool    is_input;
+    };
+    std::vector<PortVisual> port_visuals_;
+    bool is_dragging_connection_ = false;
+    PortRef drag_from_port_;
    
     // Состояние редактора
     ImVec2 canvas_p0_;
@@ -135,6 +154,8 @@ private:
     // Вспомогательные методы
     ImVec2 GetMousePosRelativeToCanvas() const;
     void DrawGrid(ImDrawList* draw_list) const;
+    void RenderConnections(ImDrawList* draw_list);
+    void RenderPortsAndHandleConnections(ImDrawList* draw_list);
 
     // Создание виджетов
     void CreateWidgetFromTemplate(const std::string& type, const ImVec2& position);

@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <vector>
 #include <json.hpp>
 #include "imgui_internal.h"
 
@@ -27,6 +28,16 @@ namespace wg {
         IMAGE,
         CONTAINER,
         CUSTOM
+    };
+
+    // Примитивный тип данных между виджетами (JSON как универсальный контейнер)
+    using WidgetValue = nlohmann::json;
+
+    struct PortDesc {
+        std::string name;   // внутреннее имя порта
+        std::string label;  // отображаемое имя
+        std::string type;   // произвольный строковый тип ("event","table","number"...)
+        bool is_input = true;
     };
 
     class Widget {
@@ -81,6 +92,19 @@ namespace wg {
         virtual void OnDeselected() {}
         virtual void OnValueChanged() {}
         virtual void OnClick() {}
+
+        // === Порты и пайплайн данных/событий ===
+        // По умолчанию виджет не имеет портов и игнорирует входы
+        virtual std::vector<PortDesc> GetInputPorts() const { return {}; }
+        virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
+        virtual void OnInput(const std::string& /*port*/, const WidgetValue& /*value*/) {}
+        using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const WidgetValue& value)>;
+        void SetEmitCallback(EmitCallback cb) { emit_callback_ = std::move(cb); }
+        void Emit(const std::string& port, const WidgetValue& value) {
+            if (emit_callback_) {
+                emit_callback_(id_, port, value);
+            }
+        }
 
         // === Сериализация ===
         virtual nlohmann::json ToJson() const;
@@ -143,5 +167,6 @@ namespace wg {
 
     private:
         static int next_id_;
+        EmitCallback emit_callback_{};
     };
 }

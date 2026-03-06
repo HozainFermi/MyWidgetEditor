@@ -565,6 +565,124 @@ void Editor::RenderCanvas() {
     widget_manager_.RenderAll(draw_list, canvas_p0_);
     widget_manager_.RenderContentAll(canvas_p0_);
 
-
+    // Порты и соединения поверх виджетов
+    RenderPortsAndHandleConnections(draw_list);
+    RenderConnections(draw_list);
     
+}
+
+void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
+{
+    port_visuals_.clear();
+
+    auto widgets = widget_manager_.GetAllWidgets();
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 mouse_pos = io.MousePos;
+
+    // Сначала собираем все порты и рисуем кружки
+    for (auto* w : widgets) {
+        if (!w) continue;
+        ImRect rect(
+            w->GetScreenMin(canvas_p0_),
+            w->GetScreenMax(canvas_p0_));
+
+        auto inputs = w->GetInputPorts();
+        auto outputs = w->GetOutputPorts();
+
+        const float radius = 4.0f;
+        const float spacing = 12.0f;
+
+        // Входы слева
+        for (int i = 0; i < (int)inputs.size(); ++i) {
+            ImVec2 p(
+                rect.Min.x,
+                rect.Min.y + 20.0f + i * spacing);
+            PortVisual vis{ {w->GetId(), inputs[i].name}, p, true };
+            port_visuals_.push_back(vis);
+            draw_list->AddCircleFilled(p, radius, IM_COL32(180, 220, 180, 255));
+        }
+        // Выходы справа
+        for (int i = 0; i < (int)outputs.size(); ++i) {
+            ImVec2 p(
+                rect.Max.x,
+                rect.Min.y + 20.0f + i * spacing);
+            PortVisual vis{ {w->GetId(), outputs[i].name}, p, false };
+            port_visuals_.push_back(vis);
+            draw_list->AddCircleFilled(p, radius, IM_COL32(220, 180, 180, 255));
+        }
+    }
+
+    // Обработка drag для создания соединений
+    const float hit_radius = 6.0f;
+
+    if (ImGui::IsMouseClicked(0)) {
+        // Начало drag'а по порту
+        for (auto& vis : port_visuals_) {
+            float dx = mouse_pos.x - vis.pos.x;
+            float dy = mouse_pos.y - vis.pos.y;
+            if (dx * dx + dy * dy <= hit_radius * hit_radius) {
+                is_dragging_connection_ = true;
+                drag_from_port_ = vis.ref;
+                break;
+            }
+        }
+    }
+
+    if (is_dragging_connection_) {
+        // Временная линия от исходного порта до мыши
+        ImVec2 from_pos{};
+        for (auto& vis : port_visuals_) {
+            if (vis.ref.widget_id == drag_from_port_.widget_id &&
+                vis.ref.port == drag_from_port_.port) {
+                from_pos = vis.pos;
+                break;
+            }
+        }
+        float dx = (mouse_pos.x - from_pos.x) * 0.5f;
+        ImVec2 c1(from_pos.x + dx, from_pos.y);
+        ImVec2 c2(mouse_pos.x - dx, mouse_pos.y);
+        draw_list->AddBezierCubic(from_pos, c1, c2, mouse_pos,
+            IM_COL32(200, 200, 100, 255), 2.0f);
+
+        if (ImGui::IsMouseReleased(0)) {
+            // Попробуем найти порт под мышью для завершения соединения
+            for (auto& vis : port_visuals_) {
+                float dx2 = mouse_pos.x - vis.pos.x;
+                float dy2 = mouse_pos.y - vis.pos.y;
+                if (dx2 * dx2 + dy2 * dy2 <= hit_radius * hit_radius) {
+                    // Не соединяем порт сам с собой
+                    if (!(vis.ref.widget_id == drag_from_port_.widget_id &&
+                          vis.ref.port == drag_from_port_.port)) {
+                        connections_.push_back({ drag_from_port_, vis.ref });
+                    }
+                    break;
+                }
+            }
+            is_dragging_connection_ = false;
+        }
+    }
+}
+
+void Editor::RenderConnections(ImDrawList* draw_list)
+{
+    // Нужно актуальное положение портов из port_visuals_
+    auto find_pos = [this](const PortRef& ref) -> ImVec2 {
+        for (auto& v : port_visuals_) {
+            if (v.ref.widget_id == ref.widget_id &&
+                v.ref.port == ref.port) {
+                return v.pos;
+            }
+        }
+        return ImVec2(0, 0);
+    };
+
+    for (const auto& c : connections_) {
+        ImVec2 p1 = find_pos(c.from);
+        ImVec2 p2 = find_pos(c.to);
+        float dx = (p2.x - p1.x) * 0.5f;
+        ImVec2 c1(p1.x + dx, p1.y);
+        ImVec2 c2(p2.x - dx, p2.y);
+        draw_list->AddBezierCubic(p1, c1, c2, p2,
+            IM_COL32(150, 150, 255, 255), 2.0f);
+    }
 }

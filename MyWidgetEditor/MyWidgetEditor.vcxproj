@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -445,6 +445,7 @@
     <ClInclude Include="src\ui\EditorMainWindowLayout.h" />
     <ClInclude Include="src\ui\RuntimeWindowProperties.h" />
     <ClInclude Include="src\widgets\InputTextWidget.h" />
+    <ClInclude Include="src\widgets\PlotWidget.h" />
     <ClInclude Include="src\widgets\TableWidget.h" />
     <ClInclude Include="src\widgets\TextWidget.h" />
     <ClInclude Include="src\widgets\Widget.h" />
@@ -471,6 +472,7 @@
     <ClCompile Include="src\styles\Background.cpp" />
     <ClCompile Include="src\ui\EditorMainWindowLayout.cpp" />
     <ClCompile Include="src\widgets\InputTextWidget.cpp" />
+    <ClCompile Include="src\widgets\PlotWidget.cpp" />
     <ClCompile Include="src\widgets\TableWidget.cpp" />
     <ClCompile Include="src\widgets\TextWidget.cpp" />
     <ClCompile Include="src\widgets\Widget.cpp" />
