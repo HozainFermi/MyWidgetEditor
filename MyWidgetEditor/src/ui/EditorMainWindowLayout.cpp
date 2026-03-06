@@ -589,13 +589,13 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
         auto inputs = w->GetInputPorts();
         auto outputs = w->GetOutputPorts();
 
-        const float radius = 4.0f;
-        const float spacing = 12.0f;
+        const float radius = 6.0f;
+        const float spacing = 15.0f;
 
         // Входы слева
         for (int i = 0; i < (int)inputs.size(); ++i) {
             ImVec2 p(
-                rect.Min.x,
+                rect.Min.x-3.0f,
                 rect.Min.y + 20.0f + i * spacing);
             PortVisual vis{ {w->GetId(), inputs[i].name}, p, true };
             port_visuals_.push_back(vis);
@@ -604,7 +604,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
         // Выходы справа
         for (int i = 0; i < (int)outputs.size(); ++i) {
             ImVec2 p(
-                rect.Max.x,
+                rect.Max.x+3.0f,
                 rect.Min.y + 20.0f + i * spacing);
             PortVisual vis{ {w->GetId(), outputs[i].name}, p, false };
             port_visuals_.push_back(vis);
