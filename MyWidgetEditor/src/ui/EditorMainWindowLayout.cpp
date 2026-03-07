@@ -4,6 +4,7 @@
 #include "RuntimeWindowProperties.h"
 #include "independent_launcher.h"
 #include <filesystem>
+#include <fstream>
 
 
 static void HelpMarker(const char* desc)
@@ -200,7 +201,7 @@ void Editor::RenderSaveFileMenu() {
                         ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1), "Config file with name '%s' already exists", it );
                     }
                     else {
-                        widget_manager_.SaveToFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+temp+".json",window_props_);
+                        SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR)+"/configs/"+temp+".json");
                         filebrowser_open_ = false;
                         filesave_open_ = false;
                     }
@@ -215,6 +216,29 @@ void Editor::RenderSaveFileMenu() {
             }
             ImGui::EndPopup();
         }
+    }
+}
+
+void Editor::SaveConfigWithConnections(const std::string& filename)
+{
+    // Базовый json с окном и виджетами
+    nlohmann::json json = widget_manager_.ToJson(window_props_);
+
+    // Сериализуем connections_
+    nlohmann::json conn = nlohmann::json::array();
+    for (const auto& c : connections_) {
+        conn.push_back({
+            {"from_widget", c.from.widget_id},
+            {"from_port",   c.from.port},
+            {"to_widget",   c.to.widget_id},
+            {"to_port",     c.to.port}
+        });
+    }
+    json["connections"] = conn;
+
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << json.dump(4);
     }
 }
 
@@ -676,7 +700,12 @@ void Editor::RenderConnections(ImDrawList* draw_list)
         return ImVec2(0, 0);
     };
 
-    for (const auto& c : connections_) {
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 mouse_pos = io.MousePos;
+    const float remove_radius = 8.0f;
+
+    for (int i = (int)connections_.size() - 1; i >= 0; --i) {
+        const auto& c = connections_[i];
         ImVec2 p1 = find_pos(c.from);
         ImVec2 p2 = find_pos(c.to);
         float dx = (p2.x - p1.x) * 0.5f;
@@ -684,5 +713,14 @@ void Editor::RenderConnections(ImDrawList* draw_list)
         ImVec2 c2(p2.x - dx, p2.y);
         draw_list->AddBezierCubic(p1, c1, c2, p2,
             IM_COL32(150, 150, 255, 255), 2.0f);
+
+        // Приближённая точка "середины" линии
+        ImVec2 mid((p1.x + p2.x) * 0.5f, (p1.y + p2.y) * 0.5f);
+        float dxm = mouse_pos.x - mid.x;
+        float dym = mouse_pos.y - mid.y;
+        if (dxm * dxm + dym * dym <= remove_radius * remove_radius &&
+            ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            connections_.erase(connections_.begin() + i);
+        }
     }
 }

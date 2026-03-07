@@ -116,6 +116,12 @@ namespace wg {
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;
 
+         //== порты ==
+        std::vector<PortDesc> GetInputPorts() const override { return {}; }
+        std::vector<PortDesc> GetOutputPorts() const override {
+            return { PortDesc{ "data", "Data", "table", false } };
+        }
+
     private:
         // Генерируем тестовые данные для превью в редакторе
         void GeneratePreviewData();

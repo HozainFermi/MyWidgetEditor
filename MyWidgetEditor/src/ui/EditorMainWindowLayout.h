@@ -157,6 +157,9 @@ private:
     void RenderConnections(ImDrawList* draw_list);
     void RenderPortsAndHandleConnections(ImDrawList* draw_list);
 
+    // Сохранение/загрузка конфигурации с учётом connections_
+    void SaveConfigWithConnections(const std::string& filename);
+
     // Создание виджетов
     void CreateWidgetFromTemplate(const std::string& type, const ImVec2& position);
 };

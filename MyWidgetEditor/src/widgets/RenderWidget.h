@@ -34,6 +34,12 @@ namespace wg {
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;
 
+        // Порты: вход для данных сцены (на будущее)
+        std::vector<PortDesc> GetInputPorts() const override {
+            return { PortDesc{ "scene", "Scene", "render_scene", true } };
+        }
+        std::vector<PortDesc> GetOutputPorts() const override { return {}; }
+
     private:
         void GeneratePreviewData();
 

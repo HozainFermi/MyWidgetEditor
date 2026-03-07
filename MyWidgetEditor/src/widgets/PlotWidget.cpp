@@ -41,7 +41,7 @@ namespace wg {
                     ImVec2(size.x - 20.0f, size.y - 20.0f));
             }
             else {
-                ImGui::Text("");
+                ImGui::Text("No data");
             }
 
             ImGui::EndChild();
@@ -55,6 +55,14 @@ namespace wg {
         ImGui::Text("Inputs:");
         ImGui::BulletText("data (array of numbers)");
         ImGui::BulletText("refresh (event)");
+
+        ImGui::Separator();
+        ImGui::Text("Data source settings");
+        char buf[128];
+        strncpy_s(buf, column_name_.c_str(), sizeof(buf));
+        if (ImGui::InputText("Column name", buf, sizeof(buf))) {
+            column_name_ = buf;
+        }
     }
 
     std::vector<PortDesc> PlotWidget::GetInputPorts() const
@@ -73,12 +81,20 @@ namespace wg {
     void PlotWidget::OnInput(const std::string& port, const WidgetValue& value)
     {
         if (port == "data") {
-            // ожидаем массив чисел в JSON
+            // ожидаем массив объектов [{...}], берем столбец column_name_
+            y_values_.clear();
             if (value.is_array()) {
-                y_values_.clear();
-                for (const auto& v : value) {
-                    if (v.is_number()) {
-                        y_values_.push_back(v.get<float>());
+                for (const auto& row : value) {
+                    if (!row.is_object()) continue;
+                    if (!row.contains(column_name_)) continue;
+                    const auto& cell = row[column_name_];
+                    if (cell.is_number()) {
+                        y_values_.push_back(cell.get<float>());
+                    } else if (cell.is_string()) {
+                        try {
+                            y_values_.push_back(std::stof(cell.get<std::string>()));
+                        } catch (...) {
+                        }
                     }
                 }
             }
@@ -86,6 +102,19 @@ namespace wg {
         else if (port == "refresh") {
             // на будущее: можно реагировать на событие
         }
+    }
+
+    nlohmann::json PlotWidget::ToJson() const
+    {
+        auto json = Widget::ToJson();
+        json["column_name"] = column_name_;
+        return json;
+    }
+
+    void PlotWidget::FromJson(const nlohmann::json& json)
+    {
+        Widget::FromJson(json);
+        column_name_ = json.value("column_name", std::string("Value"));
     }
 }
 

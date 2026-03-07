@@ -6,10 +6,10 @@ namespace rn {
     REGISTER_WIDGET(TableWidget);
 
     TableWidget::TableWidget() :
-        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // Больший размер по умолчанию
+        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  //    
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
-        // Инициализируем тестовые колонки для превью
+        //     
         //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id",50.0f, true }, std::vector < std::string>{}));
         //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
         //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
@@ -18,10 +18,10 @@ namespace rn {
     }
 
     TableWidget::TableWidget(const std::string& name, const ImVec2& pos) :
-        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // Больший размер по умолчанию
+        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  //    
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
-        // Инициализируем тестовые колонки для превью
+        //     
        //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id", 50.0f,true }, std::vector < std::string>{}) );
        //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
        //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
@@ -58,7 +58,7 @@ namespace rn {
 
         if (ImGui::BeginChild(("##table_child_" + GetId()).c_str(),
             size,
-            false, 
+            false, // No border
             ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_AlwaysUseWindowPadding)) {
@@ -66,7 +66,7 @@ namespace rn {
             // Получаем доступную область внутри окна
             ImVec2 content_size = ImGui::GetContentRegionAvail();
 
-            // Создаём таблицу
+            
             if (ImGui::BeginTable(("##table_" + GetId()).c_str(),
                 (int)columns_.size(),
                 flags_,
@@ -86,18 +86,41 @@ namespace rn {
                 }
 
                 static char buf[256];
-                for (int row = 0; row < max_display_rows_; row++) {
+                //for (int row = 0; row < max_display_rows_; row++) {
+                //    ImGui::TableNextRow();
+
+                //    for (int col = 0; col < (int)columns_.size(); col++) {
+                //        ImGui::TableSetColumnIndex(col);                       
+                //        sprintf_s(buf, columns_[col].second[row].c_str());
+                //        ImGui::PushID(row*10+col);
+                //        ImGui::Selectable(buf, column_selected[col]);
+                //        ImGui::PopID();
+                //    }
+                //}
+                // Определяем реальное количество строк для отображения
+                int rows_to_display = 0;
+                if (!columns_.empty() && !columns_[0].second.empty()) {
+                    rows_to_display = std::min((int)columns_[0].second.size(), max_display_rows_);
+                }
+
+                for (int row = 0; row < rows_to_display; row++) {
                     ImGui::TableNextRow();
 
                     for (int col = 0; col < (int)columns_.size(); col++) {
-                        ImGui::TableSetColumnIndex(col);                       
-                        sprintf_s(buf, columns_[col].second[row].c_str());
-                        ImGui::PushID(row*10+col);
+                        ImGui::TableSetColumnIndex(col);
+
+                        if (row < (int)columns_[col].second.size()) {
+                            sprintf_s(buf, columns_[col].second[row].c_str());
+                        }
+                        else {
+                            sprintf_s(buf, "");
+                        }
+
+                        ImGui::PushID(row * 10 + col);
                         ImGui::Selectable(buf, column_selected[col]);
                         ImGui::PopID();
                     }
                 }
-
                 ImGui::EndTable();
             }
 
@@ -134,9 +157,10 @@ namespace rn {
         static_data_ = data;
     }
 
+    
+
     httplib::Result TableWidget::LoadTableData()
     {
-        is_loading_ = true;
 
         for (auto& element : columns_) {
             element.second.clear();
@@ -145,36 +169,15 @@ namespace rn {
         if (data_source_type_ != DataSourceType::NONE &&
             data_source_type_ != DataSourceType::STATIC_DATA) {
 
-            // Парсинг URL
-            size_t protocolEnd = data_source_.find("://");
-            if (protocolEnd == std::string::npos) {
-                throw std::invalid_argument("Invalid URL: " + data_source_);
-            }
-
-            size_t domainStart = protocolEnd + 3;
-            size_t pathStart = data_source_.find('/', domainStart);
-
-            std::string scheme_host_port;
-            std::string path_query;
-
-            if (pathStart == std::string::npos) {
-                scheme_host_port = data_source_;
-                path_query = "/";  // Путь по умолчанию
-            }
-            else {
-                scheme_host_port = data_source_.substr(0, pathStart);
-                path_query = data_source_.substr(pathStart);
-            }
-
-            // Создание клиента с извлеченным хостом
-            httplib::Client cli(scheme_host_port.c_str());
-
-            // Использование извлеченного пути
-            if (auto res = cli.Get(path_query.c_str())) {
+            //URL
+            auto hostNquery = ParseUrl();
+            
+            httplib::Client cli(hostNquery.first.c_str());
+            
+            if (auto res = cli.Get(hostNquery.second.c_str())) {
                 if (data_source_type_ == DataSourceType::JSON_URL) {
                     std::cout << "RESPONSE: " << res->body.substr(0, 15) << std::endl;
                     FromResponseJsonToColumns(res->body);
-                    is_loading_ = false;
                 }
                 return res;
             }
@@ -200,19 +203,32 @@ namespace rn {
 
             if (time_since_last_update >= update_interval_millisec_) {
                 if (!is_loading_) {
-                  //current_thread_ = std::jthread(&rn::TableWidget::LoadTableData, this);
-                    LoadTableData();
+                    is_loading_ = true;
+                    load_thread_ = std::jthread([this]() {
+                        try {
+                            LoadTableData();
+                        } catch (...) {
+                        }
+                        is_loading_ = false;
+                    });
                 }
-                last_update_= std::chrono::steady_clock::now();
+                last_update_ = std::chrono::steady_clock::now();
                 return true;
             }            
             break;
         case UpdateTrigger::BUTTON_CLICK:
             break;
         case UpdateTrigger::ON_LOAD:
-            if (last_update_.time_since_epoch().count() == 0) {
-                
-                LoadTableData();
+            if (last_update_.time_since_epoch().count() == 0 && !is_loading_) {
+                is_loading_ = true;
+                load_thread_ = std::jthread([this]() {
+                    try {
+                        LoadTableData();
+                    } catch (...) {
+                    }
+                    is_loading_ = false;
+                });
+                last_update_ = std::chrono::steady_clock::now();
             }
             break;
        }       
@@ -230,22 +246,22 @@ namespace rn {
             nlohmann::json json = nlohmann::json::parse(body);
 
             if (json.is_array()) {
-                max_display_rows_ = json.size();
-                if (columns_.empty()) {
+                max_display_rows_ = (int)json.size();
+                rows_.clear();
+                if (columns_.empty() && !json.empty() && json[0].is_object()) {
                     for (auto& [key, value] : json[0].items()) {
                         columns_.push_back(std::pair{ TableColumnConfig{ key, key,50.0f, false }, std::vector<std::string>{} });
                     }
                 }
                 for (auto& line : json) {
-                                      
-                    if (line.is_object()) {                                               
-                        // Проверяем соответствие количества полей
-                        if (line.size() == columns_.size()) {                            
+                    if (line.is_object()) {
+                        if (line.size() == columns_.size()) {
                             int i = 0;
                             for (auto& [key, value] : line.items()) {
                                 columns_[i].second.push_back(value.dump());
                                 i++;
                             }
+                            rows_.push_back(line);
                         }
                         else {
                             std::cout << "Line has " << line.size() << " fields, but table has " << columns_.size() << " columns" << std::endl;
@@ -256,6 +272,9 @@ namespace rn {
                         throw std::invalid_argument("Element in array is not an object");
                     }
                 }
+
+                // Отправляем данные дальше
+                Emit("data", rows_);
             }
             else {
                 throw std::invalid_argument("Response body is not an array");
@@ -270,7 +289,7 @@ namespace rn {
     void TableWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);
 
-        // Колонки
+        // 
         if (json.contains("columns") && json["columns"].is_array()) {
             columns_.clear();
             for (const auto& col_json : json["columns"]) {
@@ -280,7 +299,7 @@ namespace rn {
             }
         }
 
-        // Источник данных
+        //  
         if (json.contains("data_source_type")) {
             data_source_type_ = (DataSourceType)json["data_source_type"].get<int>();
         }
@@ -295,7 +314,7 @@ namespace rn {
             update_interval_millisec_= std::chrono::milliseconds{ update_interval_ * 1000 };
         }
 
-        // Настройки таблицы
+        //  
         if (json.contains("flags")) {
             flags_ = json["flags"].get<int>();
         }
@@ -312,7 +331,7 @@ namespace rn {
             max_display_rows_ = json["max_display_rows"].get<int>();
         }
 
-        // Статические данные
+        //  
         if (json.contains("static_data") && json["static_data"].is_array()) {
             static_data_.clear();
             for (const auto& row_json : json["static_data"]) {
@@ -324,7 +343,7 @@ namespace rn {
             }
         }
 
-        // HTTP настройки
+        // HTTP 
         if (json.contains("api_key")) {
             api_key_ = json["api_key"].get<std::string>();
         }
@@ -333,8 +352,12 @@ namespace rn {
         }
     }
 
+
+
+    //==Helper functions==
+
     void TableWidget::GenerateData() {
-        // Генерируем тестовые данные для превью
+        //     
         static_data_.clear();
         for (int i = 0; i < 5; i++) {
             std::vector<std::string> row;
@@ -351,5 +374,29 @@ namespace rn {
             }
             static_data_.push_back(row);
         }
+    }
+
+    std::pair<std::string, std::string> TableWidget::ParseUrl() {
+        size_t protocolEnd = data_source_.find("://");
+        if (protocolEnd == std::string::npos) {
+            throw std::invalid_argument("Invalid URL: " + data_source_);
+        }
+
+        size_t domainStart = protocolEnd + 3;
+        size_t pathStart = data_source_.find('/', domainStart);
+
+        std::string scheme_host_port;
+        std::string path_query;
+
+        if (pathStart == std::string::npos) {
+            scheme_host_port = data_source_;
+            path_query = "/";
+        }
+        else {
+            scheme_host_port = data_source_.substr(0, pathStart);
+            path_query = data_source_.substr(pathStart);
+        }
+
+        return std::pair<std::string, std::string>{scheme_host_port, path_query};
     }
 }

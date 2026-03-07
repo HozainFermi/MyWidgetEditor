@@ -42,7 +42,7 @@ namespace rn {
             auto& creators = GetJsonCreators();
             auto it = creators.find(type);
             if (it != creators.end()) {
-                return it->second(json);  // Âûחûגאול creator, ךמעמנûי סאל גûחמגוע FromJson
+                return it->second(json);  // Âûחûגאול creator
             }
 
             return nullptr;

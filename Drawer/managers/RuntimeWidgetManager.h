@@ -13,6 +13,16 @@ namespace rn {
         int selected_widget_id_ = -1;
         RuntimeWidgetManager() = default;
 
+        struct PortRef {
+            std::string widget_id;
+            std::string port;
+        };
+        struct Connection {
+            PortRef from;
+            PortRef to;
+        };
+        std::vector<Connection> connections_;
+
     public:
         rn::RuntimeWindowProperties window_props_;
 

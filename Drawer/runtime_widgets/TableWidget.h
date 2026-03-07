@@ -4,6 +4,7 @@
 #include <string>
 #include "../managers/RuntimeWidgetFactory.h"
 #include <future>
+#include <thread>
 
 namespace rn {
 
@@ -25,7 +26,7 @@ namespace rn {
     };
 
     enum class UpdateTrigger {
-        NONE,          // Только ручное
+        NONE,        
         TIMER,
         BUTTON_CLICK,
         ON_LOAD
@@ -33,7 +34,7 @@ namespace rn {
 
     struct TableColumnConfig {
         std::string header;
-        std::string data_field;  // Поле в JSON/CSV (например: "name", "price")
+        std::string data_field;  //// РџРѕР»Рµ РІ JSON/CSV ("name", "price")
         float width = 100.0f;
         bool sortable = false;
         
@@ -47,37 +48,41 @@ namespace rn {
 
     class TableWidget : public Widget {
     private:
-        // === КОНФИГУРАЦИЯ ===
+        // === РљРћРќР¤РР“РЈР РђР¦РРЇ (СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РІ JSON) ===
         std::vector < std::pair<TableColumnConfig, std::vector<std::string>> > columns_;
         DataSourceType data_source_type_ = DataSourceType::NONE;
-        std::string data_source_;  // URL или путь к файлу
+        std::string data_source_;   // URL РёР»Рё РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
         UpdateTrigger update_trigger_ = UpdateTrigger::NONE;
-        int update_interval_ = 10;  // в секундах (если TIMER)
+        int update_interval_ = 10;  // seconds (TIMER)
         std::chrono::milliseconds update_interval_millisec_{10000};
         std::chrono::steady_clock::time_point last_update_;
         std::chrono::steady_clock::time_point now_;
-                   
+                  
        
         std::atomic<bool> is_loading_{ false };
         std::string latest_json_response_;
 
-        // Статические данные 
+        
+        std::vector<WidgetValue> rows_;
+        std::jthread load_thread_;
+
+        // РЎС‚Р°С‚РёС‡РµСЃРєРёРµ РґР°РЅРЅС‹Рµ (РµСЃР»Рё РёСЃС‚РѕС‡РЅРёРє STATIC_DATA) 
         std::vector<std::vector<std::string>> static_data_;
 
-        // Настройки таблицы
+        // РќР°СЃС‚СЂРѕР№РєРё С‚Р°Р±Р»РёС†С‹
         ImGuiTableFlags flags_;
         bool show_headers_ = true;
         bool show_borders_ = true;
         bool alternate_row_colors_ = true;
-        int max_display_rows_ = 100;  // Ограничение для производительности
+        int max_display_rows_ = 100;  // РћРіСЂР°РЅРёС‡РµРЅРёРµ РґР»СЏ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё
         bool column_selected[3] = {};
 
-        // Стиль (сериализуется)
+        // РЎС‚РёР»СЊ (СЃРµСЂРёР°Р»РёР·СѓРµС‚СЃСЏ)
         ImU32 header_bg_color_ = IM_COL32(60, 60, 80, 255);
         ImU32 row_bg_color_ = IM_COL32(40, 40, 50, 200);
         ImU32 alternate_row_bg_color_ = IM_COL32(50, 50, 60, 200);
 
-        // HTTP настройки (если URL)
+        // HTTP РЅР°СЃС‚СЂРѕР№РєРё (РµСЃР»Рё URL)
         std::string api_key_;
         std::map<std::string, std::string> custom_headers_;
 
@@ -95,7 +100,7 @@ namespace rn {
 
         void RenderProperties();
 
-        // === КОНФИГУРАЦИОННЫЕ МЕТОДЫ ===
+        // === РљРћРќР¤РР“РЈР РђР¦РРћРќРќР«Р• РњР•РўРћР”Р« ===
         void AddColumn(const std::string& header, float width = 100.0f,
             const std::string& data_field = "");
         void RemoveColumn(int index);
@@ -105,6 +110,8 @@ namespace rn {
         void SetUpdateTrigger(UpdateTrigger trigger, float interval = 5.0f);
         void SetStaticData(const std::vector<std::vector<std::string>>& data);
 
+        std::pair<std::string, std::string> ParseUrl();
+
         void SetApiKey(const std::string& api_key) { api_key_ = api_key; }
         void AddCustomHeader(const std::string& key, const std::string& value) {
             custom_headers_[key] = value;
@@ -113,16 +120,22 @@ namespace rn {
         bool UpdateTableData();
 
 
-        // === ГЕТТЕРЫ  ===
+        // === Р“Р•РўРўР•Р Р« ===
         const  std::vector < std::pair<TableColumnConfig, std::vector<std::string>> >& GetColumns() const { return columns_; }
         DataSourceType GetDataSourceType() const { return data_source_type_; }
         const std::string& GetDataSource() const { return data_source_; }
         UpdateTrigger GetUpdateTrigger() const { return update_trigger_; }
         float GetUpdateInterval() const { return update_interval_; }
 
-        // === СЕРИАЛИЗАЦИЯ ===       
+        // === РЎР•Р РРђР›РР—РђР¦РРЇ ===
         void FromResponseJsonToColumns(const std::string& body);
         void FromJson(const nlohmann::json& json) override;
+
+        // РїРѕСЂС‚С‹
+        std::vector<PortDesc> GetInputPorts() const override { return {}; }
+        std::vector<PortDesc> GetOutputPorts() const override {
+            return { PortDesc{ "data", "Data", "table", false } };
+        }
 
         
         ~TableWidget() = default;
