@@ -625,6 +625,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             port_visuals_.push_back(vis);
             draw_list->AddCircleFilled(p, radius, IM_COL32(180, 220, 180, 255));
         }
+
         // Выходы справа
         for (int i = 0; i < (int)outputs.size(); ++i) {
             ImVec2 p(
@@ -638,19 +639,21 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
 
     // Обработка drag для создания соединений
     const float hit_radius = 6.0f;
-
-    if (ImGui::IsMouseClicked(0)) {
+         
+        if (ImGui::IsMouseClicked(0)) {
         // Начало drag'а по порту
         for (auto& vis : port_visuals_) {
             float dx = mouse_pos.x - vis.pos.x;
             float dy = mouse_pos.y - vis.pos.y;
             if (dx * dx + dy * dy <= hit_radius * hit_radius) {
                 is_dragging_connection_ = true;
-                drag_from_port_ = vis.ref;
+                drag_from_port_ = vis.ref;               
                 break;
             }
         }
     }
+
+    
 
     if (is_dragging_connection_) {
         // Временная линия от исходного порта до мыши
