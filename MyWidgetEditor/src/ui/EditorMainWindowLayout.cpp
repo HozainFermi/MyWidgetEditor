@@ -603,6 +603,10 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 mouse_pos = io.MousePos;
 
+    const float radius = 6.0f;
+    const float spacing = 15.0f;
+    const float hit_radius = 6.0f;
+
     // Сначала собираем все порты и рисуем кружки
     for (auto* w : widgets) {
         if (!w) continue;
@@ -612,10 +616,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
 
         auto inputs = w->GetInputPorts();
         auto outputs = w->GetOutputPorts();
-
-        const float radius = 6.0f;
-        const float spacing = 15.0f;
-
+        
         // Входы слева
         for (int i = 0; i < (int)inputs.size(); ++i) {
             ImVec2 p(
@@ -624,6 +625,22 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             PortVisual vis{ {w->GetId(), inputs[i].name}, p, true };
             port_visuals_.push_back(vis);
             draw_list->AddCircleFilled(p, radius, IM_COL32(180, 220, 180, 255));
+
+            // Создаем невидимую кнопку поверх порта
+            ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
+            ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
+            if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
+                // Обработка клика
+                //is_dragging_connection_ = true;
+                //drag_from_port_ = vis.ref;
+            }
+
+            // Тултип при наведении
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", vis.ref.port.c_str());
+            }
+            ImGui::PopID();
+
         }
 
         // Выходы справа
@@ -634,12 +651,24 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             PortVisual vis{ {w->GetId(), outputs[i].name}, p, false };
             port_visuals_.push_back(vis);
             draw_list->AddCircleFilled(p, radius, IM_COL32(220, 180, 180, 255));
+            // Создаем невидимую кнопку поверх порта
+            ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
+            ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
+            if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
+                // Обработка клика
+                //is_dragging_connection_ = true;
+                //drag_from_port_ = vis.ref;
+            }
+
+            // Тултип при наведении
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", vis.ref.port.c_str());
+            }
+            ImGui::PopID();
         }
     }
 
-    // Обработка drag для создания соединений
-    const float hit_radius = 6.0f;
-         
+    // Обработка drag для создания соединений             
         if (ImGui::IsMouseClicked(0)) {
         // Начало drag'а по порту
         for (auto& vis : port_visuals_) {

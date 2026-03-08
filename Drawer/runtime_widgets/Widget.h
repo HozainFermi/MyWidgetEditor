@@ -88,6 +88,7 @@ namespace rn {
         virtual std::vector<PortDesc> GetInputPorts() const { return {}; }
         virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
         virtual void OnInput(const std::string& port, const WidgetValue& value) {}
+
         using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const WidgetValue& value)>;
         void SetEmitCallback(EmitCallback cb) { emit_callback_ = std::move(cb); }
         void Emit(const std::string& port, const WidgetValue& value) {
