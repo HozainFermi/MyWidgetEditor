@@ -85,18 +85,7 @@ namespace rn {
                     ImGui::TableHeadersRow();
                 }
 
-                static char buf[256];
-                //for (int row = 0; row < max_display_rows_; row++) {
-                //    ImGui::TableNextRow();
-
-                //    for (int col = 0; col < (int)columns_.size(); col++) {
-                //        ImGui::TableSetColumnIndex(col);                       
-                //        sprintf_s(buf, columns_[col].second[row].c_str());
-                //        ImGui::PushID(row*10+col);
-                //        ImGui::Selectable(buf, column_selected[col]);
-                //        ImGui::PopID();
-                //    }
-                //}
+                static char buf[256];               
                 // Определяем реальное количество строк для отображения
                 int rows_to_display = 0;
                 if (!columns_.empty() && !columns_[0].second.empty()) {

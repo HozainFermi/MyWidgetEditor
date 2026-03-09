@@ -6,7 +6,7 @@ namespace rn {
 
 	struct RuntimeWindowProperties {	
 		ImU32 bg_color = IM_COL32(40, 40, 40, 225);//IM_COL32(40, 40, 40, 255);
-		float bg_color_float[4]{ 0.15686275f,0.15686275f,0.15686275f ,0.8824f };
+		float bg_color_float[4]{ 0.15686275f, 0.15686275f, 0.15686275f, 0.8824f };
 		bool always_on_top = false;
 		bool moveble = true;
 		std::string frag_GLSLshader_file;

@@ -25,7 +25,9 @@ private:
         PortRef from;
         PortRef to;
     };
+
     std::vector<Connection> connections_;
+
     // для отрисовки и взаимодействия
     struct PortVisual {
         PortRef ref;

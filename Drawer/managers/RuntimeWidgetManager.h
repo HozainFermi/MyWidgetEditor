@@ -14,8 +14,8 @@ namespace rn {
         RuntimeWidgetManager() = default;
 
         struct PortRef {
-            std::string widget_id;
             std::string port;
+            std::string widget_id;
         };
         struct Connection {
             PortRef from;
@@ -41,14 +41,14 @@ namespace rn {
 
 
         // === Управление виджетами ===
-        template<typename T, typename... Args>
-        T* CreateWidget(Args&&... args) {
-            auto widget = std::make_unique<T>(std::forward<Args>(args)...);
-            T* ptr = widget.get();
-            widgets_by_id_[widget->GetId()] = ptr;
-            widgets_.push_back(std::move(widget));
-            return ptr;
-        }
+        //template<typename T, typename... Args>
+        //T* CreateWidget(Args&&... args) {
+        //    auto widget = std::make_unique<T>(std::forward<Args>(args)...);
+        //    T* ptr = widget.get();
+        //    widgets_by_id_[widget->GetId()] = ptr;
+        //    widgets_.push_back(std::move(widget));
+        //    return ptr;
+        //}
 
         // Добавляет виджет в менеджер
         void AddWidget(std::unique_ptr<Widget> widget) {

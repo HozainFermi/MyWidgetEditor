@@ -83,7 +83,17 @@ namespace rn {
         window_props_.moveble = windowjs.value("moveble", true);
         window_props_.FloatToImU32();
 
-
+        //Check connections
+        if (json.contains("connections")) {
+            for (const auto& connection : json["connection"])
+            {
+                connections_.push_back(Connection{
+                     PortRef{connection["from_port"],connection["from_widget"]},
+                     PortRef{connection["to_port"],connection["to_widget"]}
+                    });
+            }
+        }
+        
         for (const auto& widget_json : json["widgets"]) {
             // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = RuntimeWidgetFactory::CreateFromJson(widget_json);
@@ -98,4 +108,5 @@ namespace rn {
             }
         }
     }
+
 }
