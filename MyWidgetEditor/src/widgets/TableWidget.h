@@ -112,15 +112,15 @@ namespace wg {
         UpdateTrigger GetUpdateTrigger() const { return update_trigger_; }
         float GetUpdateInterval() const { return update_interval_; }
 
+         //== порты ==
+        std::vector<PortDesc> GetInputPorts() const override;
+        std::vector<PortDesc> GetOutputPorts() const override;
+
         // === —≈–»јЋ»«ј÷»я ===
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;
 
-         //== порты ==
-        std::vector<PortDesc> GetInputPorts() const override { return {}; }
-        std::vector<PortDesc> GetOutputPorts() const override {
-            return { PortDesc{ "data", "Data", "table", false } };
-        }
+        
 
     private:
         // √енерируем тестовые данные дл€ превью в редакторе

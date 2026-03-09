@@ -92,6 +92,7 @@ namespace rn {
                      PortRef{connection["to_port"],connection["to_widget"]}
                     });
             }
+
         }
         
         for (const auto& widget_json : json["widgets"]) {
@@ -100,7 +101,8 @@ namespace rn {
 
             if (widget) {                
                 widget.get()->FromJson(widget_json);
-                widgets_.push_back(std::move(widget));               
+                widgets_.push_back(std::move(widget));                               
+
             }
             else {
                 std::cerr << "Фабрика не смогла создать (неверный формат или не зарегистрирован)";

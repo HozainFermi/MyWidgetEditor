@@ -32,6 +32,10 @@ set(IMGUI_SOURCES
     ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp 
 )
 
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
 # Подключаем подпроекты
 add_subdirectory(${ASSIMP_DIR} assimp_build)
 add_subdirectory(MyWidgetEditor)

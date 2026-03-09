@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 #include "RuntimeWindowProperties.h"
+#include "Connections.h"
 
 enum class FileBrowserMode {
     Load,
@@ -15,25 +16,8 @@ enum class FileBrowserMode {
 class Editor {
 private:
     wg::WidgetManager widget_manager_;
-   
-    // Связи между виджетами
-    struct PortRef {
-        std::string widget_id;
-        std::string port;
-    };
-    struct Connection {
-        PortRef from;
-        PortRef to;
-    };
-
-    std::vector<Connection> connections_;
-
-    // для отрисовки и взаимодействия
-    struct PortVisual {
-        PortRef ref;
-        ImVec2  pos;
-        bool    is_input;
-    };
+    
+    // связи
     std::vector<PortVisual> port_visuals_;
     bool is_dragging_connection_ = false;
     PortRef drag_from_port_;

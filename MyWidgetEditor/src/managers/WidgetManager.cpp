@@ -4,6 +4,9 @@
 #include <fstream>
 #include <iostream>
 
+
+
+
 namespace wg {
     void WidgetManager::UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size) {
         for (size_t i = 0; i < widgets_.size(); i++) {
@@ -52,12 +55,21 @@ namespace wg {
     }
 
     void WidgetManager::DeleteWidget(const std::string& id) {
+
+        auto it = std::find_if(connections_.begin(), connections_.end(), [id](const Connection& p) {
+            return p.from.widget_id == id || p.to.widget_id == id;
+            });
+
+        if (it != connections_.end()) { connections_.erase(it); }
+
+        widgets_by_id_.erase(id);
         for (auto it = widgets_.begin(); it != widgets_.end(); ++it) {
             if ((*it)->GetId() == id) {
                 widgets_.erase(it);
                 break;
             }
         }
+
     }
 
     void WidgetManager::SaveToFile(const std::string& filename, const wg::RuntimeWindowProperties& mw_props) const {
@@ -102,6 +114,7 @@ namespace wg {
 
     void WidgetManager::FromJson(const nlohmann::json& json, wg::RuntimeWindowProperties& mw_props) {
         widgets_.clear();
+        widgets_by_id_.clear();
                
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;
@@ -123,14 +136,27 @@ namespace wg {
        mw_props.width = windowjs.value("width", 150);
        mw_props.height = windowjs.value("height", 300);
        mw_props.moveble = windowjs.value("moveble", true);
-      
+                   
+       //Check connections
+       if (json.contains("connections") && json["connections"].is_array()) {
+           for (const auto& connection : json["connections"])
+           {
+               connections_.push_back(Connection{
+                    PortRef{connection["from_port"],connection["from_widget"]},
+                    PortRef{connection["to_port"],connection["to_widget"]}
+                   });
+           }
+       }
+       
         for (const auto& widget_json : json["widgets"]) {
             // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);            
             if (widget) {                           
                 // Виджет уже создан и FromJson 
-                widget.get()->FromJson(widget_json);               
-                widgets_.push_back(std::move(widget));                
+                widget.get()->FromJson(widget_json);
+                widgets_by_id_[widget.get()->GetId()] = widget.get();
+                widgets_.push_back(std::move(widget));
+
             }
             else {
                 std::cout << "Фабрика не смогла создать (старый формат или не зарегистрирован)";
@@ -138,4 +164,6 @@ namespace wg {
             }
         }
     }
+
+    
 }

@@ -68,7 +68,7 @@ namespace wg {
     std::vector<PortDesc> PlotWidget::GetInputPorts() const
     {
         return {
-            PortDesc{ "data", "Data", "array<number>", true },
+            PortDesc("data","Data","json",true),
             PortDesc{ "refresh", "Refresh", "event", true }
         };
     }

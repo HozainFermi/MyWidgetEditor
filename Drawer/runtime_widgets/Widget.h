@@ -89,11 +89,29 @@ namespace rn {
         virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
         virtual void OnInput(const std::string& port, const WidgetValue& value) {}
 
+        //В коллбеке находится ссылка на OnInput связанного виджета
         using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const WidgetValue& value)>;
-        void SetEmitCallback(EmitCallback cb) { emit_callback_ = std::move(cb); }
-        void Emit(const std::string& port, const WidgetValue& value) {
-            if (emit_callback_) emit_callback_(id_, port, value);
+       
+        // Установить callback для конкретного порта
+        void SetPortCallback(const std::string& port, EmitCallback cb) {
+            from_port_callbacks_[port] = std::move(cb);
         }
+
+        // Очистить callback для порта
+        void ClearPortCallback(const std::string& port) {
+            from_port_callbacks_.erase(port);
+        }
+
+        // Обновленный метод Emit
+        void Emit(const std::string& from_port, const WidgetValue& value) {
+            // Ищем callback для этого порта
+            auto it = from_port_callbacks_.find(from_port);
+            if (it != from_port_callbacks_.end() && it->second) {
+                // Вызываем callback, передавая ID виджета, порт и значение
+                it->second(id_, from_port, value);
+            }
+        }
+
 
         // === Сериализация ===    
         virtual void FromJson(const nlohmann::json& json);
@@ -150,7 +168,8 @@ namespace rn {
         //ImRect GetScreenRect(const ImVec2& canvas_p0) { return ImRect(canvas_p0.x + position_.x, canvas_p0.y + position_.y, canvas_p0.x + position_.x + size_.x, canvas_p0.y + position_.y + size_.y); };
 
     private:
-        static int next_id_;
-        EmitCallback emit_callback_{};
+        static int next_id_;        
+        std::unordered_map<std::string, EmitCallback> from_port_callbacks_;  // Храним callback'и для каждого выходного порта
+        
     };
 }
