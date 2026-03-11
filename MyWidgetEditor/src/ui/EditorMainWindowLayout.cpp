@@ -4,6 +4,7 @@
 #include "RuntimeWindowProperties.h"
 #include "independent_launcher.h"
 #include <filesystem>
+#include <fstream>
 
 
 static void HelpMarker(const char* desc)
@@ -20,6 +21,7 @@ static void HelpMarker(const char* desc)
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
     widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+filename+".json", window_props_);                
+
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
     std::filesystem::path relfilePath(std::string(PROJECT_SOURCE_DIR)+"/configs/" + filename + ".json");
@@ -51,170 +53,26 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
 }
 
 
+void Editor::SaveConfigWithConnections(const std::string& filename)
+{
+    // Базовый json с окном и виджетами
+    nlohmann::json json = widget_manager_.ToJson(window_props_);
 
-void Editor::RenderFileBrowser(FileBrowserMode& mode) {
-    if (filebrowser_open_) {        
-        ImGui::OpenPopup("FileBrowser");
-        if (ImGui::BeginPopupModal("FileBrowser", NULL,
-            ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            // Строка поиска
-            static char search_buffer[256] = "";
-
-            // Синхронизируем buffer с search_query_
-            if (ImGui::IsWindowAppearing()) {
-                strncpy_s(search_buffer, search_query_.c_str(), sizeof(search_buffer) - 1);
-            }
-
-            if (ImGui::InputText("##Search", search_buffer, sizeof(search_buffer),
-                ImGuiInputTextFlags_CallbackAlways,
-                &Editor::SearchCallback))
-            {
-                // InputText возвращает true при редактировании
-                SetSearchQuery(search_buffer);
-            }
-
-            // Подсказка
-            ImGui::SameLine();
-            ImGui::TextDisabled("(?)");
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("Type to filter files\nPress Enter to open selected");
-            }
-
-            ImGui::Separator();
-
-            // Список файлов
-            const auto& files = GetFilteredFiles();
-            static int selected = -1;
-
-            if (ImGui::BeginChild("FileList", ImVec2(400, 300), true)) {
-                if (files.empty()) {
-                    ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1),
-                        search_query_.empty() ?
-                        "No config files found in ./configs/" :
-                        "No files matching '%s'", search_query_.c_str());
-                }
-                else {
-                    for (int i = 0; i < files.size(); i++) {
-                        if (ImGui::Selectable(files[i].c_str(), selected == i)) {
-                            selected = i;
-                        }
-
-                        // Двойной клик для быстрого открытия
-                        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {                            
-                            ImGui::CloseCurrentPopup();
-                            if (mode == FileBrowserMode::Run) {                                
-                                OnFileForRunSelected(files[selected]);
-
-                            }
-                            else if (mode == FileBrowserMode::Load) {
-                                OnFileForLoadSelected(files[selected]);
-                            }
-                            mode = FileBrowserMode::None;
-                            filebrowser_open_ = false;
-                        }
-                    }
-                }
-                ImGui::EndChild();
-
-            }
-
-            // Статистика
-            ImGui::Text("%zu files (%zu total)", files.size(), all_files_.size());
-
-            ImGui::Separator();
-
-            // Кнопки действий
-            if (ImGui::Button("Refresh")) {
-                ScanConfigFiles();
-                selected = -1;
-            }
-
-            ImGui::SameLine();
-
-            if (ImGui::Button("Open") && selected >= 0 && selected < files.size()) {
-                ImGui::CloseCurrentPopup();
-                filebrowser_open_ = false;
-                if (mode == FileBrowserMode::Run) {                    
-                    OnFileForRunSelected(files[selected]);
-                }
-                else if (mode == FileBrowserMode::Load) {
-                    OnFileForLoadSelected(files[selected]);
-                }
-                mode = FileBrowserMode::None;
-            }
-
-            ImGui::SameLine();
-
-            if (ImGui::Button("Cancel")) {
-                filebrowser_open_ = false;
-                mode = FileBrowserMode::None;
-                search_query_.clear();
-                filter_dirty_ = true;
-                strcpy_s(search_buffer, "");
-                ImGui::CloseCurrentPopup();
-            }
-
-            // Горячие клавиши
-            if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive()) {
-                if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
-                    ImGui::CloseCurrentPopup();
-                    mode = FileBrowserMode::None;
-                    filebrowser_open_ = false;
-                }
-                if (ImGui::IsKeyPressed(ImGuiKey_Enter) && selected >= 0 && selected < files.size()) {
-                    if (mode == FileBrowserMode::Run) {
-                        //OnFileSelected(files[selected]);
-                    }
-                    else if (mode == FileBrowserMode::Load) {
-                        OnFileForLoadSelected(files[selected]);
-                    }
-                    ImGui::CloseCurrentPopup();
-                    mode = FileBrowserMode::None;
-                }
-            }
-
-            ImGui::EndPopup();
-        }
+    // Сериализуем connections_
+    nlohmann::json conn = nlohmann::json::array();
+    for (const auto& c : widget_manager_.connections_) {
+        conn.push_back({
+            {"from_widget", c.from.widget_id},
+            {"from_port",   c.from.port},
+            {"to_widget",   c.to.widget_id},
+            {"to_port",     c.to.port}
+        });
     }
-}
+    json["connections"] = conn;
 
-void Editor::RenderSaveFileMenu() {
-    if (filesave_open_) {
-        static char savefile_buffer[32];
-        ImGui::OpenPopup("SaveFile");
-        if (ImGui::BeginPopupModal("SaveFile", NULL,
-            ImGuiWindowFlags_AlwaysAutoResize)) {
-
-            if (ImGui::BeginChild("SaveFileChild", ImVec2(400, 80), true)) {
-
-                ImGui::InputText("l", savefile_buffer,IM_ARRAYSIZE(savefile_buffer));
-                ImGui::SameLine();
-                ImGui::Text(".json");    
-                ImGui::Dummy(ImVec2(0,10));
-                std::string temp;
-                if (ImGui::Button("Save")) {
-                    temp = savefile_buffer;
-                    auto it = std::find(all_files_.begin(), all_files_.end(), temp);
-                    if (it!=all_files_.end()) {
-                        ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1), "Config file with name '%s' already exists", it );
-                    }
-                    else {
-                        widget_manager_.SaveToFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+temp+".json",window_props_);
-                        filebrowser_open_ = false;
-                        filesave_open_ = false;
-                    }
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Cancel")) {
-                    ImGui::CloseCurrentPopup();
-                    filebrowser_open_ = false;
-                    filesave_open_ = false;                    
-                }
-                ImGui::EndChild();
-            }
-            ImGui::EndPopup();
-        }
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << json.dump(4);
     }
 }
 
@@ -254,8 +112,8 @@ void Editor::RenderMenuBar() {
 
         ImGui::EndMenuBar();
     }
-    RenderFileBrowser(browsermode);
-    RenderSaveFileMenu();
+    Editor::RenderFileBrowser(browsermode);
+    Editor::RenderSaveFileMenu();
         
 }
 
@@ -412,8 +270,9 @@ void Editor::CreateWidgetFromTemplate(const std::string& widget_class, const ImV
     std::unique_ptr<wg::Widget> widget = wg::WidgetFactory::CreateWithName(widget_class, name, position);
 
     if (widget) {
-        // Добавляем в менеджер
-        widget_manager_.AddWidget(std::move(widget));        
+        // Добавляем в менеджер        
+        widget_manager_.AddWidget(std::move(widget));
+
     }
     else {
         // Обработка ошибки: виджет не зарегистрирован
@@ -565,6 +424,179 @@ void Editor::RenderCanvas() {
     widget_manager_.RenderAll(draw_list, canvas_p0_);
     widget_manager_.RenderContentAll(canvas_p0_);
 
+    // Порты и соединения поверх виджетов
+    RenderPortsAndHandleConnections(draw_list);
+    RenderConnections(draw_list);
+    
+    for (size_t i = 0; i < widget_manager_.connections_.size(); i++)
+    {
+        //std::cout << port_visuals_.size() << std::endl;
+        //std::cout << widget_manager_.connections_[i].to.widget_id << std::endl;
+        //std::cout << std::endl;
+        //std::cout << widget_manager_.connections_.size() <<std::endl;
+    }
+}
+
+void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
+{
+    port_visuals_.clear();
+
+    auto widgets = widget_manager_.GetAllWidgets();
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 mouse_pos = io.MousePos;
+
+    const float radius = 6.0f;
+    const float spacing = 15.0f;
+    const float hit_radius = 6.0f;
+
+    // Сначала собираем все порты и рисуем кружки
+    for (auto* w : widgets) {
+        if (!w) continue;
+        ImRect rect(
+            w->GetScreenMin(canvas_p0_),
+            w->GetScreenMax(canvas_p0_));
+
+        auto inputs = w->GetInputPorts();
+        auto outputs = w->GetOutputPorts();
+        
+        // Входы слева
+        for (int i = 0; i < (int)inputs.size(); ++i) {
+            ImVec2 p(
+                rect.Min.x-3.0f,
+                rect.Min.y + 20.0f + i * spacing);
+            PortVisual vis{ {inputs[i].name, w->GetId()}, p, true };
+            port_visuals_.push_back(vis);
+            draw_list->AddCircleFilled(p, radius, IM_COL32(180, 220, 180, 255));
+
+            // Создаем невидимую кнопку поверх порта
+            ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
+            ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
+            if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
+                // Обработка клика
+                //is_dragging_connection_ = true;
+                //drag_from_port_ = vis.ref;
+            }
+
+            // Тултип при наведении
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", vis.ref.port.c_str());
+            }
+            ImGui::PopID();
+
+        }
+
+        // Выходы справа
+        for (int i = 0; i < (int)outputs.size(); ++i) {
+            ImVec2 p(
+                rect.Max.x+3.0f,
+                rect.Min.y + 20.0f + i * spacing);
+            PortVisual vis{ {outputs[i].name, w->GetId()}, p, false };
+            port_visuals_.push_back(vis);
+            draw_list->AddCircleFilled(p, radius, IM_COL32(220, 180, 180, 255));
+            // Создаем невидимую кнопку поверх порта
+            ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
+            ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
+            if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
+                // Обработка клика
+                //is_dragging_connection_ = true;
+                //drag_from_port_ = vis.ref;
+            }
+
+            // Тултип при наведении
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", vis.ref.port.c_str());
+            }
+            ImGui::PopID();
+        }
+    }
+
+    // Обработка drag для создания соединений             
+        if (ImGui::IsMouseClicked(0)) {
+        // Начало drag'а по порту
+        for (auto& vis : port_visuals_) {
+            float dx = mouse_pos.x - vis.pos.x;
+            float dy = mouse_pos.y - vis.pos.y;
+            if (dx * dx + dy * dy <= hit_radius * hit_radius) {
+                is_dragging_connection_ = true;
+                drag_from_port_ = vis.ref;               
+                break;
+            }
+        }
+    }
 
     
+
+    if (is_dragging_connection_) {
+        // Временная линия от исходного порта до мыши
+        ImVec2 from_pos{};
+        for (auto& vis : port_visuals_) {
+            if (vis.ref.widget_id == drag_from_port_.widget_id &&
+                vis.ref.port == drag_from_port_.port) {
+                from_pos = vis.pos;
+                break;
+            }
+        }
+        float dx = (mouse_pos.x - from_pos.x) * 0.5f;
+        ImVec2 c1(from_pos.x + dx, from_pos.y);
+        ImVec2 c2(mouse_pos.x - dx, mouse_pos.y);
+        draw_list->AddBezierCubic(from_pos, c1, c2, mouse_pos,
+            IM_COL32(200, 200, 100, 255), 2.0f);
+
+        if (ImGui::IsMouseReleased(0)) {
+            // Попробуем найти порт под мышью для завершения соединения
+            for (auto& vis : port_visuals_) {
+                float dx2 = mouse_pos.x - vis.pos.x;
+                float dy2 = mouse_pos.y - vis.pos.y;
+                if (dx2 * dx2 + dy2 * dy2 <= hit_radius * hit_radius) {
+                    // Не соединяем порт сам с собой
+                    if (!(vis.ref.widget_id == drag_from_port_.widget_id &&
+                          vis.ref.port == drag_from_port_.port)) {
+                        widget_manager_.connections_.push_back({ drag_from_port_, vis.ref });
+                    }
+                    break;
+                }
+            }
+            is_dragging_connection_ = false;
+        }
+    }
+}
+
+void Editor::RenderConnections(ImDrawList* draw_list)
+{
+    // Нужно актуальное положение портов из port_visuals_
+    //TODO: заменить на map
+    auto find_pos = [this](const PortRef& ref) -> ImVec2 {
+        for (auto& v : port_visuals_) {                
+            if (v.ref.widget_id == ref.widget_id && v.ref.port == ref.port) {
+                return v.pos;
+            }
+        }
+        //std::cout <<"NOT FOUND:" << std::endl;
+        return ImVec2(0, 0);
+    };
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 mouse_pos = io.MousePos;
+    const float remove_radius = 8.0f;
+
+    for (int i = (int)widget_manager_.connections_.size() - 1; i >= 0; --i) {
+        const auto& c = widget_manager_.connections_[i];
+        ImVec2 p1 = find_pos(c.from);
+        ImVec2 p2 = find_pos(c.to);
+
+        float dx = (p2.x - p1.x) * 0.5f;
+        ImVec2 c1(p1.x + dx, p1.y);
+        ImVec2 c2(p2.x - dx, p2.y);
+        draw_list->AddBezierCubic(p1, c1, c2, p2,
+            IM_COL32(150, 150, 255, 255), 2.0f);
+
+        // Приближённая точка "середины" линии
+        ImVec2 mid((p1.x + p2.x) * 0.5f, (p1.y + p2.y) * 0.5f);
+        float dxm = mouse_pos.x - mid.x;
+        float dym = mouse_pos.y - mid.y;
+        if (dxm * dxm + dym * dym <= remove_radius * remove_radius &&
+            ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            widget_manager_.connections_.erase(widget_manager_.connections_.begin() + i);
+        }
+    }
 }

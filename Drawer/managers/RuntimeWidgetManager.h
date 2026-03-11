@@ -13,6 +13,16 @@ namespace rn {
         int selected_widget_id_ = -1;
         RuntimeWidgetManager() = default;
 
+        struct PortRef {
+            std::string port;
+            std::string widget_id;
+        };
+        struct Connection {
+            PortRef from;
+            PortRef to;
+        };
+        std::vector<Connection> connections_;
+
     public:
         rn::RuntimeWindowProperties window_props_;
 
@@ -31,14 +41,14 @@ namespace rn {
 
 
         // === Управление виджетами ===
-        template<typename T, typename... Args>
-        T* CreateWidget(Args&&... args) {
-            auto widget = std::make_unique<T>(std::forward<Args>(args)...);
-            T* ptr = widget.get();
-            widgets_by_id_[widget->GetId()] = ptr;
-            widgets_.push_back(std::move(widget));
-            return ptr;
-        }
+        //template<typename T, typename... Args>
+        //T* CreateWidget(Args&&... args) {
+        //    auto widget = std::make_unique<T>(std::forward<Args>(args)...);
+        //    T* ptr = widget.get();
+        //    widgets_by_id_[widget->GetId()] = ptr;
+        //    widgets_.push_back(std::move(widget));
+        //    return ptr;
+        //}
 
         // Добавляет виджет в менеджер
         void AddWidget(std::unique_ptr<Widget> widget) {

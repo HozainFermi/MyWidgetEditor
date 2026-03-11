@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 #include "RuntimeWindowProperties.h"
-
+#include "Connections.h"
 
 enum class FileBrowserMode {
     Load,
@@ -16,6 +16,11 @@ enum class FileBrowserMode {
 class Editor {
 private:
     wg::WidgetManager widget_manager_;
+    
+    // связи
+    std::vector<PortVisual> port_visuals_;
+    bool is_dragging_connection_ = false;
+    PortRef drag_from_port_;
    
     // Состояние редактора
     ImVec2 canvas_p0_;
@@ -135,6 +140,11 @@ private:
     // Вспомогательные методы
     ImVec2 GetMousePosRelativeToCanvas() const;
     void DrawGrid(ImDrawList* draw_list) const;
+    void RenderConnections(ImDrawList* draw_list);
+    void RenderPortsAndHandleConnections(ImDrawList* draw_list);
+
+    // Сохранение/загрузка конфигурации с учётом connections_
+    void SaveConfigWithConnections(const std::string& filename);
 
     // Создание виджетов
     void CreateWidgetFromTemplate(const std::string& type, const ImVec2& position);

@@ -7,11 +7,10 @@
 namespace rn {
 
 	 class MainWindowLayout {
-
      private:
          MainWindowLayout() = default;
 	     
-     public:		
+     public:		        
         static MainWindowLayout* Get() {
             static MainWindowLayout instance;
             return &instance;

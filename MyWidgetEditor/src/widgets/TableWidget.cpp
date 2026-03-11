@@ -349,4 +349,13 @@ namespace wg {
             static_data_.push_back(row);
         }
     }
+
+    std::vector<PortDesc> TableWidget::GetInputPorts() const {
+        return { };
+    }
+
+    std::vector<PortDesc> TableWidget::GetOutputPorts() const  {
+        return { PortDesc("data","Data","json",false)};
+    }
+
 }

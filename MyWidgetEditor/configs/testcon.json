@@ -1,0 +1,89 @@
+{
+    "connections": [
+        {
+            "from_port": "data",
+            "from_widget": "widget_0",
+            "to_port": "data",
+            "to_widget": "widget_1"
+        }
+    ],
+    "widgets": [
+        {
+            "alternate_row_colors": true,
+            "bg_color": 4283443240,
+            "columns": [
+                {
+                    "data_field": "id",
+                    "header": "ID",
+                    "sortable": true,
+                    "width": 50.0
+                },
+                {
+                    "data_field": "name",
+                    "header": "Name",
+                    "sortable": true,
+                    "width": 150.0
+                },
+                {
+                    "data_field": "value",
+                    "header": "Value",
+                    "sortable": false,
+                    "width": 100.0
+                }
+            ],
+            "data_source": "",
+            "data_source_type": 0,
+            "flags": 26561,
+            "id": "widget_0",
+            "max_display_rows": 100,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TableWidget1",
+            "position": [
+                3.0,
+                49.0
+            ],
+            "show_borders": true,
+            "show_headers": true,
+            "size": [
+                400.0,
+                300.0
+            ],
+            "type": 8,
+            "update_interval": 5,
+            "update_trigger": 0,
+            "widget_class": "TableWidget"
+        },
+        {
+            "bg_color": 4283443240,
+            "column_name": "Value",
+            "id": "widget_1",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "PlotWidget2",
+            "position": [
+                440.0,
+                101.0
+            ],
+            "size": [
+                300.0,
+                200.0
+            ],
+            "type": 7,
+            "widget_class": "PlotWidget"
+        }
+    ],
+    "window": {
+        "always_on_top": false,
+        "bg_color": [
+            0.2450980544090271,
+            0.1213475689291954,
+            0.1213475689291954,
+            1.0
+        ],
+        "frag_shader": "",
+        "height": 500,
+        "moveble": true,
+        "width": 500
+    }
+}

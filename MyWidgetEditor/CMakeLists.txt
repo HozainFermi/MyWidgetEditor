@@ -15,7 +15,7 @@ set(MAIN_SOURCES
 )
 
 
-# ����� �� ����� widgets
+# widgets
 file(GLOB WIDGETS_SOURCES
     "src/widgets/*.cpp"
     "src/widgets/*.c"
@@ -26,7 +26,7 @@ file(GLOB WIDGETS_HEADERS
     "src/widgets/*.h"
 )
 
-# ����� �� ����� ui
+# ui
 file(GLOB UI_SOURCES
     "src/ui/*.cpp"
     "src/ui/*.c"
@@ -37,7 +37,7 @@ file(GLOB UI_HEADERS
     "src/ui/*.h"
 )
 
-# ����� �� ����� styles
+#  styles
 file(GLOB STYLES_SOURCES
     "src/styles/*.cpp"
     "src/styles/*.c"
@@ -48,7 +48,7 @@ file(GLOB STYLES_HEADERS
     "src/styles/*.h"
 )
 
-# ����� �� ����� managers
+#  managers
 file(GLOB MANAGERS_SOURCES
     "src/managers/*.cpp"
     "src/managers/*.c"
@@ -59,13 +59,13 @@ file(GLOB MANAGERS_HEADERS
     "src/managers/*.h"
 )
 
-# ����� �� ����� include
+# include
 file(GLOB INCLUDE_HEADERS
     "src/include/*.cpp"
     "src/include/*.c"
 )
 
-# ����� �� ����� Helpers
+# Helpers
 file(GLOB GLHELPERS_SOURCES
     "${GLHELPERS_DIR}/*.cpp"
 )
@@ -74,7 +74,7 @@ file(GLOB GLHELPERS_HEADERS
     "${GLHELPERS_DIR}/*.h"
 )
 
-# ���������� ���
+# 
 set(ALL_SOURCES
     ${MAIN_SOURCES}
     ${HELPERS_SOURCES}
@@ -128,7 +128,7 @@ target_link_libraries(MyWidgetEditor PRIVATE
 
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE) # �������� ��� .lib, ����� �� �������� � .dll
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE) 
 
 
 # Copy configs directory to output

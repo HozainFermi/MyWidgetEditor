@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include "RuntimeWindowProperties.h"
+#include "Connections.h"
 
 namespace wg {
     class WidgetManager {
@@ -14,32 +15,14 @@ namespace wg {
         int selected_widget_index_ = -1;
 
     public:
-        // === Управление виджетами ===
-        template<typename T, typename... Args>
-        T* CreateWidget(Args&&... args) {
-            auto widget = std::make_unique<T>(std::forward<Args>(args)...);
-            T* ptr = widget.get();
-            widgets_by_id_[widget->GetId()] = ptr;
-            widgets_.push_back(std::move(widget));
-            return ptr;
-        }
+        // === Соединения ===
+        std::vector<Connection> connections_;
 
         // Добавляет виджет в менеджер
-        void AddWidget(std::unique_ptr<Widget> widget) {
+        void AddWidget(std::unique_ptr<Widget> widget) {            
+            widgets_by_id_[widget.get()->GetId()] = widget.get();
             widgets_.push_back(std::move(widget));
         }
-
-        //// Создает виджет по имени класса
-        //Widget* CreateWidgetByClass(const std::string& widget_class,
-        //    const std::string& name,
-        //    const ImVec2& pos) {
-        //    auto widget = WidgetFactory::CreateWithName(widget_class, name, pos);
-        //    if (!widget) return nullptr;
-
-        //    Widget* ptr = widget.get();
-        //    widgets_.push_back(std::move(widget));
-        //    return ptr;
-        //}
 
         void DeleteWidget(const std::string& id);
         void DeleteWidget(int index);
