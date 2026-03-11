@@ -246,7 +246,7 @@ namespace rn {
                     if (line.is_object()) {
                         if (line.size() == columns_.size()) {
                             int i = 0;
-                            for (auto& [key, value] : line.items()) {
+                            for (auto& [key, value] : line.items()) {                                
                                 columns_[i].second.push_back(value.dump());
                                 i++;
                             }

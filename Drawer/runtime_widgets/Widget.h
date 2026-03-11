@@ -5,9 +5,11 @@
 #include <imgui.h>
 #include <json.hpp>
 #include <imgui_internal.h>
+#include <iostream>
 
 namespace rn {
     // Примитивный тип данных между виджетами (JSON как универсальный контейнер)
+    // Строка в таблице
     using WidgetValue = nlohmann::json;
 
 
@@ -84,13 +86,14 @@ namespace rn {
         virtual void OnValueChanged() {}
         virtual void OnClick() {}
 
-        // Порты и пайплайн (по умолчанию отсутствуют)
+        // == Порты и пайплайн (по умолчанию отсутствуют) ==
+        //В коллбеке находится ссылка на OnInput связанного виджета
+        using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const std::vector<WidgetValue>& value) > ;
+        std::unordered_map<std::string, EmitCallback> from_port_callbacks_;  // Храним callback'и для каждого выходного порта
         virtual std::vector<PortDesc> GetInputPorts() const { return {}; }
         virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
-        virtual void OnInput(const std::string& port, const WidgetValue& value) {}
+        virtual void OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) {}
 
-        //В коллбеке находится ссылка на OnInput связанного виджета
-        using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const WidgetValue& value)>;
        
         // Установить callback для конкретного порта
         void SetPortCallback(const std::string& port, EmitCallback cb) {
@@ -103,15 +106,15 @@ namespace rn {
         }
 
         // Обновленный метод Emit
-        void Emit(const std::string& from_port, const WidgetValue& value) {
-            // Ищем callback для этого порта
+        void Emit(const std::string& from_port, const std::vector<WidgetValue>& value) {
+            // Ищем callback для этого порта           
             auto it = from_port_callbacks_.find(from_port);
             if (it != from_port_callbacks_.end() && it->second) {
-                // Вызываем callback, передавая ID виджета, порт и значение
+                // Вызываем callback, передавая ID виджета, порт и значение               
                 it->second(id_, from_port, value);
             }
         }
-
+        
 
         // === Сериализация ===    
         virtual void FromJson(const nlohmann::json& json);
@@ -157,6 +160,7 @@ namespace rn {
             default: return "NONE";
             }
         }
+        
 
     protected:
         // Внутренние методы для обработки
@@ -169,7 +173,6 @@ namespace rn {
 
     private:
         static int next_id_;        
-        std::unordered_map<std::string, EmitCallback> from_port_callbacks_;  // Храним callback'и для каждого выходного порта
         
     };
 }

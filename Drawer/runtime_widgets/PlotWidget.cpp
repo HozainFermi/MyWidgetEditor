@@ -1,5 +1,6 @@
 #include "PlotWidget.h"
 #include <imgui_internal.h>
+#include <iostream>
 
 namespace rn {
 
@@ -58,12 +59,11 @@ namespace rn {
         y_values_.clear();
     }
 
-    void PlotWidget::OnInput(const std::string& port, const WidgetValue& value)
-    {
-        if (port == "data") {
-            y_values_.clear();
-            if (value.is_array()) {
-                for (const auto& row : value) {
+    void PlotWidget::OnInput(const std::string& from_widget_id,const std::string& from_port, const std::vector<WidgetValue>& value)
+    {        
+        if (from_port == "data") {
+            y_values_.clear();            
+                for (const auto& row : value) {                    
                     if (!row.is_object()) continue;
                     if (!row.contains(column_name_)) continue;
                     const auto& cell = row[column_name_];
@@ -75,7 +75,7 @@ namespace rn {
                         } catch (...) {}
                     }
                 }
-            }
+            
         }
     }
 }

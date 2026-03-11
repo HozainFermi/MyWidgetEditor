@@ -50,7 +50,7 @@ int main(int argc, char** argv)
         manager->LoadFromFile(argv[1]);
     }
     else {
-    manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/testbackground2.json");
+    manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/connection.json");
 
     }
 

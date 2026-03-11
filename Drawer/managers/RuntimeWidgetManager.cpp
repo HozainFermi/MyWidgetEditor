@@ -83,9 +83,9 @@ namespace rn {
         window_props_.moveble = windowjs.value("moveble", true);
         window_props_.FloatToImU32();
 
-        //Check connections
+        //Создаём соединения
         if (json.contains("connections")) {
-            for (const auto& connection : json["connection"])
+            for (const auto& connection : json["connections"])
             {
                 connections_.push_back(Connection{
                      PortRef{connection["from_port"],connection["from_widget"]},
@@ -95,20 +95,36 @@ namespace rn {
 
         }
         
+        // Пробуем создать виджет через фабрику            
         for (const auto& widget_json : json["widgets"]) {
-            // Пробуем создать виджет через фабрику
             std::unique_ptr<Widget> widget = RuntimeWidgetFactory::CreateFromJson(widget_json);
 
             if (widget) {                
-                widget.get()->FromJson(widget_json);
-                widgets_.push_back(std::move(widget));                               
-
+                widget->FromJson(widget_json);
+                widgets_by_id_[widget->GetId()] = widget.get();
+                widgets_.push_back(std::move(widget));                
             }
-            else {
-                std::cerr << "Фабрика не смогла создать (неверный формат или не зарегистрирован)";
-
-            }
+            else {std::cerr << "Фабрика не смогла создать (неверный формат или не зарегистрирован)";}            
         }
+
+            // Добавляем OnInput связанного виджета в коллбеки текущего виджета                
+            for (auto& widget : widgets_) {
+                for (auto& connection : connections_) {
+                if (connection.from.widget_id == widget->GetId()) {
+                    Widget* target_widget = widgets_by_id_[connection.to.widget_id];
+
+                    if (target_widget) {
+                        // Сохраняем лямбду, которая вызывает метод OnInput у target_widget
+                        widget->from_port_callbacks_[connection.from.port] =
+                            [target_widget](const std::string from_widget_id, std::string from_port, const std::vector<WidgetValue>& data) {
+                            target_widget->OnInput(from_widget_id, from_port, data);
+                            };
+                    }
+                }
+                }
+            }
+    
+    
     }
 
 }

@@ -22,7 +22,7 @@ namespace rn {
         void FromJson(const nlohmann::json& json) override;
 
         // Обработка входящих данных от таблицы
-        void OnInput(const std::string& port, const WidgetValue& value) override;
+        void OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) override;
     };
 }
 
