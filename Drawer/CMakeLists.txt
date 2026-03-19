@@ -4,7 +4,13 @@ project(Drawer)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# �������� ��� ��������� 
+# Implot
+file(GLOB IMPLOT_FILES
+    "${IMPLOT_DIR}/implot.cpp"
+    "${IMPLOT_DIR}/implot.h"
+    "${IMPLOT_DIR}/implot_internal.cpp"
+    "${IMPLOT_DIR}/implot_internal.h"
+)
 file(GLOB_RECURSE RUNTIME_SOURCES "runtime_widgets/*.*")
 set(MANAGERS_FILES managers/RuntimeWidgetManager.cpp managers/RuntimeWidgetManager.h managers/RuntimeWidgetFactory.h)
 set(UI_FILES ui/MainWindowLayout.cpp ui/MainWindowLayout.h ui/RuntimeWindowProperties.h)
@@ -12,12 +18,15 @@ set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
 
 find_package(OpenSSL REQUIRED)
 
+
+
 add_executable(Drawer 
     main.cpp 
     ${MANAGERS_FILES} 
     ${UI_FILES} 
     ${RUNTIME_SOURCES}
     ${IMGUI_SOURCES}
+    ${IMPLOT_FILES}
 )
 
 target_include_directories(Drawer PRIVATE 
@@ -41,7 +50,7 @@ target_compile_definitions(Drawer PRIVATE
     PROJECT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-# ��������
+# 
 target_link_libraries(Drawer PRIVATE 
      "${GLFW_DIR}/lib-vc2022/glfw3.lib" 
     opengl32

@@ -78,8 +78,9 @@ file(GLOB GLHELPERS_HEADERS
 file(GLOB IMPLOT_FILES
     "${IMPLOT_DIR}/implot.cpp"
     "${IMPLOT_DIR}/implot.h"
-    "${IMPLOT_DIR}/implot_internal.cpp"
+    "${IMPLOT_DIR}/implot_items.cpp"
     "${IMPLOT_DIR}/implot_internal.h"
+    #"${IMPLOT_DIR}/implot_demo.cpp"
 )
 
 # 

@@ -10,6 +10,12 @@ namespace rn {
     private:
         std::vector<float> y_values_;
         std::string column_name_ = "Value";
+        //---------------------------------\\
+        std::vector<float> y_values_;
+        std::vector < std::vector<float> > xy_values_;
+        std::string plot_name_ = "Plot";
+        std::vector < std::tuple<std::string, std::string, std::string> > charts_;
+
 
     public:
         PlotWidget();
