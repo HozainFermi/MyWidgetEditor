@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB IMPLOT_FILES
     "${IMPLOT_DIR}/implot.cpp"
     "${IMPLOT_DIR}/implot.h"
-    "${IMPLOT_DIR}/implot_internal.cpp"
+    "${IMPLOT_DIR}/implot_items.cpp"
     "${IMPLOT_DIR}/implot_internal.h"
 )
 file(GLOB_RECURSE RUNTIME_SOURCES "runtime_widgets/*.*")

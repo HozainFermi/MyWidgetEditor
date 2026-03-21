@@ -131,6 +131,7 @@ namespace wg {
         // Настройки графиков
         ImGui::Text("Charts:");
         for (size_t i = 0; i < chart_configs_.size(); i++) {
+
             char titile_buf[128];
             char x_column_buf[128];
             char y_column_buf[128];
@@ -142,8 +143,7 @@ namespace wg {
             ImGui::PushID((int)i);
 
             ImGui::Text("Chart %d:", (int)i + 1);
-            ImGui::SetNextItemWidth(50);
-           //ImGui::SetNextItemWidth(50);
+            ImGui::SetNextItemWidth(50);           
             if (ImGui::InputText("##title_column", titile_buf, sizeof(titile_buf))) {
                 chart_configs_[i].title_column= titile_buf;
             }

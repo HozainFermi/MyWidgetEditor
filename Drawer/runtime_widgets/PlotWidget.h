@@ -6,16 +6,53 @@
 
 namespace rn {
 
+    struct ChartData {
+        std::string name;
+        std::vector<float> x_data;
+        std::vector<float> y_data;
+    };
+    struct ChartMapping {
+        std::string title_column;
+        std::string x_column;
+        std::string y_column;
+
+        nlohmann::json ToJson() const {
+            return {
+                {"chart_title", title_column},
+                {"x_key", x_column},
+                {"y_key", y_column}
+            };
+        }
+        void FromJson(const nlohmann::json& json) {
+            title_column = json.value("chart_title", "");
+            x_column = json.value("x_key", "");
+            y_column = json.value("y_key", "");
+        }
+
+    };
+
+    enum class PlotType {
+        LinePlot,
+        FilledLinePlot,
+        ScatterPlot,
+        BubblePlot,
+        PieChart,
+        RealTimePlot,
+        CandleStickChart,
+        None
+    };
+
     class PlotWidget : public Widget {
     private:
-        std::vector<float> y_values_;
-        std::string column_name_ = "Value";
-        //---------------------------------\\
-        std::vector<float> y_values_;
-        std::vector < std::vector<float> > xy_values_;
-        std::string plot_name_ = "Plot";
-        std::vector < std::tuple<std::string, std::string, std::string> > charts_;
+        // Данные для графика        
+        PlotType plot_type_{ 0 };
 
+        std::string plot_name_ = "Plot";
+        std::string x_plot_label_ = "x values";
+        std::string y_plot_label_ = "y values";
+
+        std::vector<ChartMapping> chart_configs_;
+        std::vector<ChartData> all_charts_;
 
     public:
         PlotWidget();

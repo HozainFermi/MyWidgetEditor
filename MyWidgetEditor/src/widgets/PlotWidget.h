@@ -32,14 +32,14 @@ namespace wg {
     };
 
     enum class PlotType {
-        None,
         LinePlot,
         FilledLinePlot,
         ScatterPlot,
         BubblePlot,
         PieChart,
         RealTimePlot,
-        CandleStickChart
+        CandleStickChart,
+        None
     };
 
 
