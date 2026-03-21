@@ -74,6 +74,15 @@ file(GLOB GLHELPERS_HEADERS
     "${GLHELPERS_DIR}/*.h"
 )
 
+# Implot
+file(GLOB IMPLOT_FILES
+    "${IMPLOT_DIR}/implot.cpp"
+    "${IMPLOT_DIR}/implot.h"
+    "${IMPLOT_DIR}/implot_items.cpp"
+    "${IMPLOT_DIR}/implot_internal.h"
+    #"${IMPLOT_DIR}/implot_demo.cpp"
+)
+
 # 
 set(ALL_SOURCES
     ${MAIN_SOURCES}
@@ -96,7 +105,7 @@ set(ALL_HEADERS
 )
 
 # Create executable
-add_executable(MyWidgetEditor ${ALL_SOURCES} ${ALL_HEADERS} ${IMGUI_SOURCES})
+add_executable(MyWidgetEditor ${ALL_SOURCES} ${ALL_HEADERS} ${IMGUI_SOURCES} ${IMPLOT_FILES})
 
 # Include directories
 target_include_directories(MyWidgetEditor PRIVATE

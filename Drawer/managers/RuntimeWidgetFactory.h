@@ -60,6 +60,8 @@ namespace rn {
         static bool IsTypeRegistered(const std::string& type_name) {
             return GetJsonCreators().find(type_name) != GetJsonCreators().end();
         }
+        
+
     };
 
 
