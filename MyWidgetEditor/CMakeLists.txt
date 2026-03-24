@@ -102,7 +102,7 @@ set(ALL_HEADERS
     ${STYLES_HEADERS}
     ${MANAGERS_HEADERS}
     ${GLHELPERS_HEADERS}
-)
+ "src/include/BBCodeParser.h" "src/styles/IconText.h")
 
 # Create executable
 add_executable(MyWidgetEditor ${ALL_SOURCES} ${ALL_HEADERS} ${IMGUI_SOURCES} ${IMPLOT_FILES})

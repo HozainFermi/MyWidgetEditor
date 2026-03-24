@@ -134,6 +134,7 @@ namespace wg {
 			ImGui::Text("Camera Position:");
 			ImGui::DragFloat("X:", &scene_.camera_.get()->Position.x, 0.01f);
 			ImGui::DragFloat("Y:", &scene_.camera_.get()->Position.y, 0.01f);
+			ImGui::DragFloat("Z:", &scene_.camera_.get()->Position.z, 0.01f);
 		}
 	}
 

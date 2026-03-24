@@ -4,9 +4,7 @@
 #include <vector>
 #include "Scene.hpp"
 #include "WidgetFactory.h"
-#include <shapes/cube.hpp>
-#include <shapes/plane.hpp>
-#include <shaders/shaderSources.hpp>
+
 
 namespace wg {
 

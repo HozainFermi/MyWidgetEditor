@@ -5,6 +5,7 @@
 #include "independent_launcher.h"
 #include <filesystem>
 #include <fstream>
+#include <IconText.h>
 
 
 static void HelpMarker(const char* desc)
@@ -77,14 +78,15 @@ void Editor::SaveConfigWithConnections(const std::string& filename)
 }
 
 // Реализация методов класса Editor
-void Editor::RenderMenuBar() {
+void Editor::RenderMenuBar() {  
     if (ImGui::BeginMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
+        //std::string FILEText = std::string(ICON(ICON_FILE_PLUS)) + " File";
+        if (ImGui::BeginMenu("File ")) {
             if (ImGui::MenuItem("Run", "")) {          
                 filebrowser_open_ = true;
                 browsermode = FileBrowserMode::Run;
             }
-            if (ImGui::MenuItem("Save", "Ctrl+S")) {
+            if (ImGui::MenuItem("Save ", "Ctrl+S")) {
                 filesave_open_ = true;                
             }
             if (ImGui::MenuItem("Load", "Ctrl+L")) {                
@@ -97,7 +99,7 @@ void Editor::RenderMenuBar() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Edit")) {
+        if (ImGui::BeginMenu("Edit ")) {
             if (ImGui::MenuItem("Undo", "Ctrl+Z")) {}
             if (ImGui::MenuItem("Redo", "Ctrl+Y")) {}
             ImGui::Separator();
@@ -105,13 +107,14 @@ void Editor::RenderMenuBar() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("View")) {
+        if (ImGui::BeginMenu("View ")) {
             ImGui::MenuItem("Show Grid", nullptr, &show_grid_);
             ImGui::EndMenu();
         }
 
         ImGui::EndMenuBar();
     }
+
     Editor::RenderFileBrowser(browsermode);
     Editor::RenderSaveFileMenu();
         

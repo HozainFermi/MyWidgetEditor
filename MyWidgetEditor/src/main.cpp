@@ -33,6 +33,7 @@
 #include <iostream>
 #include <stb_image.h>
 #include <implot/implot.h>
+#include <IconText.h>
 
 
 
@@ -112,6 +113,16 @@ int main(int, char**)
     ImGuiStyle& style = ImGui::GetStyle();
     style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
     style.FontScaleDpi = main_scale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+      
+    io.Fonts->AddFontDefault();
+    ImFontConfig config;
+    config.MergeMode = true;
+    config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced 
+    //std::string fonts_path { "%s/assets/fonts/OpenFontIcons.ttf",PROJECT_SOURCE_DIR };
+    //C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf
+    static const ImWchar icon_ranges[] = { ICON_MIN, ICON_MAX, 0 };
+    io.Fonts->AddFontFromFileTTF("C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf", 13.0f, &config);
+    io.Fonts->AddFontFromFileTTF("C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf", 25.0f, &config);
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
