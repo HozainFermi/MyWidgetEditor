@@ -48,7 +48,7 @@ namespace wg {
             text_begin_screen_pos.x = screen_max.x - (size_.x * 0.5f) - (text_size.x/2);            
         }
         if (right_alignment_) {
-            text_begin_screen_pos.x = screen_max.x - (size_.x * 0.5f) + 5;           
+            text_begin_screen_pos.x = screen_max.x - (size_.x * 0.5f);           
         }
        
        for (auto segment : parse_result_) {
