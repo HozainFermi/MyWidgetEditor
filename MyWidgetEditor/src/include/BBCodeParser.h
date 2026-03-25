@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include <stdexcept>
+
 
 // Битовые флаги для эффектов
 enum TextEffects_ {
@@ -16,6 +18,10 @@ struct TextSegment {
     std::string content; // Текст без тегов
     uint32_t flags;      // Активные эффекты 
 };
+
+
+//TODO: Два типа флагов, флаги эффектов Rainbow , shake, wave не могут пересекаться,
+//а флаги стилей b i могу пересекаться
 
 class BBCodeParser {
 public:
@@ -68,6 +74,10 @@ private:
         if (tag[0] == '/') { // Закрывающий тег [/tag]
             if (!stack.empty()) {
                 std::string top = stack.top();
+                if("/"+top!=tag) 
+                {
+                    throw std::invalid_argument("Tags are overlaping");
+                }
                 flags &= ~GetFlagForTag(top); // Убираем бит
                 stack.pop();
             }
@@ -82,6 +92,7 @@ private:
         if (tag == "b") return TextEffect_Bold;
         if (tag == "i") return TextEffect_Italic;
         if (tag == "wave") return TextEffect_Wave;
+        if (tag == "rainbow") return TextEffect_Rainbow;
         return 0;
     }
 };
