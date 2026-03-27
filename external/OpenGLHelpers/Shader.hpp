@@ -10,6 +10,8 @@ namespace Helpers {
     class Shader {
     public:
         GLuint ID;
+        std::string vertex_shader_path;
+        std::string fragment_shader_path;
 
         Shader(const char* vertexSource, const char* fragmentSource);
         Shader(std::filesystem::path vertexPath, std::filesystem::path fragmentPath);

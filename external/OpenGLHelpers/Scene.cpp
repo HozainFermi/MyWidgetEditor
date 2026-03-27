@@ -1,5 +1,4 @@
 #include "Scene.hpp"
-#include <shaders/shaderSources.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
@@ -34,14 +33,21 @@ namespace Styles {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void Scene::AddModel(const std::filesystem::path& path, const std::string& name)
+	void Scene::AddModel(
+		const std::filesystem::path& model_path,
+		const std::filesystem::path& vert_shader_path,
+		const std::filesystem::path& frag_shader_path,
+		const std::string& name)
 	{
 		ModelData data;
-		data.path = path;
-		data.name = name.empty() ? path.filename().string() : name;
-		data.model = std::make_unique<Helpers::Model>(path);
-		data.shader = std::make_unique<Helpers::Shader>(std::filesystem::path("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"),
-														std::filesystem::path("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag"));
+		data.path = model_path;
+		data.name = name.empty() ? model_path.filename().string() : name;
+		data.model = std::make_unique<Helpers::Model>(model_path);
+		data.shader = std::make_unique<Helpers::Shader>(vert_shader_path, frag_shader_path);
+														//std::filesystem::path("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag"))
+		data.shader->vertex_shader_path = vert_shader_path.string();
+		data.shader->fragment_shader_path = frag_shader_path.string();
+
 		data.model_mat = glm::mat4(1.0f);
 		models_.push_back(std::move(data));
 	}

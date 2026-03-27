@@ -5,6 +5,7 @@
 #include "independent_launcher.h"
 #include <filesystem>
 #include <fstream>
+#include <IconText.h>
 
 
 static void HelpMarker(const char* desc)
@@ -44,7 +45,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     std::string exePath = "\"" + absExePath.string() + "\"";
     std::string configPath = "\"" + absConfigPath.string() + "\""; 
 
-    std::cout << "Executing: " << exePath << " " << configPath << "\n";
+    std::cout << "Executing: " << exePath << " " << configPath << std::endl;
 
     // Вариант 1: Раздельная передача
     if (!IndependentLauncher::launch(exePath,configPath)) {
@@ -77,14 +78,15 @@ void Editor::SaveConfigWithConnections(const std::string& filename)
 }
 
 // Реализация методов класса Editor
-void Editor::RenderMenuBar() {
+void Editor::RenderMenuBar() {  
     if (ImGui::BeginMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
+        //std::string FILEText = std::string(ICON(ICON_FILE_PLUS)) + " File";
+        if (ImGui::BeginMenu("File ")) {
             if (ImGui::MenuItem("Run", "")) {          
                 filebrowser_open_ = true;
                 browsermode = FileBrowserMode::Run;
             }
-            if (ImGui::MenuItem("Save", "Ctrl+S")) {
+            if (ImGui::MenuItem("Save ", "Ctrl+S")) {
                 filesave_open_ = true;                
             }
             if (ImGui::MenuItem("Load", "Ctrl+L")) {                
@@ -97,7 +99,7 @@ void Editor::RenderMenuBar() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Edit")) {
+        if (ImGui::BeginMenu("Edit ")) {
             if (ImGui::MenuItem("Undo", "Ctrl+Z")) {}
             if (ImGui::MenuItem("Redo", "Ctrl+Y")) {}
             ImGui::Separator();
@@ -105,13 +107,14 @@ void Editor::RenderMenuBar() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("View")) {
+        if (ImGui::BeginMenu("View ")) {
             ImGui::MenuItem("Show Grid", nullptr, &show_grid_);
             ImGui::EndMenu();
         }
 
         ImGui::EndMenuBar();
     }
+
     Editor::RenderFileBrowser(browsermode);
     Editor::RenderSaveFileMenu();
         
@@ -154,8 +157,9 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
-    static char FRAGbuf[150];
     static char VERTbuf[150];
+    static char FRAGbuf[150];
+
     ImGui::Text("==Main window Properties:==");
     ImGui::Separator();
     ImGui::Text("Width: %.0f", canvas_size_.x);

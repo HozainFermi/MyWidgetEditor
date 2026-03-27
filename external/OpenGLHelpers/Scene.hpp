@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <Shader.hpp>
 #include <Model.hpp>
+#include <json.hpp>
 
 namespace Styles {
 
@@ -18,6 +19,15 @@ namespace Styles {
 		glm::mat4 model_mat = glm::mat4(1.0f);
 		std::filesystem::path path;
 		std::string name;
+
+		nlohmann::json ToJson() const {
+			nlohmann::json json;
+			json["model_path"] = path.string();
+			json["vert_shader_path"] = shader->vertex_shader_path;
+			json["fragment_shader_path"] = shader->fragment_shader_path;
+			return json;
+		}
+		
 	};
 
 	class Scene {
@@ -43,7 +53,10 @@ namespace Styles {
 		~Scene() = default;
 
 		void Draw();
-		void AddModel(const std::filesystem::path& path, const std::string& name);
+		void AddModel(const std::filesystem::path& model_path,
+			const std::filesystem::path& vert_shader_path,
+			const std::filesystem::path& frag_shader_path,
+			const std::string& name);
 
 		void ProcessInputData();
 	};
