@@ -1,0 +1,68 @@
+{
+    "connections": [],
+    "widgets": [
+        {
+            "bg_color": 4283443240,
+            "center_alignment": true,
+            "font_scale": 1.0,
+            "id": "widget_0",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TextWidget1",
+            "position": [
+                189.0,
+                102.0
+            ],
+            "size": [
+                283.0,
+                72.0
+            ],
+            "text": "[wave]Sample text[/wave] [rainbow]Hello ther[/rainbow]",
+            "type": 0,
+            "widget_class": "TextWidget",
+            "wrap_text": true
+        },
+        {
+            "bg_color": 4283443240,
+            "id": "widget_1",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "models": [
+                {
+                    "fragment_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag",
+                    "model_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj",
+                    "vert_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"
+                },
+                {
+                    "fragment_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag",
+                    "model_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj",
+                    "vert_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"
+                }
+            ],
+            "name": "RenderWidget2",
+            "position": [
+                125.0,
+                191.0
+            ],
+            "size": [
+                468.0,
+                400.0
+            ],
+            "type": 9,
+            "widget_class": "RenderWidget"
+        }
+    ],
+    "window": {
+        "always_on_top": false,
+        "bg_color": [
+            0.1568627506494522,
+            0.1568627506494522,
+            0.1568627506494522,
+            1.0
+        ],
+        "frag_shader": "",
+        "height": 500,
+        "moveble": true,
+        "width": 500
+    }
+}

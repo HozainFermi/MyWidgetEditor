@@ -2,7 +2,6 @@
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <IconText.h>
-#include <BBCodeParser.h>
 
 
 namespace wg {
@@ -142,7 +141,8 @@ namespace wg {
         ImGui::PopStyleVar();
         ImGui::PopStyleColor(1);
         ImGui::SetWindowFontScale(1.0f);
-
+        
+        ImGui::InputTextMultiline("check",&text_);
         ImGui::InputText("##textwContent", &text_, flags);
         if (ImGui::IsItemDeactivatedAfterEdit()) {            
                       
@@ -168,6 +168,10 @@ namespace wg {
         json["text"] = text_;
         json["font_scale"] = font_scale_;
         json["wrap_text"] = wrap_text_;
+
+        if (left_alignment_)  {json["left_alignment"] = true; }
+        if (center_alignment_){json["center_alignment"] = true; }
+        if (right_alignment_) {json["right_alignment"] = true; }
         return json;
     }
 
@@ -176,5 +180,9 @@ namespace wg {
         text_ = json.value("text", "");
         font_scale_ = json.value("font_scale", 1.0f);
         wrap_text_ = json.value("wrap_text", false);
+
+        if (json.value("left_alignment", true)) { left_alignment_ = true; }
+        if (json.value("center_alignment", true)) { center_alignment_ = true; }
+        if (json.value("right_alignment", true)) { right_alignment_ = true; }
     }
 }

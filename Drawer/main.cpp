@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <glad/gl.h>
 #include <stdio.h>
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #define GL_SILENCE_DEPRECATION
@@ -45,17 +46,7 @@ int main(int argc, char** argv)
     if (!glfwInit())
         return 1;
 
-    rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
-    if (argc>1) {
-        manager->LoadFromFile(argv[1]);
-    }
-    else {
-    manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot.json");
-
-    }
-
-    
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100 (WebGL 1.0)
@@ -91,6 +82,7 @@ int main(int argc, char** argv)
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
+   
     // Create window with graphics context
     //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
@@ -99,6 +91,21 @@ int main(int argc, char** argv)
         return 1;
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
+
+    if (!gladLoadGL(glfwGetProcAddress)) {
+        std::cerr << "GLAD BROKE!" << std::endl;
+        glfwTerminate();
+        return -2;
+    }
+
+    rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
+    if (argc > 1) {
+        manager->LoadFromFile(argv[1]);
+    }
+    else {
+        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/RENDER_TEST_TEST.json");
+
+    }
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();

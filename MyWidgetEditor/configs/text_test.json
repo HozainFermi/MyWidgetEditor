@@ -1,0 +1,39 @@
+{
+    "connections": [],
+    "widgets": [
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_0",
+            "left_alignment": true,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TextWidget1",
+            "position": [
+                250.0,
+                196.0
+            ],
+            "size": [
+                201.0,
+                60.0
+            ],
+            "text": "[wave]Sample text [/wave] [rainbow]Hello[/rainbow]",
+            "type": 0,
+            "widget_class": "TextWidget",
+            "wrap_text": true
+        }
+    ],
+    "window": {
+        "always_on_top": false,
+        "bg_color": [
+            0.1568627506494522,
+            0.1568627506494522,
+            0.1568627506494522,
+            1.0
+        ],
+        "frag_shader": "",
+        "height": 500,
+        "moveble": true,
+        "width": 500
+    }
+}

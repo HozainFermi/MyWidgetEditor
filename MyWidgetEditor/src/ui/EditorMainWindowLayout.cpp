@@ -45,7 +45,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     std::string exePath = "\"" + absExePath.string() + "\"";
     std::string configPath = "\"" + absConfigPath.string() + "\""; 
 
-    std::cout << "Executing: " << exePath << " " << configPath << "\n";
+    std::cout << "Executing: " << exePath << " " << configPath << std::endl;
 
     // Вариант 1: Раздельная передача
     if (!IndependentLauncher::launch(exePath,configPath)) {
@@ -157,8 +157,9 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
-    static char FRAGbuf[150];
     static char VERTbuf[150];
+    static char FRAGbuf[150];
+
     ImGui::Text("==Main window Properties:==");
     ImGui::Separator();
     ImGui::Text("Width: %.0f", canvas_size_.x);

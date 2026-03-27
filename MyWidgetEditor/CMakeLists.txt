@@ -102,7 +102,8 @@ set(ALL_HEADERS
     ${STYLES_HEADERS}
     ${MANAGERS_HEADERS}
     ${GLHELPERS_HEADERS}
- "src/include/BBCodeParser.h" "src/styles/IconText.h")
+    "${BB_DIR}/BBCodeParser.h"
+    "${BB_DIR}/IconText.h")
 
 # Create executable
 add_executable(MyWidgetEditor ${ALL_SOURCES} ${ALL_HEADERS} ${IMGUI_SOURCES} ${IMPLOT_FILES})
@@ -126,7 +127,8 @@ target_include_directories(MyWidgetEditor PRIVATE
     ${ASSIMP_DIR}/include
     ${HTTPLIB_DIR}
     ${JSON_DIR}
-    ${STB_DIR}    
+    ${STB_DIR}
+    ${BB_DIR}
 )
 
 target_link_libraries(MyWidgetEditor PRIVATE 

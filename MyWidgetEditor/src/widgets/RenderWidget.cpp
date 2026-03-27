@@ -33,6 +33,7 @@ namespace wg {
 	void RenderWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
 	{
 		ImVec2 widget_size = GetSize();
+		
 		scene_.SCR_WIDTH = widget_size.x;
 		scene_.SCR_HEIGHT = widget_size.y;
 
@@ -79,14 +80,24 @@ namespace wg {
 		static int selected_idx = 0;
 		static float Xoffset = 0.0f;
 		static float Yoffset = 0.0f;
-		static char modelPath[260] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj";
+		static char modelPath[200] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj";
+		static char VERTbuf[200] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert";
+		static char FRAGbuf[200] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag";
 
 		ImGui::Text("==Render Settings==");
 		ImGui::Separator();
 
 		ImGui::InputText("Model path", modelPath, IM_ARRAYSIZE(modelPath));
+		ImGui::PushID("ModelShaders");
+		if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
+			//window_props_.vertex_GLSLshader_file = VERTbuf;
+		}
+		if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf))) {
+			//window_props_.frag_GLSLshader_file = FRAGbuf;
+		}
+		ImGui::PopID();
 		if (ImGui::Button("Load model")) {
-			scene_.AddModel(modelPath, "");
+			scene_.AddModel(modelPath,VERTbuf,FRAGbuf,"");
 			if (!scene_.models_.empty()) {
 				selected_idx = static_cast<int>(scene_.models_.size()) - 1;
 			}
@@ -154,12 +165,23 @@ namespace wg {
 	}
 
 	nlohmann::json RenderWidget::ToJson() const
-	{
-		return nlohmann::json();
+	{   
+		auto json = Widget::ToJson();		
+		nlohmann::json models_json = nlohmann::json::array();
+		for (const auto& model : scene_.models_) {
+			models_json.push_back(model.ToJson());			
+		}
+		json["models"] = models_json;
+
+		return json;
 	}
 
 	void RenderWidget::FromJson(const nlohmann::json& json)
 	{
+		Widget::FromJson(json);
+		for (const auto& model : json["models"]) {
+			scene_.AddModel(model["model_path"], model["vert_shader_path"], model["fragment_shader_path"],"");
+		}
 
 	}
 

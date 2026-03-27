@@ -2,34 +2,29 @@
 #include "Widget.h"
 #include <string>
 #include <vector>
-#include "Scene.hpp"
-#include "WidgetFactory.h"
+#include "../managers/RuntimeWidgetFactory.h"
+#include <Scene.hpp>
 
 
-namespace wg {
+namespace rn {
 
-   
     class RenderWidget : public Widget {
     private:
         Styles::Scene scene_;
 
     public:
-        int selectedMeshIndex=-1;
+        int selectedMeshIndex = -1;
 
         RenderWidget();
-        RenderWidget(const std::string& name, const ImVec2& pos);
-        bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) override;
-        void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
+        RenderWidget(const std::string& name, const ImVec2& pos);       
+        void Render(ImDrawList* draw_list) override;
         void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
-
-        void RenderProperties();
-
+       
         void RenderSelectedMeshProps(int index);
-        
+
         void AddItem();
         void RemoveItem();
-               
-        nlohmann::json ToJson() const override;
+
         void FromJson(const nlohmann::json& json) override;
 
         // Порты: вход для данных сцены (на будущее)
@@ -39,7 +34,7 @@ namespace wg {
         std::vector<PortDesc> GetOutputPorts() const override { return {}; }
 
     private:
-        void GeneratePreviewData();       
-                   
+        void GeneratePreviewData();
+
     };
 }

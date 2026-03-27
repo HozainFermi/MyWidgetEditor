@@ -20,7 +20,7 @@ set(IMPLOT_DIR "${EXTERNAL_DIR}/implot")
 set(HTTPLIB_DIR "${EXTERNAL_DIR}/httplib")
 set(JSON_DIR "${EXTERNAL_DIR}/json")
 set(STB_DIR "${EXTERNAL_DIR}/stb")
-
+set(BB_DIR "${EXTERNAL_DIR}/BB")
 
 # Собираем список файлов ImGui один раз для всех
 set(IMGUI_SOURCES

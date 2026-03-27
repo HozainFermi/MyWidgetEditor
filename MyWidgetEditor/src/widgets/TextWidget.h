@@ -14,7 +14,7 @@ namespace wg {
         bool parsing_error_ = false;
         const char* error_message_;
 
-        bool wrap_text_ = false;
+        bool wrap_text_ = true;
         bool left_alignment_ = false;
         bool center_alignment_ = true;
         bool right_alignment_ = false;
