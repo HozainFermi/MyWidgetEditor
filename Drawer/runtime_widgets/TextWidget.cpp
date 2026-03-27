@@ -123,9 +123,9 @@ namespace rn {
         font_scale_ = json.value("font_scale", 1.0f);
         wrap_text_ = json.value("wrap_text", false);
 
-        if (json.value("left_alignment", true)) { left_alignment_ = true; }
-        if (json.value("center_alignment", true)) { center_alignment_ = true; }
-        if (json.value("right_alignment", true)) { right_alignment_ = true; }
+        if (json.value("left_alignment", false)) { left_alignment_ = true; }
+        if (json.value("center_alignment", false)) { center_alignment_ = true; }
+        if (json.value("right_alignment", false)) { right_alignment_ = true; }
 
         try {
             parse_result_ = std::move(BBCodeParser::Parse(text_));

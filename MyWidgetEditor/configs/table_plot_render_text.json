@@ -40,8 +40,8 @@
             "min_width": 30.0,
             "name": "TableWidget1",
             "position": [
-                5.0,
-                67.0
+                14.0,
+                1.0
             ],
             "show_borders": true,
             "show_headers": true,
@@ -58,7 +58,7 @@
             "bg_color": 4283443240,
             "chart_configs": [
                 {
-                    "chart_title": "Pice",
+                    "chart_title": "Price",
                     "x_key": "id",
                     "y_key": "price"
                 }
@@ -69,17 +69,62 @@
             "name": "PlotWidget2",
             "plot_type": 0,
             "position": [
-                416.0,
-                64.0
+                447.0,
+                9.0
             ],
             "size": [
-                367.0,
-                308.0
+                432.0,
+                310.0
             ],
             "type": 7,
             "widget_class": "PlotWidget",
-            "x_plot_label": "Id",
-            "y_plot_label": "Price"
+            "x_plot_label": "id`s",
+            "y_plot_label": "prices"
+        },
+        {
+            "bg_color": 4283443240,
+            "id": "widget_2",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "models": [
+                {
+                    "fragment_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag",
+                    "model_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj",
+                    "vert_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"
+                }
+            ],
+            "name": "RenderWidget1",
+            "position": [
+                456.0,
+                327.0
+            ],
+            "size": [
+                393.0,
+                372.0
+            ],
+            "type": 9,
+            "widget_class": "RenderWidget"
+        },
+        {
+            "bg_color": 4283443240,
+            "font_scale": 1.0,
+            "id": "widget_3",
+            "left_alignment": true,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "TextWidget2",
+            "position": [
+                12.0,
+                354.0
+            ],
+            "size": [
+                395.0,
+                60.0
+            ],
+            "text": "[wave]Sample text Sample text Sample text[/wave]",
+            "type": 0,
+            "widget_class": "TextWidget",
+            "wrap_text": true
         }
     ],
     "window": {
@@ -88,7 +133,7 @@
             0.19738562405109406,
             0.5689350366592407,
             0.5921568870544434,
-            0.0
+            0.3607843220233917
         ],
         "frag_shader": "",
         "height": 500,
