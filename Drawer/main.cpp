@@ -10,13 +10,13 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include <glad/gl.h>
 #include <stdio.h>
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
+#include <glad/gl.h>
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 
@@ -32,6 +32,7 @@
 #include <iostream>
 #include "ui/MainWindowLayout.h"
 #include "../external/implot/implot.h"
+
 
 static void glfw_error_callback(int error, const char* description)
 {

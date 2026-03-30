@@ -1,15 +1,15 @@
 #pragma once
-
+#include <glad/gl.h>
 #include <memory>
 #include <string>
 #include <vector>
 #include <filesystem>
 
 #include <Camera.h>
-#include <GLFW/glfw3.h>
 #include <Shader.hpp>
 #include <Model.hpp>
 #include <json.hpp>
+#include <GLFW/glfw3.h>
 
 namespace Styles {
 

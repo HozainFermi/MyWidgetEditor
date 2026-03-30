@@ -9,8 +9,8 @@ namespace wg {
 		float bg_color_float[4]{ 0.15686275f,0.15686275f ,0.15686275f ,1.0f};
 		bool always_on_top = false;
 		bool moveble = true;
-		std::string frag_GLSLshader_file;
-		std::string vertex_GLSLshader_file;
+		std::string vertex_GLSLshader_file = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.vert";
+		std::string frag_GLSLshader_file = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag";
 		int width=500;
 		int height=500;
 

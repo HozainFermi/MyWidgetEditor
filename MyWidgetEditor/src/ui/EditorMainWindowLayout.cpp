@@ -408,6 +408,54 @@ void Editor::RenderCanvas() {
     ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);
     draw_list->AddRectFilled(canvas_p0_, canvas_p1, col);
     
+    //========================================================================================================
+
+    background_scene_.SCR_WIDTH = canvas_avail.x;
+    background_scene_.SCR_HEIGHT = canvas_avail.y;
+
+    // Сохраняем текущий Viewport, чтобы не сбить ImGui
+    GLint last_viewport[4];
+    glGetIntegerv(GL_VIEWPORT, last_viewport);
+
+    // Рендерим сцену в FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, background_scene_.FBO);
+    glViewport(0, 0, (GLsizei)canvas_avail.x, (GLsizei)canvas_avail.y);
+
+    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (!background_scene_.models_.empty()) {
+        auto model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.5f, -1.5f, -1.5f));
+        //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 0.0f));
+        background_scene_.models_[0].model_mat = model;
+
+        background_scene_.models_[0].shader->setFloat("iTime", (float)glfwGetTime());
+        background_scene_.models_[0].shader->setVec2("iResolution", (float)0.8, (float)1);
+
+            //glm::rotate(background_scene_.models_[0].model_mat,
+            //    glm::radians(sin(static_cast<float>(glfwGetTime()))),
+            //    glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+
+    background_scene_.Draw();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Восстанавливаем Viewport обратно для ImGui
+    glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
+   
+    ImVec2 pos = ImVec2(canvas_p0_.x + 5, canvas_p0_.y + 5);
+    ImGui::SetNextWindowPos(pos);
+    ImGui::SetNextWindowSize(canvas_size_);
+
+    if (ImGui::BeginChild("##background_scene", canvas_size_)) {
+        ImGui::Image((ImTextureID)(intptr_t)background_scene_.textureColorBuffer,
+            ImVec2(canvas_size_.x, canvas_size_.y),
+            ImVec2(0, 1), ImVec2(1, 0));
+    }
+    ImGui::EndChild();
+    //========================================================================================================
+
     // Сетка
     DrawGrid(draw_list);
   
@@ -432,13 +480,13 @@ void Editor::RenderCanvas() {
     RenderPortsAndHandleConnections(draw_list);
     RenderConnections(draw_list);
     
-    for (size_t i = 0; i < widget_manager_.connections_.size(); i++)
-    {
-        //std::cout << port_visuals_.size() << std::endl;
-        //std::cout << widget_manager_.connections_[i].to.widget_id << std::endl;
-        //std::cout << std::endl;
-        //std::cout << widget_manager_.connections_.size() <<std::endl;
-    }
+    //for (size_t i = 0; i < widget_manager_.connections_.size(); i++)
+    //{
+    //    //std::cout << port_visuals_.size() << std::endl;
+    //    //std::cout << widget_manager_.connections_[i].to.widget_id << std::endl;
+    //    //std::cout << std::endl;
+    //    //std::cout << widget_manager_.connections_.size() <<std::endl;
+    //}
 }
 
 void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)

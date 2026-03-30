@@ -1,9 +1,12 @@
 #pragma once
-#include "WidgetManager.h"
 #include <imgui.h>
+#include <glad/gl.h> 
 #include <GLFW/glfw3.h>
+#include "WidgetManager.h"
 #include "RuntimeWindowProperties.h"
 #include "Connections.h"
+#include "Mesh.h"
+#include "Scene.hpp"
 
 enum class FileBrowserMode {
     Load,
@@ -17,6 +20,7 @@ class Editor {
 private:
     wg::WidgetManager widget_manager_;
     
+
     // связи
     std::vector<PortVisual> port_visuals_;
     bool is_dragging_connection_ = false;
@@ -35,13 +39,65 @@ private:
     bool filebrowser_open_ = false;
     bool filesave_open_ = false;
     FileBrowserMode browsermode= FileBrowserMode::None;
-    wg::RuntimeWindowProperties window_props_;
+    wg::RuntimeWindowProperties window_props_{};
     
-    Editor() = default;
+    Styles::Scene background_scene_{};
+    //Helpers::Shader background_shaders_{window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file};
+    //Editor() = default;
 
 
 public:
     
+    Editor()
+    {
+        std::vector<Helpers::Vertex> vertices_{
+
+        Helpers::Vertex{
+        glm::vec3{-1.f,1.f,0.0f},
+        glm::vec3{1.f,1.f,1.0f},
+        glm::vec2{0.f,1.f} },
+        Helpers::Vertex{
+        glm::vec3{1.f,1.f,0.f},
+        glm::vec3{1.f,1.f,1.0f},
+        glm::vec2{1.0f,1.0f} },
+        Helpers::Vertex{
+        glm::vec3{-1.f,-1.f,0.0f},
+        glm::vec3{1.f,1.f,1.0f},
+        glm::vec2{0.f,0.f} },
+
+         Helpers::Vertex{
+        glm::vec3{1.f,1.f,0.f},
+        glm::vec3{1.f,1.f,1.0f},
+        glm::vec2{1.0f,1.0f} },
+         Helpers::Vertex{
+        glm::vec3{-1.f,-1.f,0.0f},
+        glm::vec3{1.f,1.f,1.0f},
+        glm::vec2{0.f,0.f} },
+         Helpers::Vertex{
+        glm::vec3{1.0f,-1.f,0.0f},
+        glm::vec3{1.f,1.f,1.0f},
+        glm::vec2{1.0f,0.0f} },
+
+        };
+        std::vector<unsigned int> EBOpoints_ = {
+            0,1,2,
+            1,2,5
+        };
+
+        Helpers::Mesh background_mesh_{ vertices_,EBOpoints_ };
+       
+        std::unique_ptr model = std::make_unique<Helpers::Model>();        
+        model->AddMesh(background_mesh_);
+
+        std::unique_ptr shaders = std::make_unique<Helpers::Shader>( window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file );
+
+        Styles::ModelData model_data { std::move(model), std::move(shaders) };
+
+        background_scene_.models_.push_back(std::move(model_data));
+        //background_scene_.camera_->Position = glm::vec3(0.0f, 0.0f, 3.0f);
+
+    }
+
     static Editor* Get() {
         static Editor instance;
         return &instance;

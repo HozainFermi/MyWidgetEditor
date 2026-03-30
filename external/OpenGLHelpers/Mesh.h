@@ -6,12 +6,11 @@
 #include <vector>
 #include <glm.hpp>
 #include <Shader.hpp>
-using namespace std;
+//using namespace std;
 
 #define MAX_BONE_INFLUENCE 4
 
 namespace Helpers{
-
 
 
 struct Vertex {
@@ -33,20 +32,20 @@ struct Vertex {
 
 struct Texture {
     unsigned int id;
-    string type;
-    string path;
+    std::string type;
+    std::string path;
 };
 
 class Mesh {
 public:
     // mesh Data
-    vector<Vertex>       vertices;
-    vector<unsigned int> indices;
-    vector<Texture>      textures;
+    std::vector<Vertex>       vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture>      textures;
     unsigned int VAO;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
     {
         this->vertices = vertices;
         this->indices = indices;
@@ -55,7 +54,13 @@ public:
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
     }
-
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
+    {
+        this->vertices = vertices;
+        this->indices = indices;
+        //this->textures = textures;
+        setupMesh();
+    }
     // render the mesh
     void Draw(Helpers::Shader& shader)
     {
@@ -68,8 +73,8 @@ public:
         {
             glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
             // retrieve texture number (the N in diffuse_textureN)
-            string number;
-            string name = textures[i].type;
+            std::string number;
+            std::string name = textures[i].type;
             if (name == "texture_diffuse")
                 number = std::to_string(diffuseNr++);
             else if (name == "texture_specular")
