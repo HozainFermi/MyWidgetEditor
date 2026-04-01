@@ -20,7 +20,6 @@ class Editor {
 private:
     wg::WidgetManager widget_manager_;
     
-
     // связи
     std::vector<PortVisual> port_visuals_;
     bool is_dragging_connection_ = false;
@@ -90,7 +89,6 @@ public:
         model->AddMesh(background_mesh_);
 
         std::unique_ptr shaders = std::make_unique<Helpers::Shader>( window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file );
-
         Styles::ModelData model_data { std::move(model), std::move(shaders) };
 
         background_scene_.models_.push_back(std::move(model_data));

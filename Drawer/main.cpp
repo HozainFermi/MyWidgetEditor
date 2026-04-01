@@ -99,12 +99,12 @@ int main(int argc, char** argv)
         return -2;
     }
 
-    rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
+    rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get(manager->window_props_);
     if (argc > 1) {
         manager->LoadFromFile(argv[1]);
     }
     else {
-        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/RENDER_TEST_TEST.json");
+        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot.json");
 
     }
 
