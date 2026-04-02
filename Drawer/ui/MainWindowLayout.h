@@ -58,6 +58,10 @@ namespace rn {
              std::unique_ptr shaders = std::make_unique<Helpers::Shader>(window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file);
              Styles::ModelData model_data{ std::move(model), std::move(shaders) };
 
+             //background_scene_.FBO = 1;
+             //background_scene_.textureColorBuffer = 1;
+             //background_scene_.rbo = 1;
+
              background_scene_.models_.push_back(std::move(model_data));
          }
 
