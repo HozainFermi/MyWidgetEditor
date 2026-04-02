@@ -113,6 +113,7 @@ namespace Helpers {
 	}
 	MeshLoader::MeshLoader()
 	{
+
 	}
 	MeshLoader::~MeshLoader()
 	{

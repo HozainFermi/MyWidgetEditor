@@ -82,17 +82,17 @@
             "y_plot_label": "Price"
         }
     ],
-    "window": {
-        "always_on_top": false,
-        "bg_color": [
-            0.19738562405109406,
-            0.5689350366592407,
-            0.5921568870544434,
-            0.3607843220233917
-        ],
-        "frag_shader": "",
-        "height": 500,
-        "moveble": true,
-        "width": 500
-    }
+  "window": {
+    "always_on_top": false,
+    "bg_color": [
+      0.19738562405109406,
+      0.5689350366592407,
+      0.5921568870544434,
+      0.3607843220233917
+    ],
+    "frag_shader": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag",
+    "height": 500,
+    "moveble": true,
+    "width": 500
+  }
 }

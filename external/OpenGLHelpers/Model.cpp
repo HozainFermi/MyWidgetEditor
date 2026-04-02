@@ -13,6 +13,11 @@ namespace Helpers {
 		}
 	}
 
+	void Model::AddMesh(Mesh& mesh)
+	{
+		meshes.push_back(mesh);
+	}
+
 	void Model::loadModel(std::filesystem::path path)
 	{
 		Assimp::Importer import;
@@ -43,9 +48,9 @@ namespace Helpers {
 
 	Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	{
-		vector<Vertex> vertices;
-		vector<unsigned int> indices;
-		vector<Texture> textures;
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
@@ -100,10 +105,10 @@ namespace Helpers {
 		{
 			
 				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-				vector<Texture> diffuseMaps = loadMaterialTextures(material,
+				std::vector<Texture> diffuseMaps = loadMaterialTextures(material,
 					aiTextureType_DIFFUSE, "texture_diffuse");
 				textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-				vector<Texture> specularMaps = loadMaterialTextures(material,
+				std::vector<Texture> specularMaps = loadMaterialTextures(material,
 					aiTextureType_SPECULAR, "texture_specular");
 				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			
@@ -112,9 +117,9 @@ namespace Helpers {
 		return Mesh(vertices, indices, textures);
 	}
 
-	vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)
+	std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 	{
-		vector<Texture> textures;
+		std::vector<Texture> textures;
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 		{
 			aiString str;
@@ -144,7 +149,7 @@ namespace Helpers {
 
 	unsigned int Model::TextureFromFile(std::string path, std::string directory)
 	{
-		string filename = directory + '/' + path;
+		std::string filename = directory + '/' + path;
 		std::cout << filename;
 
 		unsigned int textureID;

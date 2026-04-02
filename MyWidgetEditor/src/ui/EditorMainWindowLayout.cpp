@@ -21,7 +21,7 @@ static void HelpMarker(const char* desc)
 }
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
-    widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+filename+".json", window_props_);                
+    widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+filename+".json", window_props_);
 
 }
 void Editor::OnFileForRunSelected(const std::string& filename) {
@@ -158,7 +158,10 @@ void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
     static char VERTbuf[150];
-    static char FRAGbuf[150];
+    static char FRAGbuf[150];// = window_props_.frag_GLSLshader_file.c_str();
+ 
+    std::strncpy(FRAGbuf, window_props_.frag_GLSLshader_file.c_str(), sizeof(FRAGbuf) - 1);    
+    FRAGbuf[sizeof(FRAGbuf) - 1] = '\0';
 
     ImGui::Text("==Main window Properties:==");
     ImGui::Separator();
@@ -181,12 +184,17 @@ void Editor::RenderRightPanel() {
     ImGui::Checkbox("Always on top", &window_props_.always_on_top);
     ImGui::Checkbox("Moveble", &window_props_.moveble);
 
-    if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf))) {
-        window_props_.frag_GLSLshader_file = FRAGbuf;
+    if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {
+        window_props_.frag_GLSLshader_file = FRAGbuf;        
     }
-    if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
-        window_props_.vertex_GLSLshader_file = VERTbuf;
+    if (ImGui::Button("Compile shader")) {
+        std::unique_ptr shaders = std::make_unique<Helpers::Shader>(window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file);
+        background_scene_.models_[0].shader.release();
+        background_scene_.models_[0].shader = std::move(shaders);
     }
+    //if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
+    //    window_props_.vertex_GLSLshader_file = VERTbuf;
+    //}
     ImGui::Separator();
 
     if (selected) {
@@ -408,6 +416,58 @@ void Editor::RenderCanvas() {
     ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);
     draw_list->AddRectFilled(canvas_p0_, canvas_p1, col);
     
+    //========================================================================================================
+    if (window_props_.frag_GLSLshader_file != "" && window_props_.vertex_GLSLshader_file != "") {        
+        background_scene_.SCR_WIDTH = canvas_size_.x;
+        background_scene_.SCR_HEIGHT = canvas_size_.y;
+
+        // Сохраняем текущий Viewport, чтобы не сбить ImGui
+        GLint last_viewport[4];
+        glGetIntegerv(GL_VIEWPORT, last_viewport);
+
+        // Рендерим сцену в FBO
+        glBindFramebuffer(GL_FRAMEBUFFER, background_scene_.FBO);
+        glViewport(0, 0, (GLsizei)canvas_size_.x, (GLsizei)canvas_size_.y);
+
+        glClearColor(window_props_.bg_color_float[0], window_props_.bg_color_float[1], window_props_.bg_color_float[2], window_props_.bg_color_float[3]);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (!background_scene_.models_.empty()) {
+
+            auto model = glm::mat4(1.0f);
+            auto view = glm::mat4(1.0f);
+            auto proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+
+            background_scene_.models_[0].model_mat = model;
+
+
+            background_scene_.models_[0].shader->setFloat("iTime", (float)glfwGetTime());
+            background_scene_.models_[0].shader->setVec2("iResolution", canvas_size_.x, canvas_size_.y);
+            background_scene_.models_[0].shader->setMat4("ortho_model", model);
+            background_scene_.models_[0].shader->setMat4("ortho_view", view);
+            background_scene_.models_[0].shader->setMat4("ortho_projection", proj);
+            //glm::rotate(background_scene_.models_[0].model_mat,
+            //    glm::radians(sin(static_cast<float>(glfwGetTime()))),
+            //    glm::vec3(0.0f, 1.0f, 0.0f));
+        }
+
+        background_scene_.Draw();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Восстанавливаем Viewport обратно для ImGui
+        glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
+
+        ImVec2 pos = ImVec2(canvas_p0_.x + 0, canvas_p0_.y + 0);
+
+        ImGui::GetWindowDrawList()->AddImage(
+            (ImTextureID)(intptr_t)background_scene_.textureColorBuffer,
+            pos,
+            ImVec2(pos.x + canvas_size_.x, pos.y + canvas_size_.y),
+            ImVec2(0, 1), ImVec2(1, 0)
+        );
+    }
+    //========================================================================================================
+
     // Сетка
     DrawGrid(draw_list);
   
@@ -432,13 +492,7 @@ void Editor::RenderCanvas() {
     RenderPortsAndHandleConnections(draw_list);
     RenderConnections(draw_list);
     
-    for (size_t i = 0; i < widget_manager_.connections_.size(); i++)
-    {
-        //std::cout << port_visuals_.size() << std::endl;
-        //std::cout << widget_manager_.connections_[i].to.widget_id << std::endl;
-        //std::cout << std::endl;
-        //std::cout << widget_manager_.connections_.size() <<std::endl;
-    }
+    
 }
 
 void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)

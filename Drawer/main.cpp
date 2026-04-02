@@ -10,13 +10,13 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include <glad/gl.h>
 #include <stdio.h>
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
+#include <glad/gl.h>
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 
@@ -32,6 +32,7 @@
 #include <iostream>
 #include "ui/MainWindowLayout.h"
 #include "../external/implot/implot.h"
+
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -98,12 +99,12 @@ int main(int argc, char** argv)
         return -2;
     }
 
-    rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get();
+    rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get(manager->window_props_);
     if (argc > 1) {
         manager->LoadFromFile(argv[1]);
     }
     else {
-        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/RENDER_TEST_TEST.json");
+        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot.json");
 
     }
 

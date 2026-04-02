@@ -147,6 +147,11 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/configs
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
      FILES_MATCHING PATTERN "*.json")
 
+
+get_directory_property(PARENT_DIR PARENT_DIRECTORY)
+
 target_compile_definitions(MyWidgetEditor PRIVATE 
     PROJECT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    ASSETS_SOURCE_DIR="${PARENT_DIR}/assets"
+
 )

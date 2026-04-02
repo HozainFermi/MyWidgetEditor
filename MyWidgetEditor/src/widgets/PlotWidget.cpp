@@ -94,7 +94,7 @@ namespace wg {
         ImGui::Text("PlotWidget");
         ImGui::Separator();
         ImGui::Text("Inputs:");
-        ImGui::BulletText("data (array of numbers)");
+        ImGui::BulletText("data (array of json objects)");
         ImGui::BulletText("refresh (event)");
         ImGui::Separator();
         ImGui::Text("Properties:");
