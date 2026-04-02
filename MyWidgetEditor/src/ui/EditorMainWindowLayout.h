@@ -41,6 +41,7 @@ private:
     wg::RuntimeWindowProperties window_props_{};
     
     Styles::Scene background_scene_{};
+    
     //Helpers::Shader background_shaders_{window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file};
     //Editor() = default;
 
@@ -87,9 +88,13 @@ public:
        
         std::unique_ptr model = std::make_unique<Helpers::Model>();        
         model->AddMesh(background_mesh_);
-
-        std::unique_ptr shaders = std::make_unique<Helpers::Shader>( window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file );
+        //std::string("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.vert")
+        //std::string("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag")
+        std::unique_ptr shaders = std::make_unique<Helpers::Shader>( window_props_.vertex_GLSLshader_file,window_props_.frag_GLSLshader_file  );
         Styles::ModelData model_data { std::move(model), std::move(shaders) };
+        background_scene_.FBO = 1;
+        background_scene_.textureColorBuffer = 1;
+        background_scene_.rbo = 1;
 
         background_scene_.models_.push_back(std::move(model_data));
         //background_scene_.camera_->Position = glm::vec3(0.0f, 0.0f, 3.0f);
