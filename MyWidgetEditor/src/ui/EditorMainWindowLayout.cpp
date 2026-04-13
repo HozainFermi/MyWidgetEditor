@@ -157,6 +157,8 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
+    static bool selections[] = { false, false, true, false,true };
+    static const char* items[] = { "Always on top", "Window rounding", "Resizeble", "Mouse passthrougth","Decorated"};
     static char VERTbuf[150];
     static char FRAGbuf[150];// = window_props_.frag_GLSLshader_file.c_str();
  
@@ -170,9 +172,7 @@ void Editor::RenderRightPanel() {
     ImGui::Text("Height: %.0f", canvas_size_.y);
     ImGui::Text("Background color:");
 
-   // ImVec4 color = ImGui::ColorConvertU32ToFloat4(window_props_.bg_color);
-   // memcpy(window_props_.bg_color_float, &color, sizeof(float) * 4);
-
+   
     if (ImGui::ColorEdit4("MainWindowColor", window_props_.bg_color_float, ImGuiColorEditFlags_DisplayHSV)) {
 
         window_props_.bg_color = ImGui::ColorConvertFloat4ToU32(
@@ -181,8 +181,22 @@ void Editor::RenderRightPanel() {
                 window_props_.bg_color_float[2],
                 window_props_.bg_color_float[3]));
     }
-    ImGui::Checkbox("Always on top", &window_props_.always_on_top);
-    ImGui::Checkbox("Moveble", &window_props_.moveble);
+
+    if (ImGui::BeginCombo(".", "Window properties"))
+    {
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        {            
+            if (ImGui::Checkbox(items[n], &selections[n])){}
+        }
+        ImGui::EndCombo();
+    }
+
+    if (selections[1]) {
+        ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
+    }
+
+    //ImGui::Checkbox("Always on top", &window_props_.always_on_top);
+    //ImGui::Checkbox("Moveble", &window_props_.moveble);
 
     if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {
         window_props_.frag_GLSLshader_file = FRAGbuf;        
@@ -385,6 +399,8 @@ void Editor::RenderCanvas() {
 
     // Информация о канвасе
     ImGui::Text("Canvas: %.0fx%.0f", canvas_size_.x, canvas_size_.y);
+    window_props_.width = canvas_size_.x;
+    window_props_.height = canvas_size_.y;
     ImGui::SameLine();
     ImGui::Text("Mouse: %.0f, %.0f",
        curmouse.x,
@@ -392,9 +408,11 @@ void Editor::RenderCanvas() {
     
     // Создаём невидимую кнопку-канвас
     ImVec2 canvas_avail = ImGui::GetContentRegionAvail();
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, window_props_.rounding);
     ImGui::InvisibleButton("CanvasButton", canvas_avail,
         ImGuiButtonFlags_MouseButtonLeft |
         ImGuiButtonFlags_MouseButtonRight);
+    ImGui::PopStyleVar();
 
     // Получаем координаты канваса
     canvas_p0_ = ImGui::GetItemRectMin();
@@ -413,8 +431,8 @@ void Editor::RenderCanvas() {
         window_props_.bg_color_float[2] * 255,
         window_props_.bg_color_float[3] * 255 
     };
-    ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);
-    draw_list->AddRectFilled(canvas_p0_, canvas_p1, col);
+    ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);    
+    draw_list->AddRectFilled(canvas_p0_, canvas_p1, col, window_props_.rounding);
     
     //========================================================================================================
     if (window_props_.frag_GLSLshader_file != "" && window_props_.vertex_GLSLshader_file != "") {        
@@ -472,7 +490,7 @@ void Editor::RenderCanvas() {
     DrawGrid(draw_list);
   
     // Рамка канваса
-    draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
+    draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), window_props_.rounding, 0, 2.0f);
 
     // Обработка Drag & Drop
     if (ImGui::BeginDragDropTarget()) {

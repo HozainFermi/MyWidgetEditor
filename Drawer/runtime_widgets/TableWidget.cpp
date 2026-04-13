@@ -183,9 +183,10 @@ namespace rn {
 
 
     bool TableWidget::UpdateTableData()
-    {
-        
+    {        
         switch (update_trigger_) {
+
+
         case UpdateTrigger::TIMER:
             now_ = std::chrono::steady_clock::now();
             auto time_since_last_update = now_ - last_update_;
@@ -205,8 +206,12 @@ namespace rn {
                 return true;
             }            
             break;
+
+
         case UpdateTrigger::BUTTON_CLICK:
             break;
+
+
         case UpdateTrigger::ON_LOAD:
             if (last_update_.time_since_epoch().count() == 0 && !is_loading_) {
                 is_loading_ = true;
@@ -220,7 +225,9 @@ namespace rn {
                 last_update_ = std::chrono::steady_clock::now();
             }
             break;
-       }       
+       }
+
+
         return false;
 
         
@@ -230,8 +237,7 @@ namespace rn {
 
     void TableWidget::FromResponseJsonToColumns(const std::string& body)
     {
-        try {
-          
+        try {          
             nlohmann::json json = nlohmann::json::parse(body);
 
             if (json.is_array()) {
@@ -242,6 +248,7 @@ namespace rn {
                         columns_.push_back(std::pair{ TableColumnConfig{ key, key,50.0f, false }, std::vector<std::string>{} });
                     }
                 }
+
                 for (auto& line : json) {
                     if (line.is_object()) {
                         if (line.size() == columns_.size()) {
