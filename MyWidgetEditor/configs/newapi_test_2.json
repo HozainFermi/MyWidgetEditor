@@ -31,7 +31,7 @@
                     "width": 100.0
                 }
             ],
-            "data_source": "https://my.api.mockaroo.com/mock_product_price.json?key=31d42050",
+            "data_source": "https://69de699bd6de26e11927e69c.mockapi.io/api/products",
             "data_source_type": 2,
             "flags": 26561,
             "id": "widget_0",
@@ -40,8 +40,8 @@
             "min_width": 30.0,
             "name": "TableWidget1",
             "position": [
-                86.0,
-                121.0
+                33.0,
+                85.0
             ],
             "show_borders": true,
             "show_headers": true,
@@ -69,8 +69,8 @@
             "name": "PlotWidget2",
             "plot_type": 0,
             "position": [
-                526.0,
-                128.0
+                467.0,
+                73.0
             ],
             "size": [
                 367.0,
@@ -83,7 +83,8 @@
         }
     ],
     "window": {
-        "always_on_top": false,
+        "always_on_bottom": false,
+        "always_on_top": true,
         "bg_color": [
             0.19738562405109406,
             0.5689350366592407,
@@ -92,12 +93,12 @@
         ],
         "decorated": true,
         "frag_shader": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag",
-        "height": 500,
+        "height": 650,
         "mouse_passthrougth": false,
         "moveble": true,
         "resizeble": true,
-        "rounding": 101.5,
-        "width": 500,
+        "rounding": 120.0,
+        "width": 877,
         "window_rounding": false
     }
 }

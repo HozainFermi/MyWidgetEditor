@@ -101,6 +101,7 @@ namespace wg {
             });
 
         window["always_on_top"] = mw_props.always_on_top;
+        window["always_on_bottom"] = mw_props.always_on_bottom;
         window["window_rounding"] = mw_props.window_rounding;
         window["resizeble"] = mw_props.resizeble;
         window["mouse_passthrougth"] = mw_props.mouse_passthrougth;
@@ -140,6 +141,7 @@ namespace wg {
       }
       
       mw_props.always_on_top = windowjs.value("always_on_top",false);
+      mw_props.always_on_bottom = windowjs.value("always_on_bottom", false);
       mw_props.resizeble = windowjs.value("resizeble", true);
       mw_props.mouse_passthrougth = windowjs.value("mouse_passthrougth", false);
       mw_props.moveble = windowjs.value("moveble", true);

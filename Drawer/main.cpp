@@ -96,7 +96,6 @@ int main(int argc, char** argv)
     if (window == nullptr)
         return 1;
 
-    rn::SetupWindowStyle(window,manager->window_props_);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
@@ -106,7 +105,8 @@ int main(int argc, char** argv)
         return -2;
     }
     
-
+    rn::ScopedWindowCleaner wdCleaner(window);
+    rn::SetupWindowStyle(window,manager->window_props_);
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get(manager->window_props_);
    
 
@@ -179,6 +179,7 @@ int main(int argc, char** argv)
 #endif
 
     // Cleanup
+    rn::ClearWindow(window);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImPlot::DestroyContext();

@@ -157,11 +157,14 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
-    static bool selections[] = { false, false, true, false,true };
-    static const char* items[] = { "Always on top", "Window rounding", "Resizeble", "Mouse passthrougth","Decorated"};
+    static bool selections[] = { false,false,false,true,false,true,true };
+    static const char* items[] = { "Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
     static char VERTbuf[150];
-    static char FRAGbuf[150];// = window_props_.frag_GLSLshader_file.c_str();
- 
+    static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
+    static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";
+    static std::vector<std::string> shaderNames {};
+    static std::vector<std::filesystem::path> shaders_paths {};
+
     std::strncpy(FRAGbuf, window_props_.frag_GLSLshader_file.c_str(), sizeof(FRAGbuf) - 1);    
     FRAGbuf[sizeof(FRAGbuf) - 1] = '\0';
 
@@ -186,12 +189,22 @@ void Editor::RenderRightPanel() {
     {
         for (int n = 0; n < IM_ARRAYSIZE(items); n++)
         {            
-            if (ImGui::Checkbox(items[n], &selections[n])){}
+            if (ImGui::Checkbox(items[n], &selections[n])){
+                if( selections[0] && selections[1])  {
+                    if (n == 0) {
+                        selections[1] = false;
+                    }
+                    if (n == 1) {
+                        selections[0] = false;
+                    }
+                }
+            }
         }
         ImGui::EndCombo();
     }
+    window_props_.SetProperties(selections);
 
-    if (selections[1]) {
+    if (selections[2]) {
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
     }
 
@@ -201,6 +214,31 @@ void Editor::RenderRightPanel() {
     if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {
         window_props_.frag_GLSLshader_file = FRAGbuf;        
     }
+    ImGui::SameLine();
+    if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,15)) ) {
+        shaderNames.clear();
+        shaders_paths.clear();
+        for (const auto& folder : std::filesystem::directory_iterator(shadersFolderPath) )
+        {
+            if (folder.is_directory()) {
+                for (const auto& file : std::filesystem::directory_iterator(folder)) {
+
+                    if (file.path().extension() == ".frag") {                       
+                        shaders_paths.push_back(file.path());                       
+                        shaderNames.push_back( folder.path().filename().string() );                                                
+                    }                    
+                }
+            }
+        }
+        ImGui::OpenPopup("select_shader_popup");
+    }
+    if (ImGui::BeginPopup("select_shader_popup")) {
+        for (size_t i = 0; i < shaderNames.size(); ++i) {
+            if (ImGui::Selectable(shaderNames[i].c_str())) { window_props_.frag_GLSLshader_file = shaders_paths[i].generic_string(); }
+        }
+        ImGui::EndPopup();                
+    }
+
     if (ImGui::Button("Compile shader")) {
         std::unique_ptr shaders = std::make_unique<Helpers::Shader>(window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file);
         background_scene_.models_[0].shader.release();
@@ -237,7 +275,6 @@ void Editor::RenderRightPanel() {
 
         // Тип виджета (только для чтения)
         ImGui::Text("Type: %s", selected->TypeToString(selected->GetType()).c_str());
-
         ImGui::Separator();
 
         // Кнопки действий
@@ -269,6 +306,7 @@ void Editor::RenderRightPanel() {
         ImGui::Text("Click on a widget to select it");
         ImGui::Text("Right-click for context menu");
     }
+    
 }
 
 ImVec2 Editor::GetMousePosRelativeToCanvas() const {

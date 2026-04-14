@@ -23,7 +23,7 @@ namespace rn {
         ImVec2 main_screen_min = ImGui::GetWindowPos();
         ImVec2 window_size = { main_screen_max.x - main_screen_min.x, main_screen_max.y - main_screen_min.y };
 
-
+            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, window_props_.rounding);
             if(ImGui::BeginChild("main_child", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y)))
             {   
                 background_scene_.SCR_WIDTH = ImGui::GetWindowSize().x;
@@ -69,20 +69,23 @@ namespace rn {
 
                     ImVec2 pos = ImVec2(main_screen_min.x + 0, main_screen_min.y + 0);
 
-                    ImGui::GetWindowDrawList()->AddImage(
+                    ImGui::GetWindowDrawList()->AddImageRounded(
                         (ImTextureID)(intptr_t)background_scene_.textureColorBuffer,
                         pos,
                         ImVec2(main_screen_max.x, main_screen_max.y),
-                        ImVec2(0, 1), ImVec2(1, 0)
+                        ImVec2(0, 1), ImVec2(1, 0),
+                        IM_COL32_WHITE,
+                        manager->window_props_.rounding
                     );
                 }
                 //ImVec2 screen_max = { ImGui::GetWindowPos().x + ImGui::GetWindowSize().x, ImGui::GetWindowPos().y + ImGui::GetWindowSize().y };
-                drawlist->AddRectFilled(main_screen_min, main_screen_max, manager->window_props_.bg_color);
+                drawlist->AddRectFilled(main_screen_min, main_screen_max, manager->window_props_.bg_color,manager->window_props_.rounding);
                 manager->UpdateAll();
                 manager->RenderAll(drawlist);
                 manager->RenderContentAll();                      
             }
             ImGui::EndChild();
+            ImGui::PopStyleVar();
 
         }       
         ImGui::End();

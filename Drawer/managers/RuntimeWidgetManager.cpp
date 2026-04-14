@@ -79,6 +79,7 @@ namespace rn {
         }
 
         window_props_.always_on_top = windowjs.value("always_on_top", false);
+        window_props_.always_on_bottom = windowjs.value("always_on_bottom", false);
         window_props_.window_rounding = windowjs.value("window_rounding", false);
         window_props_.decorated = windowjs.value("decorated", true);        
         window_props_.resizeble = windowjs.value("resizeble", true);

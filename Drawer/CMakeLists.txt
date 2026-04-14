@@ -69,8 +69,12 @@ target_include_directories(Drawer PRIVATE
     ${OPENSSL_INCLUDE_DIR}
 )
 
+
+get_directory_property(PARENT_DIR PARENT_DIRECTORY)
+
 target_compile_definitions(Drawer PRIVATE 
     PROJECT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+     ASSETS_SOURCE_DIR="${PARENT_DIR}/assets"
 )
 
 # 

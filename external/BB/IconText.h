@@ -13,7 +13,9 @@
 #define ICON_EDIT u8"\ue058"
 #define ICON_FILE_PLUS u8"\ue05f"
 #define ICON_FILE u8"\ue061"
+#define ICON_FOLDER u8"\ue067"
 #define ICON_SAVE u8"\ue0b7"
+
 
 
 #define ICON(str) reinterpret_cast<const char*>(str)

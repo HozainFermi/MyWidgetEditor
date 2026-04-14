@@ -32,7 +32,7 @@ namespace rn {
         WCHAR szCSDVersion[128];
     } RTL_OSVERSIONINFOW, * PRTL_OSVERSIONINFOW;
 
-    bool IsWindows11OrGreater() {
+    inline bool IsWindows11OrGreater() {
         typedef NTSTATUS(WINAPI* PfnRtlGetVersion)(PRTL_OSVERSIONINFOW);
 
         HMODULE hMod = GetModuleHandleW(L"ntdll.dll");
@@ -49,9 +49,44 @@ namespace rn {
         }
         return false;
     }
+
+    BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
+        HWND p = FindWindowEx(hwnd, NULL, "SHELLDLL_DefView", NULL);
+        if (p != NULL) {
+            // Находим следующее окно после того, где лежат иконки
+            *(HWND*)lParam = FindWindowEx(NULL, hwnd, "WorkerW", NULL);
+        }
+        return TRUE;
+    }
+
+    inline void ClearWindow(GLFWwindow* window) {
+        if (!window) return;
+        HWND hwnd = glfwGetWin32Window(window);
+
+        ShowWindow(hwnd, SW_HIDE);
+      
+        SetParent(hwnd, NULL);
+    
+        HWND progman = FindWindowW(L"Progman", NULL);
+        SendMessageTimeoutW(progman, 0x052C, 0, 0, SMTO_NORMAL, 1000, NULL);
+        
+        InvalidateRect(NULL, NULL, TRUE);
+    }
+
+    struct ScopedWindowCleaner {
+        GLFWwindow* window;
+        ScopedWindowCleaner(GLFWwindow* win) : window(win) {}
+        ~ScopedWindowCleaner() {
+            if (window) {
+                ClearWindow(window);
+            }
+        }
+    };
+
+
 #endif
 
-    void SetupWindowStyle(GLFWwindow* window, RuntimeWindowProperties& props) {
+    inline void SetupWindowStyle(GLFWwindow* window, RuntimeWindowProperties& props) {
 #ifdef _WIN32
 
 
@@ -65,7 +100,27 @@ namespace rn {
                 glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
             }        
         }
+        if (props.always_on_bottom) {
+            HWND hwnd = glfwGetWin32Window(window);
 
+            // создал WorkerW
+            HWND progman = FindWindowW(L"Progman", NULL);
+            SendMessageTimeoutW(progman, 0x052C, 0, 0, SMTO_NORMAL, 1000, NULL);
+
+            // Ищем созданный WorkerW
+            HWND workerw = NULL;
+            EnumWindows(EnumWindowsProc, (LPARAM)&workerw);
+
+            // Если WorkerW найден — встраиваемся В него
+            if (workerw != NULL) {
+                SetParent(hwnd, workerw);
+            }
+            else {
+                // Если не нашли, используем запасной вариант (Progman)
+                SetParent(hwnd, progman);
+            }
+        }
+        
 #endif
     }
 
