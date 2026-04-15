@@ -47,14 +47,13 @@ int main(int argc, char** argv)
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-
+    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot_render_text.json";
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
     if (argc > 1) {
-        manager->LoadFromFile(argv[1]);
+        manager->WindowPropsFromJson(argv[1]);
     }
     else {//table_plot
-        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/newapi_test_2.json");
-
+        manager->WindowPropsFromJson(test_str);
     }
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -96,11 +95,12 @@ int main(int argc, char** argv)
     GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor(); // Получаем основной монитор
     const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(primaryMonitor); // Valid on GLFW 3.3+ only
+
     if (manager->window_props_.full_screen) {
-       window = glfwCreateWindow((int)(mode->width * main_scale), (int)(mode->height * main_scale), "MyWidgetEditor GLFW+OpenGL3", primaryMonitor, nullptr);
+       window = glfwCreateWindow((int)(mode->width * main_scale), (int)(mode->height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
     }
     else {
-        window = glfwCreateWindow((int)(manager->window_props_.width * main_scale), (int)(manager->window_props_.height * main_scale), "MyWidgetEditor GLFW+OpenGL3", primaryMonitor, nullptr);
+        window = glfwCreateWindow((int)(manager->window_props_.width * main_scale), (int)(manager->window_props_.height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
     }
     if (window == nullptr)
         return 1;
@@ -126,6 +126,7 @@ int main(int argc, char** argv)
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -155,6 +156,14 @@ int main(int argc, char** argv)
     io.IniFilename = nullptr;
     EMSCRIPTEN_MAINLOOP_BEGIN
 #else
+
+    if (argc > 1) {
+        manager->LoadFromFile(argv[1]);
+    }
+    else {//table_plot
+        manager->LoadFromFile(test_str);
+    }
+
     while (!glfwWindowShouldClose(window))
 #endif
     {

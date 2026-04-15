@@ -43,6 +43,11 @@ namespace rn {
         ImVec2 size = ImVec2(screen_max.x - screen_min.x - 10,
             screen_max.y - screen_min.y - 10);
         ImVec2 pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
+
+        if (!is_loading_) {
+            Emit("data", rows_);
+        }
+
         // Ограничиваем область таблицы
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
@@ -66,7 +71,7 @@ namespace rn {
             // Получаем доступную область внутри окна
             ImVec2 content_size = ImGui::GetContentRegionAvail();
 
-            
+            std::lock_guard<std::mutex> lock(data_mutex_);
             if (ImGui::BeginTable(("##table_" + GetId()).c_str(),
                 (int)columns_.size(),
                 flags_,
@@ -151,9 +156,9 @@ namespace rn {
     httplib::Result TableWidget::LoadTableData()
     {
 
-        for (auto& element : columns_) {
-            element.second.clear();
-        }
+        //for (auto& element : columns_) {
+        //    element.second.clear();
+        //}
 
         if (data_source_type_ != DataSourceType::NONE &&
             data_source_type_ != DataSourceType::STATIC_DATA) {
@@ -191,7 +196,7 @@ namespace rn {
             now_ = std::chrono::steady_clock::now();
             auto time_since_last_update = now_ - last_update_;
 
-            if (time_since_last_update >= update_interval_millisec_) {
+            if (time_since_last_update >= update_interval_millisec_) {                
                 if (!is_loading_) {
                     is_loading_ = true;
                     load_thread_ = std::jthread([this]() {
@@ -202,7 +207,7 @@ namespace rn {
                         is_loading_ = false;
                     });
                     // Отправляем данные дальше
-                    Emit("data", rows_);
+                    //Emit("data", rows_);
                 }
                 last_update_ = std::chrono::steady_clock::now();
                 return true;

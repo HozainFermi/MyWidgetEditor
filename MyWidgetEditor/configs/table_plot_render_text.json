@@ -127,17 +127,24 @@
             "wrap_text": true
         }
     ],
-    "window": {
-        "always_on_top": false,
-        "bg_color": [
-            0.19738562405109406,
-            0.5689350366592407,
-            0.5921568870544434,
-            0.3607843220233917
-        ],
-        "frag_shader": "",
-        "height": 500,
-        "moveble": true,
-        "width": 500
-    }
+  "window": {
+    "full_screen": true,
+    "always_on_bottom": true,
+    "always_on_top": false,
+    "bg_color": [
+      0.19738562405109406,
+      0.5689350366592407,
+      0.5921568870544434,
+      0.3607843220233917
+    ],
+    "decorated": false,
+    "frag_shader": "",
+    "height": 650,
+    "mouse_passthrougth": false,
+    "moveble": true,
+    "resizeble": true,
+    "rounding": 0.0,
+    "width": 877,
+    "window_rounding": false
+  }
 }

@@ -7,6 +7,7 @@
 #include "Connections.h"
 #include "Mesh.h"
 #include "Scene.hpp"
+#include <Process.h>
 
 enum class FileBrowserMode {
     Load,
@@ -20,6 +21,8 @@ class Editor {
 private:
     wg::WidgetManager widget_manager_;
     
+    std::vector<Process> processes_;
+
     // связи
     std::vector<PortVisual> port_visuals_;
     bool is_dragging_connection_ = false;

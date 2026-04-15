@@ -47,10 +47,26 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
 
     std::cout << "Executing: " << exePath << " " << configPath << std::endl;
 
-    // Вариант 1: Раздельная передача
-    if (!IndependentLauncher::launch(exePath,configPath)) {
+    //Раздельная передача
+#ifdef _WIN32   
+    HANDLE proc = IndependentLauncher::launch(exePath, configPath);
+    if (false) {///!!!
         std::cerr << "Failed to launch process\n";
     }
+    else {
+        Process created (proc,filename);        
+        processes_.push_back(created);
+    }
+#else
+    pid_t pid = IndependentLauncher::launch(exePath, configPath);
+    if (pid == 0) {
+        std::cerr << "Failed to launch process\n";
+    }
+    else {
+        processes_.push_back(Process(pid));
+    }
+#endif
+
 }
 
 
@@ -111,6 +127,26 @@ void Editor::RenderMenuBar() {
             ImGui::MenuItem("Show Grid", nullptr, &show_grid_);
             ImGui::EndMenu();
         }
+        ImGui::Spacing();
+        if (ImGui::BeginMenu("Processes")) {
+                if (ImGui::MenuItem("Kill All",NULL)) {
+                    processes_.clear();
+                }
+            for (size_t i = 0; i < processes_.size(); ++i) {
+                char proc_num[32];
+                snprintf(proc_num, sizeof(proc_num), "Process %zu: %s", i, processes_[i].GetName().c_str());
+
+                if (ImGui::BeginMenu(proc_num)) {
+                    if (ImGui::MenuItem("Kill Process")) {
+                        processes_[i].~Process();
+                        processes_.erase(processes_.begin() + i);
+                    }                    
+                    ImGui::EndMenu(); 
+                }
+            }
+            ImGui::EndMenu();
+        }
+
 
         ImGui::EndMenuBar();
     }
@@ -204,7 +240,7 @@ void Editor::RenderRightPanel() {
     }
     window_props_.SetProperties(selections);
 
-    if (selections[2]) {
+    if (selections[3]) {
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
     }
 
