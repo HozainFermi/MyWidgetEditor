@@ -53,7 +53,7 @@ int main(int argc, char** argv)
         manager->LoadFromFile(argv[1]);
     }
     else {//table_plot
-        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot_ser.json");
+        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/newapi_test_2.json");
 
     }
     // Decide GL+GLSL versions
@@ -89,10 +89,19 @@ int main(int argc, char** argv)
 #endif
 
     rn::SetGLFWHints(manager->window_props_);
-   
+
+
     // Create window with graphics context
-    float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
-    GLFWwindow* window = glfwCreateWindow((int)(manager->window_props_.width * main_scale), (int)(manager->window_props_.height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
+    GLFWwindow* window;
+    GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor(); // Получаем основной монитор
+    const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+    float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(primaryMonitor); // Valid on GLFW 3.3+ only
+    if (manager->window_props_.full_screen) {
+       window = glfwCreateWindow((int)(mode->width * main_scale), (int)(mode->height * main_scale), "MyWidgetEditor GLFW+OpenGL3", primaryMonitor, nullptr);
+    }
+    else {
+        window = glfwCreateWindow((int)(manager->window_props_.width * main_scale), (int)(manager->window_props_.height * main_scale), "MyWidgetEditor GLFW+OpenGL3", primaryMonitor, nullptr);
+    }
     if (window == nullptr)
         return 1;
 

@@ -58,7 +58,7 @@ namespace rn {
         std::chrono::steady_clock::time_point last_update_;
         std::chrono::steady_clock::time_point now_;
                   
-       
+        mutable std::mutex data_mutex_;
         std::atomic<bool> is_loading_{ false };
         std::string latest_json_response_;
 

@@ -100,6 +100,7 @@ namespace wg {
                 mw_props.bg_color_float[3]
             });
 
+        window["full_screen"] = mw_props.full_screen;
         window["always_on_top"] = mw_props.always_on_top;
         window["always_on_bottom"] = mw_props.always_on_bottom;
         window["window_rounding"] = mw_props.window_rounding;
@@ -140,6 +141,7 @@ namespace wg {
           mw_props.bg_color_float[3] = windowjs["bg_color"].at(3).get<float>();
       }
       
+      mw_props.always_on_top = windowjs.value("full_screen", false);
       mw_props.always_on_top = windowjs.value("always_on_top",false);
       mw_props.always_on_bottom = windowjs.value("always_on_bottom", false);
       mw_props.resizeble = windowjs.value("resizeble", true);

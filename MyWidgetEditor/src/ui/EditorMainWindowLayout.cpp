@@ -157,8 +157,8 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
-    static bool selections[] = { false,false,false,true,false,true,true };
-    static const char* items[] = { "Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
+    static bool selections[] = { false,false,false,false,true,false,true,true };
+    static const char* items[] = {"Full screen" ,"Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
     static char VERTbuf[150];
     static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
     static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";

@@ -83,6 +83,7 @@
         }
     ],
     "window": {
+        "full_screen": true,
         "always_on_bottom": false,
         "always_on_top": true,
         "bg_color": [

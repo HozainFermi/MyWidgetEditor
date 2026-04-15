@@ -98,15 +98,15 @@ namespace rn {
                     for (int col = 0; col < (int)columns_.size(); col++) {
                         ImGui::TableSetColumnIndex(col);
 
-                        if (row < (int)columns_[col].second.size()) {
-                            sprintf_s(buf, columns_[col].second[row].c_str());
-                        }
-                        else {
-                            sprintf_s(buf, "");
-                        }
+                        //if (row < (int)columns_[col].second.size()) {
+                        //    sprintf_s(buf, columns_[col].second[row].c_str());
+                        //}
+                        //else {
+                        //    sprintf_s(buf, "");
+                        //}
 
-                        ImGui::PushID(row * 10 + col);
-                        ImGui::Selectable(buf, column_selected[col]);
+                        ImGui::PushID(row * 1000 + col);
+                        ImGui::Selectable(columns_[col].second[row].c_str(), column_selected[col]);
                         ImGui::PopID();
                     }
                 }
@@ -201,6 +201,8 @@ namespace rn {
                         }
                         is_loading_ = false;
                     });
+                    // Отправляем данные дальше
+                    Emit("data", rows_);
                 }
                 last_update_ = std::chrono::steady_clock::now();
                 return true;
@@ -237,30 +239,32 @@ namespace rn {
 
     void TableWidget::FromResponseJsonToColumns(const std::string& body)
     {
+        std::vector<std::pair<TableColumnConfig, std::vector<std::string>>> temporary_data;
+
         try {          
             nlohmann::json json = nlohmann::json::parse(body);
 
             if (json.is_array()) {
                 max_display_rows_ = (int)json.size();
                 rows_.clear();
-                if (columns_.empty() && !json.empty() && json[0].is_object()) {
+                if (temporary_data.empty() && !json.empty() && json[0].is_object()) {
                     for (auto& [key, value] : json[0].items()) {
-                        columns_.push_back(std::pair{ TableColumnConfig{ key, key,50.0f, false }, std::vector<std::string>{} });
+                        temporary_data.push_back(std::pair{ TableColumnConfig{ key, key,50.0f, false }, std::vector<std::string>{} });
                     }
                 }
 
                 for (auto& line : json) {
                     if (line.is_object()) {
-                        if (line.size() == columns_.size()) {
+                        if (line.size() == temporary_data.size()) {
                             int i = 0;
                             for (auto& [key, value] : line.items()) {                                
-                                columns_[i].second.push_back(value.dump());
+                                temporary_data[i].second.push_back(value.dump());
                                 i++;
                             }
                             rows_.push_back(line);
                         }
                         else {
-                            std::cout << "Line has " << line.size() << " fields, but table has " << columns_.size() << " columns" << std::endl;
+                            std::cout << "Line has " << line.size() << " fields, but table has " << temporary_data.size() << " columns" << std::endl;
                             throw std::invalid_argument("Response body object is not the same size as the table");
                         }
                     }
@@ -269,8 +273,11 @@ namespace rn {
                     }
                 }
 
-                // Отправляем данные дальше
-                Emit("data", rows_);
+                {
+                    std::lock_guard<std::mutex> lock(data_mutex_);
+                    columns_ = std::move(temporary_data); 
+                }
+                
             }
             else {
                 throw std::invalid_argument("Response body is not an array");
@@ -281,6 +288,11 @@ namespace rn {
             throw std::invalid_argument("Invalid JSON format");
         }
     }
+
+
+
+
+
 
     void TableWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);

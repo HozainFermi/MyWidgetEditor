@@ -7,6 +7,7 @@ namespace rn {
 		ImU32 bg_color = IM_COL32(40, 40, 40, 255);
 		float bg_color_float[4]{ 0.15686275f,0.15686275f ,0.15686275f ,1.0f };
 
+		bool full_screen = false;
 		bool always_on_top = false;
 		bool always_on_bottom = false;
 		bool window_rounding = false;
@@ -32,13 +33,14 @@ namespace rn {
 		}
 
 		void SetProperties(const bool* selections) {
-			selections[0] ? always_on_top = true : always_on_top = false;
-			selections[1] ? always_on_bottom = true : always_on_bottom = false;
-			selections[2] ? window_rounding = true : window_rounding = false;
-			selections[3] ? resizeble = true : resizeble = false;
-			selections[4] ? mouse_passthrougth = true : mouse_passthrougth = false;
-			selections[5] ? moveble = true : moveble = false;
-			selections[6] ? decorated = true : decorated = false;
+			selections[0] ? full_screen = true : full_screen = false;
+			selections[1] ? always_on_top = true : always_on_top = false;
+			selections[2] ? always_on_bottom = true : always_on_bottom = false;
+			selections[3] ? window_rounding = true : window_rounding = false;
+			selections[4] ? resizeble = true : resizeble = false;
+			selections[5] ? mouse_passthrougth = true : mouse_passthrougth = false;
+			selections[6] ? moveble = true : moveble = false;
+			selections[7] ? decorated = true : decorated = false;
 		}
 
 	};

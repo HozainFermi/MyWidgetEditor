@@ -78,6 +78,7 @@ namespace rn {
             window_props_.bg_color_float[3] = windowjs["bg_color"].at(3).get<float>();
         }
 
+        window_props_.full_screen = windowjs.value("full_screen", false);
         window_props_.always_on_top = windowjs.value("always_on_top", false);
         window_props_.always_on_bottom = windowjs.value("always_on_bottom", false);
         window_props_.window_rounding = windowjs.value("window_rounding", false);
