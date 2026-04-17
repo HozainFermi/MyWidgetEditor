@@ -6,6 +6,7 @@
 #include <json.hpp>
 #include <imgui_internal.h>
 #include <iostream>
+#include <RuntimeWindowProperties.h>
 
 namespace rn {
     // Примитивный тип данных между виджетами (JSON как универсальный контейнер)
@@ -57,7 +58,7 @@ namespace rn {
         ImU32 border_color_ = IM_COL32(100, 100, 100, 255);
         ImU32 selected_border_color_ = IM_COL32(199, 197, 135, 255);
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
-        float border_thickness_ = 2.0f;
+        float border_thickness_ = 2.0f;        
 
         // для ресайза
         ImVec2 drag_offset_;
@@ -72,6 +73,8 @@ namespace rn {
         Widget();
         Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size);
         virtual ~Widget() = default;
+
+        RuntimeWindowProperties* window_props;
 
         // Обработка взаимодействия
         virtual bool UpdateInteraction(int widget_id);

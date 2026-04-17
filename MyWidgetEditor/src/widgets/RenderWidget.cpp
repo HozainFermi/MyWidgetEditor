@@ -54,6 +54,7 @@ namespace wg {
 					glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 
+		
 		scene_.Draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -66,12 +67,15 @@ namespace wg {
 		ImGui::SetNextWindowPos(pos);
 		ImGui::SetNextWindowSize(size);
 
+		ImGui::PushID(this);
 		if (ImGui::BeginChild("##render", widget_size)) {
 			ImGui::Image((ImTextureID)(intptr_t)scene_.textureColorBuffer,
 				ImVec2(widget_size.x, widget_size.y),
 				ImVec2(0, 1), ImVec2(1, 0));
 		}
 		ImGui::EndChild();
+		ImGui::PopID();
+		
 	}
 
 
@@ -168,21 +172,39 @@ namespace wg {
 	{   
 		auto json = Widget::ToJson();		
 		nlohmann::json models_json = nlohmann::json::array();
+		nlohmann::json camera_json;
 		for (const auto& model : scene_.models_) {
 			models_json.push_back(model.ToJson());			
 		}
 		json["models"] = models_json;
-
+		
+		camera_json["x"] = scene_.camera_->Position.x;
+		camera_json["y"] = scene_.camera_->Position.y;
+		camera_json["z"] = scene_.camera_->Position.z;
+		camera_json["zoom"] = scene_.camera_->Zoom;
+		
+		json["camera"] = camera_json;
 		return json;
 	}
 
 	void RenderWidget::FromJson(const nlohmann::json& json)
 	{
 		Widget::FromJson(json);
-		for (const auto& model : json["models"]) {
-			scene_.AddModel(model["model_path"], model["vert_shader_path"], model["fragment_shader_path"],"");
-		}
+		auto camera_json = json["camera"];
 
+		scene_.camera_->Position.x = camera_json.value("x", 0.0f);
+		scene_.camera_->Position.y = camera_json.value("y", 0.0f);
+		scene_.camera_->Position.z = camera_json.value("z", 0.0f);
+		scene_.camera_->Zoom = camera_json.value("zoom", 45.0f);
+
+		for (const auto& model : json["models"]) {
+			scene_.AddModel(
+				model.value("model_path", ""),
+				model.value("vert_shader_path", ""),
+				model.value("fragment_shader_path", ""),
+				"");
+		}
+		
 	}
 
 	void RenderWidget::GeneratePreviewData()

@@ -10,10 +10,11 @@ namespace rn {
 
     class RenderWidget : public Widget {
     private:
-        Styles::Scene scene_;
+        Styles::Scene scene_;        
 
     public:
         int selectedMeshIndex = -1;
+        void SetClearColor();
 
         RenderWidget();
         RenderWidget(const std::string& name, const ImVec2& pos);       

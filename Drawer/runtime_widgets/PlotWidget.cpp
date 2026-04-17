@@ -44,7 +44,7 @@ namespace rn {
             switch (plot_type_) {
             case PlotType::LinePlot:
                 if (ImPlot::BeginPlot(plot_name_.c_str())) {
-                    ImPlot::SetupAxes(x_plot_label_.c_str(), y_plot_label_.c_str());
+                    ImPlot::SetupAxes(x_plot_label_.c_str(), y_plot_label_.c_str(),ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
                     
                     for (int i = 0; i < all_charts_.size();++i) {
                         ImPlot::PlotLine(all_charts_[i].name.c_str(), all_charts_[i].x_data.data(), all_charts_[i].y_data.data(), all_charts_[i].x_data.size());

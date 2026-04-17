@@ -53,6 +53,7 @@ namespace Styles {
 		~Scene() = default;
 
 		void Draw();
+		void ResetState();
 		void AddModel(const std::filesystem::path& model_path,
 			const std::filesystem::path& vert_shader_path,
 			const std::filesystem::path& frag_shader_path,

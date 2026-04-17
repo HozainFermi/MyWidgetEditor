@@ -32,15 +32,15 @@ namespace rn {
 		scene_.SCR_WIDTH = widget_size.x;
 		scene_.SCR_HEIGHT = widget_size.y;
 
-		// 1. Сохраняем текущий Viewport, чтобы не сбить ImGui
+		// Сохраняем текущий Viewport, чтобы не сбить ImGui
 		GLint last_viewport[4];
 		glGetIntegerv(GL_VIEWPORT, last_viewport);
 
-		// 2. Рендерим сцену в FBO
+		// Рендерим сцену в FBO
 		glBindFramebuffer(GL_FRAMEBUFFER, scene_.FBO);
 		glViewport(0, 0, (GLsizei)widget_size.x, (GLsizei)widget_size.y);
-
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		
+		glClearColor(window_props->bg_color_float[0], window_props->bg_color_float[1], window_props->bg_color_float[2], window_props->bg_color_float[3]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		if (!scene_.models_.empty()) {
 			scene_.models_[0].model_mat =
@@ -52,7 +52,7 @@ namespace rn {
 		scene_.Draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		// 3. Восстанавливаем Viewport обратно для ImGui
+		// Восстанавливаем Viewport обратно для ImGui
 		glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 
 		ImVec2 size = ImVec2(screen_max.x - screen_min.x - 10,
@@ -60,13 +60,15 @@ namespace rn {
 		ImVec2 pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
 		ImGui::SetNextWindowPos(pos);
 		ImGui::SetNextWindowSize(size);
-
+		ImGui::PushID(this);
 		if (ImGui::BeginChild("##render", widget_size)) {
 			ImGui::Image((ImTextureID)(intptr_t)scene_.textureColorBuffer,
 				ImVec2(widget_size.x, widget_size.y),
 				ImVec2(0, 1), ImVec2(1, 0));
 		}
 		ImGui::EndChild();
+		ImGui::PopID();
+
 	}
 
 
@@ -91,10 +93,19 @@ namespace rn {
 	void RenderWidget::FromJson(const nlohmann::json& json)
 	{
 		Widget::FromJson(json);
-		for (const auto& model : json["models"]) {
-			scene_.AddModel(model["model_path"], model["vert_shader_path"], model["fragment_shader_path"], "");
-		}
+		auto camera_json = json["camera"];
+		scene_.camera_->Position.x = camera_json.value("x", 0.0f);
+		scene_.camera_->Position.y = camera_json.value("y", 0.0f);
+		scene_.camera_->Position.z = camera_json.value("z", 0.0f);
+		scene_.camera_->Zoom = camera_json.value("zoom", 45.0f);
 
+		for (const auto& model : json["models"]) {
+			scene_.AddModel(
+				model.value("model_path", ""),
+				model.value("vert_shader_path", ""),
+				model.value("fragment_shader_path", ""),
+				"");
+		}
 	}
 
 	void RenderWidget::GeneratePreviewData()

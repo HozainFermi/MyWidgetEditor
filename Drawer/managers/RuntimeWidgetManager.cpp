@@ -59,6 +59,7 @@ namespace rn {
     }
 
     
+    
     void RuntimeWidgetManager::FromJson(const nlohmann::json& json) {
         widgets_.clear();
 
@@ -69,20 +70,7 @@ namespace rn {
             return;
         }
         const nlohmann::json& windowjs = json["window"];
-
-        window_props_.always_on_top = windowjs.value("always_on_top", false);
-        if (windowjs.contains("bg_color") && windowjs["bg_color"].is_array()) {
-            window_props_.bg_color_float[0] = windowjs["bg_color"].at(0).get<float>();
-            window_props_.bg_color_float[1] = windowjs["bg_color"].at(1).get<float>();
-            window_props_.bg_color_float[2] = windowjs["bg_color"].at(2).get<float>();
-            window_props_.bg_color_float[3] = windowjs["bg_color"].at(3).get<float>();
-        }
-        window_props_.frag_GLSLshader_file = windowjs.value("frag_shader", "");
-        window_props_.width = windowjs.value("width", 150);
-        window_props_.height = windowjs.value("height", 300);
-        window_props_.moveble = windowjs.value("moveble", true);
-        window_props_.FloatToImU32();
-
+                
         //Создаём соединения
         if (json.contains("connections")) {
             for (const auto& connection : json["connections"])
@@ -101,6 +89,7 @@ namespace rn {
 
             if (widget) {                
                 widget->FromJson(widget_json);
+                widget->window_props = &window_props_;
                 widgets_by_id_[widget->GetId()] = widget.get();
                 widgets_.push_back(std::move(widget));                
             }
@@ -125,6 +114,43 @@ namespace rn {
             }
     
     
+    }
+
+    void RuntimeWidgetManager::WindowPropsFromJson(const std::string& filename)
+    {
+        nlohmann::json json;
+
+        if (filename.empty()) {
+            return;
+        }
+        std::ifstream file(filename);
+        if (file.is_open()) {            
+            file >> json;            
+        }
+
+        const nlohmann::json& windowjs = json["window"];
+
+        if (windowjs.contains("bg_color") && windowjs["bg_color"].is_array()) {
+            window_props_.bg_color_float[0] = windowjs["bg_color"].at(0).get<float>();
+            window_props_.bg_color_float[1] = windowjs["bg_color"].at(1).get<float>();
+            window_props_.bg_color_float[2] = windowjs["bg_color"].at(2).get<float>();
+            window_props_.bg_color_float[3] = windowjs["bg_color"].at(3).get<float>();
+        }
+
+        window_props_.full_screen = windowjs.value("full_screen", false);
+        window_props_.always_on_top = windowjs.value("always_on_top", false);
+        window_props_.always_on_bottom = windowjs.value("always_on_bottom", false);
+        window_props_.window_rounding = windowjs.value("window_rounding", false);
+        window_props_.decorated = windowjs.value("decorated", true);
+        window_props_.resizeble = windowjs.value("resizeble", true);
+        window_props_.mouse_passthrougth = windowjs.value("mouse_passthrougth", false);
+        window_props_.moveble = windowjs.value("moveble", true);
+
+        window_props_.frag_GLSLshader_file = windowjs.value("frag_shader", "");
+        window_props_.width = windowjs.value("width", 150);
+        window_props_.height = windowjs.value("height", 300);
+        window_props_.rounding = windowjs.value("rounding", 0.0f);
+        window_props_.FloatToImU32();
     }
 
 }

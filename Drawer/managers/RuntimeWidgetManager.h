@@ -107,6 +107,7 @@ namespace rn {
 
         // === Сериализация ===       
         void FromJson(const nlohmann::json& json);
+        void WindowPropsFromJson(const std::string& filename);
         void LoadFromFile(const std::string& filename);
 
     };

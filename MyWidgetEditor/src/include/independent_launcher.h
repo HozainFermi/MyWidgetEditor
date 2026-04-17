@@ -17,39 +17,46 @@
 
 class IndependentLauncher {
 public:
+
     /**
      * @brief Запускает процесс полностью независимо от родительского
      * @param command Полная командная строка (исполняемый файл + аргументы)
      * @return true если процесс успешно запущен
      */
-    static bool launch(const std::string& command) {
-#ifdef _WIN32
-        return launchWindows(command);
-#else
-        return launchUnix(command);
-#endif
-    }
 
+#ifdef _WIN32
+    static HANDLE launch(const std::string& command) {
+        return launchWindows(command);        
+    }
+#else
+    static pid_t launch(const std::string& command) {
+        return launchUnix(command);
+    }
+#endif
     /**
      * @brief Запускает исполняемый файл с аргументами
      * @param executablePath Путь к исполняемому файлу
      * @param arguments Аргументы командной строки
      * @return true если процесс успешно запущен
      */
-    static bool launch(const std::string& executablePath, const std::string& arguments) {
 #ifdef _WIN32
+    static HANDLE launch(const std::string& executablePath, const std::string& arguments) {
         //return launchWindowsExeArgs(executablePath, arguments);
-        return launchWindowsShell(executablePath, arguments);
+        return launchWindowsShellExA(executablePath, arguments);
+    }
 #else
+    static pid_t launch(const std::string& executablePath, const std::string& arguments) {
         std::string command = "\"" + executablePath + "\" " + arguments;
         return launchUnix(command);
-#endif
     }
+#endif
+
 
 private:
 #ifdef _WIN32
-    // Метод 1: Использование CreateProcess с правильными параметрами
-    static bool launchWindows(const std::string& command) {
+    //Использование CreateProcess с правильными параметрами
+    static HANDLE launchWindows(const std::string& command) {
+
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         PROCESS_INFORMATION pi = { 0 };
 
@@ -73,8 +80,8 @@ private:
 
         if (success) {
             CloseHandle(pi.hThread);
-            CloseHandle(pi.hProcess);
-            return true;
+            //CloseHandle(pi.hProcess);
+            return pi.hProcess;
         }
         else {
             DWORD error = GetLastError();
@@ -92,12 +99,15 @@ private:
             }
             std::cerr << std::endl;
 
-            return false;
+            return pi.hProcess;
         }
     }
 
     //Альтернативный способ через ShellExecute 
-    static bool launchWindowsShell(const std::string& executablePath, const std::string& arguments) {
+    static HANDLE launchWindowsShellExA(const std::string& executablePath, const std::string& arguments) {
+                
+        HANDLE handle{0};
+
         HINSTANCE result = ShellExecuteA(
             NULL,           // hwnd
             "open",         // operation
@@ -107,16 +117,45 @@ private:
             SW_HIDE         // show command
         );
 
-        return ((intptr_t)result > 32);
+        //return ((intptr_t)result > 32);
+        return handle;
     }
 
+    static HANDLE launchWindowsShellEx(const std::string& executablePath, const std::string& arguments) {
+        // 1. Извлекаем путь к папке (рабочую директорию)
+        std::string directory = executablePath.substr(0, executablePath.find_last_of("\\/"));
+
+        // 2. Оборачиваем аргументы в кавычки на случай пробелов в путях
+        std::string quotedArgs = "\"" + arguments + "\"";
+
+        SHELLEXECUTEINFOA sei = { sizeof(sei) }; // Явно используем ANSI версию (A)
+        sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+        sei.lpVerb = "open";
+        sei.lpFile = executablePath.c_str();
+        sei.lpParameters = quotedArgs.c_str();
+        sei.lpDirectory = directory.c_str(); // Устанавливаем рабочую папку
+        sei.nShow = SW_SHOWNORMAL;
+
+        if (!ShellExecuteExA(&sei)) {
+            DWORD dwError = GetLastError();
+            std::cerr << "Failed to launch process. Error code: " << dwError << std::endl;
+            return NULL;
+        }
+
+        // Если hProcess все еще NULL, значит приложение открылось через DDE 
+        // (например, в существующей вкладке другого процесса)
+        return sei.hProcess;
+    }
+
+
     // Раздельная передача exe и аргументов
-    static bool launchWindowsExeArgs(const std::string& executablePath, const std::string& arguments) {
+    static HANDLE launchWindowsExeArgs(const std::string& executablePath, const std::string& arguments) {
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         PROCESS_INFORMATION pi = { 0 };
 
         // Формируем полную командную строку
-        std::string fullCmd = "\"" + executablePath + "\" " + arguments;
+        std::string fullCmd = executablePath +" "+ arguments;
+        std::cout << std::endl <<fullCmd;
         char* cmd = _strdup(fullCmd.c_str());
 
         bool success = CreateProcessA(
@@ -125,7 +164,7 @@ private:
             NULL,
             NULL,
             FALSE,
-            CREATE_NEW_CONSOLE | DETACHED_PROCESS,
+            CREATE_NEW_CONSOLE,
             NULL,
             NULL,
             &si,
@@ -136,16 +175,19 @@ private:
 
         if (success) {
             CloseHandle(pi.hThread);
-            CloseHandle(pi.hProcess);
-            return true;
+            //CloseHandle(pi.hProcess);
+            return pi.hProcess;
+        }
+        else {
+            std::cerr << "Error code: " << GetLastError() << std::endl;
         }
 
-        return false;
+        return pi.hProcess;
     }
 
 
 #else
-    static bool launchUnix(const std::string& command) {
+    static pid_t launchUnix(const std::string& command) {
         
         
         //!!!NOT DONE
@@ -164,10 +206,10 @@ private:
         }
         else if (pid > 0) {
             waitpid(pid, NULL, 0);
-            return true;
+            return pid;
         }
 
-        return false;
+        return pid;
     }
 #endif
 };

@@ -7,6 +7,7 @@
 #include "Connections.h"
 #include "Mesh.h"
 #include "Scene.hpp"
+#include <Process.h>
 
 enum class FileBrowserMode {
     Load,
@@ -20,6 +21,8 @@ class Editor {
 private:
     wg::WidgetManager widget_manager_;
     
+    std::vector<Process> processes_;
+
     // связи
     std::vector<PortVisual> port_visuals_;
     bool is_dragging_connection_ = false;
@@ -88,16 +91,11 @@ public:
        
         std::unique_ptr model = std::make_unique<Helpers::Model>();        
         model->AddMesh(background_mesh_);
-        //std::string("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.vert")
-        //std::string("C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag")
+    
         std::unique_ptr shaders = std::make_unique<Helpers::Shader>( window_props_.vertex_GLSLshader_file,window_props_.frag_GLSLshader_file  );
         Styles::ModelData model_data { std::move(model), std::move(shaders) };
-        background_scene_.FBO = 1;
-        background_scene_.textureColorBuffer = 1;
-        background_scene_.rbo = 1;
-
-        background_scene_.models_.push_back(std::move(model_data));
-        //background_scene_.camera_->Position = glm::vec3(0.0f, 0.0f, 3.0f);
+       
+        background_scene_.models_.push_back(std::move(model_data));       
 
     }
 

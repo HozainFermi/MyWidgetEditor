@@ -81,30 +81,36 @@
             "x_plot_label": "id`s",
             "y_plot_label": "prices"
         },
-        {
-            "bg_color": 4283443240,
-            "id": "widget_2",
-            "min_height": 20.0,
-            "min_width": 30.0,
-            "models": [
-                {
-                    "fragment_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag",
-                    "model_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj",
-                    "vert_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"
-                }
-            ],
-            "name": "RenderWidget1",
-            "position": [
-                456.0,
-                327.0
-            ],
-            "size": [
-                393.0,
-                372.0
-            ],
-            "type": 9,
-            "widget_class": "RenderWidget"
+      {
+        "bg_color": 4283443240,
+        "camera": {
+          "x": 0.11999999731779099,
+          "y": 0.950000047683716,
+          "z": 8.430000305175781,
+          "zoom": 45.0
         },
+        "id": "widget_2",
+        "min_height": 20.0,
+        "min_width": 30.0,
+        "models": [
+          {
+            "fragment_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag",
+            "model_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj",
+            "vert_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"
+          }
+        ],
+        "name": "RenderWidget1",
+        "position": [
+          456.0,
+          327.0
+        ],
+        "size": [
+          393.0,
+          372.0
+        ],
+        "type": 9,
+        "widget_class": "RenderWidget"
+      },
         {
             "bg_color": 4283443240,
             "font_scale": 1.0,
@@ -127,17 +133,24 @@
             "wrap_text": true
         }
     ],
-    "window": {
-        "always_on_top": false,
-        "bg_color": [
-            0.19738562405109406,
-            0.5689350366592407,
-            0.5921568870544434,
-            0.3607843220233917
-        ],
-        "frag_shader": "",
-        "height": 500,
-        "moveble": true,
-        "width": 500
-    }
+  "window": {
+    "full_screen": false,
+    "always_on_bottom": false,
+    "always_on_top": false,
+    "bg_color": [
+      0.19738562405109406,
+      0.5689350366592407,
+      0.5921568870544434,
+      0.3607843220233917
+    ],
+    "decorated": true,
+    "frag_shader": "",
+    "height": 650,
+    "mouse_passthrougth": false,
+    "moveble": true,
+    "resizeble": true,
+    "rounding": 0.0,
+    "width": 877,
+    "window_rounding": false
+  }
 }

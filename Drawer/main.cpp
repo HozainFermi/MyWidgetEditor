@@ -32,6 +32,8 @@
 #include <iostream>
 #include "ui/MainWindowLayout.h"
 #include "../external/implot/implot.h"
+#include <WindowSettings.h>
+#include <stb_image.h>
 
 
 static void glfw_error_callback(int error, const char* description)
@@ -46,8 +48,14 @@ int main(int argc, char** argv)
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-
+    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/bunny_new_test.json";
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
+    if (argc > 1) {
+        manager->WindowPropsFromJson(argv[1]);
+    }
+    else {//table_plot
+        manager->WindowPropsFromJson(test_str);
+    }
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100 (WebGL 1.0)
@@ -72,24 +80,32 @@ int main(int argc, char** argv)
     // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);  // Без декораций
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);   
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // Прозрачность
-
-    if (manager->window_props_.always_on_top) {
-        glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);  // Поверх всех окон
-    }
+   
+   
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
-   
+    rn::SetGLFWHints(manager->window_props_);
+
+
     // Create window with graphics context
-    //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-    float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
-    GLFWwindow* window = glfwCreateWindow((int)(manager->window_props_.width * main_scale), (int)(manager->window_props_.height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
+    GLFWwindow* window;
+    GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor(); // Получаем основной монитор
+    const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+    float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(primaryMonitor); // Valid on GLFW 3.3+ only
+
+    if (manager->window_props_.full_screen) {
+       window = glfwCreateWindow((int)(mode->width * main_scale), (int)(mode->height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
+    }
+    else {
+        window = glfwCreateWindow((int)(manager->window_props_.width * main_scale), (int)(manager->window_props_.height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
+    }
     if (window == nullptr)
         return 1;
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
@@ -98,15 +114,11 @@ int main(int argc, char** argv)
         glfwTerminate();
         return -2;
     }
-
+    
+    rn::ScopedWindowCleaner wdCleaner(window);
+    rn::SetupWindowStyle(window,manager->window_props_);
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get(manager->window_props_);
-    if (argc > 1) {
-        manager->LoadFromFile(argv[1]);
-    }
-    else {
-        manager->LoadFromFile("C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot.json");
-
-    }
+   
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -115,6 +127,7 @@ int main(int argc, char** argv)
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -144,6 +157,15 @@ int main(int argc, char** argv)
     io.IniFilename = nullptr;
     EMSCRIPTEN_MAINLOOP_BEGIN
 #else
+    stbi_set_flip_vertically_on_load(true);
+
+    if (argc > 1) {
+        manager->LoadFromFile(argv[1]);
+    }
+    else {//table_plot
+        manager->LoadFromFile(test_str);
+    }
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
 #endif
     {
@@ -177,6 +199,7 @@ int main(int argc, char** argv)
 #endif
 
     // Cleanup
+    rn::ClearWindow(window);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImPlot::DestroyContext();

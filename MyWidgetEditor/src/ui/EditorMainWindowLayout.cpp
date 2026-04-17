@@ -47,10 +47,26 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
 
     std::cout << "Executing: " << exePath << " " << configPath << std::endl;
 
-    // Вариант 1: Раздельная передача
-    if (!IndependentLauncher::launch(exePath,configPath)) {
+    //Раздельная передача
+#ifdef _WIN32   
+    HANDLE proc = IndependentLauncher::launch(exePath, configPath);
+    if (false) {///!!!
         std::cerr << "Failed to launch process\n";
     }
+    else {
+        Process created (proc,filename);        
+        processes_.push_back(created);
+    }
+#else
+    pid_t pid = IndependentLauncher::launch(exePath, configPath);
+    if (pid == 0) {
+        std::cerr << "Failed to launch process\n";
+    }
+    else {
+        processes_.push_back(Process(pid));
+    }
+#endif
+
 }
 
 
@@ -111,6 +127,26 @@ void Editor::RenderMenuBar() {
             ImGui::MenuItem("Show Grid", nullptr, &show_grid_);
             ImGui::EndMenu();
         }
+        ImGui::Spacing();
+        if (ImGui::BeginMenu("Processes")) {
+                if (ImGui::MenuItem("Kill All",NULL)) {
+                    processes_.clear();
+                }
+            for (size_t i = 0; i < processes_.size(); ++i) {
+                char proc_num[32];
+                snprintf(proc_num, sizeof(proc_num), "Process %zu: %s", i, processes_[i].GetName().c_str());
+
+                if (ImGui::BeginMenu(proc_num)) {
+                    if (ImGui::MenuItem("Kill Process")) {
+                        processes_[i].~Process();
+                        processes_.erase(processes_.begin() + i);
+                    }                    
+                    ImGui::EndMenu(); 
+                }
+            }
+            ImGui::EndMenu();
+        }
+
 
         ImGui::EndMenuBar();
     }
@@ -157,9 +193,24 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
+    static bool* selections[] = 
+    { 
+      &window_props_.full_screen,
+      &window_props_.always_on_top,
+      &window_props_.always_on_bottom,
+      &window_props_.window_rounding,
+      &window_props_.resizeble,
+      &window_props_.mouse_passthrougth,
+      &window_props_.moveble,
+      &window_props_.decorated
+    };
+    static const char* items[] = {"Full screen" ,"Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
     static char VERTbuf[150];
-    static char FRAGbuf[150];// = window_props_.frag_GLSLshader_file.c_str();
- 
+    static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
+    static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";
+    static std::vector<std::string> shaderNames {};
+    static std::vector<std::filesystem::path> shaders_paths {};
+
     std::strncpy(FRAGbuf, window_props_.frag_GLSLshader_file.c_str(), sizeof(FRAGbuf) - 1);    
     FRAGbuf[sizeof(FRAGbuf) - 1] = '\0';
 
@@ -170,9 +221,7 @@ void Editor::RenderRightPanel() {
     ImGui::Text("Height: %.0f", canvas_size_.y);
     ImGui::Text("Background color:");
 
-   // ImVec4 color = ImGui::ColorConvertU32ToFloat4(window_props_.bg_color);
-   // memcpy(window_props_.bg_color_float, &color, sizeof(float) * 4);
-
+   
     if (ImGui::ColorEdit4("MainWindowColor", window_props_.bg_color_float, ImGuiColorEditFlags_DisplayHSV)) {
 
         window_props_.bg_color = ImGui::ColorConvertFloat4ToU32(
@@ -181,12 +230,61 @@ void Editor::RenderRightPanel() {
                 window_props_.bg_color_float[2],
                 window_props_.bg_color_float[3]));
     }
-    ImGui::Checkbox("Always on top", &window_props_.always_on_top);
-    ImGui::Checkbox("Moveble", &window_props_.moveble);
 
+    if (ImGui::BeginCombo(".", "Window properties"))
+    {
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        {            
+            if (ImGui::Checkbox(items[n], selections[n])){
+                if( *selections[1] && *selections[2])  {
+                    if (n == 1) {
+                        *selections[2] = false;
+                    }
+                    if (n == 2) {
+                        *selections[1] = false;
+                    }
+                }
+            }
+        }
+        ImGui::EndCombo();
+    }
+    //window_props_.SetProperties(selections);
+
+    if (selections[3]) {
+        ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
+    }
+
+    //ImGui::Checkbox("Always on top", &window_props_.always_on_top);
+    //ImGui::Checkbox("Moveble", &window_props_.moveble);
+    if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,15)) ) {
+        shaderNames.clear();
+        shaders_paths.clear();
+        for (const auto& folder : std::filesystem::directory_iterator(shadersFolderPath) )
+        {
+            if (folder.is_directory()) {
+                for (const auto& file : std::filesystem::directory_iterator(folder)) {
+
+                    if (file.path().extension() == ".frag") {                       
+                        shaders_paths.push_back(file.path());                       
+                        shaderNames.push_back( folder.path().filename().string() );                                                
+                    }                    
+                }
+            }
+        }
+        ImGui::OpenPopup("select_shader_popup");
+    }
+    ImGui::SameLine();
     if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {
         window_props_.frag_GLSLshader_file = FRAGbuf;        
     }
+
+    if (ImGui::BeginPopup("select_shader_popup")) {
+        for (size_t i = 0; i < shaderNames.size(); ++i) {
+            if (ImGui::Selectable(shaderNames[i].c_str())) { window_props_.frag_GLSLshader_file = shaders_paths[i].generic_string(); }
+        }
+        ImGui::EndPopup();                
+    }
+
     if (ImGui::Button("Compile shader")) {
         std::unique_ptr shaders = std::make_unique<Helpers::Shader>(window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file);
         background_scene_.models_[0].shader.release();
@@ -223,7 +321,6 @@ void Editor::RenderRightPanel() {
 
         // Тип виджета (только для чтения)
         ImGui::Text("Type: %s", selected->TypeToString(selected->GetType()).c_str());
-
         ImGui::Separator();
 
         // Кнопки действий
@@ -255,6 +352,7 @@ void Editor::RenderRightPanel() {
         ImGui::Text("Click on a widget to select it");
         ImGui::Text("Right-click for context menu");
     }
+    
 }
 
 ImVec2 Editor::GetMousePosRelativeToCanvas() const {
@@ -385,6 +483,8 @@ void Editor::RenderCanvas() {
 
     // Информация о канвасе
     ImGui::Text("Canvas: %.0fx%.0f", canvas_size_.x, canvas_size_.y);
+    window_props_.width = canvas_size_.x;
+    window_props_.height = canvas_size_.y;
     ImGui::SameLine();
     ImGui::Text("Mouse: %.0f, %.0f",
        curmouse.x,
@@ -392,9 +492,11 @@ void Editor::RenderCanvas() {
     
     // Создаём невидимую кнопку-канвас
     ImVec2 canvas_avail = ImGui::GetContentRegionAvail();
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, window_props_.rounding);
     ImGui::InvisibleButton("CanvasButton", canvas_avail,
         ImGuiButtonFlags_MouseButtonLeft |
         ImGuiButtonFlags_MouseButtonRight);
+    ImGui::PopStyleVar();
 
     // Получаем координаты канваса
     canvas_p0_ = ImGui::GetItemRectMin();
@@ -413,8 +515,8 @@ void Editor::RenderCanvas() {
         window_props_.bg_color_float[2] * 255,
         window_props_.bg_color_float[3] * 255 
     };
-    ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);
-    draw_list->AddRectFilled(canvas_p0_, canvas_p1, col);
+    ImU32 col = IM_COL32(to_im32.x, to_im32.y, to_im32.z, to_im32.w);    
+    draw_list->AddRectFilled(canvas_p0_, canvas_p1, col, window_props_.rounding);
     
     //========================================================================================================
     if (window_props_.frag_GLSLshader_file != "" && window_props_.vertex_GLSLshader_file != "") {        
@@ -449,9 +551,7 @@ void Editor::RenderCanvas() {
             //glm::rotate(background_scene_.models_[0].model_mat,
             //    glm::radians(sin(static_cast<float>(glfwGetTime()))),
             //    glm::vec3(0.0f, 1.0f, 0.0f));
-        }
-
-        background_scene_.Draw();
+        background_scene_.Draw();        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Восстанавливаем Viewport обратно для ImGui
@@ -459,12 +559,18 @@ void Editor::RenderCanvas() {
 
         ImVec2 pos = ImVec2(canvas_p0_.x + 0, canvas_p0_.y + 0);
 
+        ImGui::PushID("background_scene");
         ImGui::GetWindowDrawList()->AddImage(
             (ImTextureID)(intptr_t)background_scene_.textureColorBuffer,
             pos,
             ImVec2(pos.x + canvas_size_.x, pos.y + canvas_size_.y),
             ImVec2(0, 1), ImVec2(1, 0)
         );
+        ImGui::PopID();
+        }
+
+        
+        
     }
     //========================================================================================================
 
@@ -472,7 +578,7 @@ void Editor::RenderCanvas() {
     DrawGrid(draw_list);
   
     // Рамка канваса
-    draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
+    draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), window_props_.rounding, 0, 2.0f);
 
     // Обработка Drag & Drop
     if (ImGui::BeginDragDropTarget()) {
