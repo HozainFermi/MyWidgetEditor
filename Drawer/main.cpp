@@ -33,6 +33,7 @@
 #include "ui/MainWindowLayout.h"
 #include "../external/implot/implot.h"
 #include <WindowSettings.h>
+#include <stb_image.h>
 
 
 static void glfw_error_callback(int error, const char* description)
@@ -47,7 +48,7 @@ int main(int argc, char** argv)
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot_render_text.json";
+    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/bunny_new_test.json";
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
     if (argc > 1) {
         manager->WindowPropsFromJson(argv[1]);
@@ -82,7 +83,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);   
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // Прозрачность
    
-    
+   
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
@@ -156,6 +157,7 @@ int main(int argc, char** argv)
     io.IniFilename = nullptr;
     EMSCRIPTEN_MAINLOOP_BEGIN
 #else
+    stbi_set_flip_vertically_on_load(true);
 
     if (argc > 1) {
         manager->LoadFromFile(argv[1]);
@@ -163,7 +165,7 @@ int main(int argc, char** argv)
     else {//table_plot
         manager->LoadFromFile(test_str);
     }
-
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
 #endif
     {

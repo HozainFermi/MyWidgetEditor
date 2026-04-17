@@ -85,7 +85,7 @@
         "bg_color": 4283443240,
         "camera": {
           "x": 0.11999999731779099,
-          "y": 3.950000047683716,
+          "y": 0.950000047683716,
           "z": 8.430000305175781,
           "zoom": 45.0
         },
@@ -134,8 +134,8 @@
         }
     ],
   "window": {
-    "full_screen": true,
-    "always_on_bottom": true,
+    "full_screen": false,
+    "always_on_bottom": false,
     "always_on_top": false,
     "bg_color": [
       0.19738562405109406,
@@ -143,7 +143,7 @@
       0.5921568870544434,
       0.3607843220233917
     ],
-    "decorated": false,
+    "decorated": true,
     "frag_shader": "",
     "height": 650,
     "mouse_passthrougth": false,

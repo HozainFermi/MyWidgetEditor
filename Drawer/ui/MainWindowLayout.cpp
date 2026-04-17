@@ -59,8 +59,6 @@ namespace rn {
                         background_scene_.models_[0].shader->setMat4("ortho_view", view);
                         background_scene_.models_[0].shader->setMat4("ortho_projection", proj);
 
-                    }
-
                     background_scene_.Draw();
                     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -78,6 +76,8 @@ namespace rn {
                         manager->window_props_.rounding
                     );
                     ImGui::PopID();
+                    }
+
                 }
                 //ImVec2 screen_max = { ImGui::GetWindowPos().x + ImGui::GetWindowSize().x, ImGui::GetWindowPos().y + ImGui::GetWindowSize().y };
                 drawlist->AddRectFilled(main_screen_min, main_screen_max, manager->window_props_.bg_color,manager->window_props_.rounding);

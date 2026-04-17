@@ -551,9 +551,6 @@ void Editor::RenderCanvas() {
             //glm::rotate(background_scene_.models_[0].model_mat,
             //    glm::radians(sin(static_cast<float>(glfwGetTime()))),
             //    glm::vec3(0.0f, 1.0f, 0.0f));
-        }
-
-        
         background_scene_.Draw();        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -570,6 +567,9 @@ void Editor::RenderCanvas() {
             ImVec2(0, 1), ImVec2(1, 0)
         );
         ImGui::PopID();
+        }
+
+        
         
     }
     //========================================================================================================
