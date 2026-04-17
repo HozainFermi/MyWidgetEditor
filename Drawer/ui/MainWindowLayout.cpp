@@ -24,7 +24,7 @@ namespace rn {
         ImVec2 window_size = { main_screen_max.x - main_screen_min.x, main_screen_max.y - main_screen_min.y };
 
             ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, window_props_.rounding);
-            if(ImGui::BeginChild("main_child", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y)))
+            if(ImGui::BeginChild("main_child", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y)) )
             {   
                 background_scene_.SCR_WIDTH = ImGui::GetWindowSize().x;
                 background_scene_.SCR_HEIGHT = ImGui::GetWindowSize().y;
@@ -68,7 +68,7 @@ namespace rn {
                     glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 
                     ImVec2 pos = ImVec2(main_screen_min.x + 0, main_screen_min.y + 0);
-
+                    ImGui::PushID("background_scene");
                     ImGui::GetWindowDrawList()->AddImageRounded(
                         (ImTextureID)(intptr_t)background_scene_.textureColorBuffer,
                         pos,
@@ -77,6 +77,7 @@ namespace rn {
                         IM_COL32_WHITE,
                         manager->window_props_.rounding
                     );
+                    ImGui::PopID();
                 }
                 //ImVec2 screen_max = { ImGui::GetWindowPos().x + ImGui::GetWindowSize().x, ImGui::GetWindowPos().y + ImGui::GetWindowSize().y };
                 drawlist->AddRectFilled(main_screen_min, main_screen_max, manager->window_props_.bg_color,manager->window_props_.rounding);

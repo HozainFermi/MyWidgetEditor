@@ -42,7 +42,7 @@ public:
 #ifdef _WIN32
     static HANDLE launch(const std::string& executablePath, const std::string& arguments) {
         //return launchWindowsExeArgs(executablePath, arguments);
-        return launchWindowsShell(executablePath, arguments);
+        return launchWindowsShellExA(executablePath, arguments);
     }
 #else
     static pid_t launch(const std::string& executablePath, const std::string& arguments) {
@@ -104,7 +104,7 @@ private:
     }
 
     //Альтернативный способ через ShellExecute 
-    static HANDLE launchWindowsShell(const std::string& executablePath, const std::string& arguments) {
+    static HANDLE launchWindowsShellExA(const std::string& executablePath, const std::string& arguments) {
                 
         HANDLE handle{0};
 
@@ -120,6 +120,33 @@ private:
         //return ((intptr_t)result > 32);
         return handle;
     }
+
+    static HANDLE launchWindowsShellEx(const std::string& executablePath, const std::string& arguments) {
+        // 1. Извлекаем путь к папке (рабочую директорию)
+        std::string directory = executablePath.substr(0, executablePath.find_last_of("\\/"));
+
+        // 2. Оборачиваем аргументы в кавычки на случай пробелов в путях
+        std::string quotedArgs = "\"" + arguments + "\"";
+
+        SHELLEXECUTEINFOA sei = { sizeof(sei) }; // Явно используем ANSI версию (A)
+        sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+        sei.lpVerb = "open";
+        sei.lpFile = executablePath.c_str();
+        sei.lpParameters = quotedArgs.c_str();
+        sei.lpDirectory = directory.c_str(); // Устанавливаем рабочую папку
+        sei.nShow = SW_SHOWNORMAL;
+
+        if (!ShellExecuteExA(&sei)) {
+            DWORD dwError = GetLastError();
+            std::cerr << "Failed to launch process. Error code: " << dwError << std::endl;
+            return NULL;
+        }
+
+        // Если hProcess все еще NULL, значит приложение открылось через DDE 
+        // (например, в существующей вкладке другого процесса)
+        return sei.hProcess;
+    }
+
 
     // Раздельная передача exe и аргументов
     static HANDLE launchWindowsExeArgs(const std::string& executablePath, const std::string& arguments) {

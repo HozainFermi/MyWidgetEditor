@@ -79,7 +79,42 @@ namespace Styles {
 			m.shader->setMat4("view", view);
 			m.shader->setMat4("projection", projection);
 			m.model->Draw(*m.shader);
+		}			
+	}
+
+	void Scene::ResetState()
+	{
+		// Отвязываем шейдер
+		glUseProgram(0);
+
+		// Отвязываем VAO 
+		glBindVertexArray(0);
+
+		// Отвязываем буферы
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		// Отвязываем текстуры (частично есть)
+		for (int i = 0; i < 8; i++) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
+		glActiveTexture(GL_TEXTURE0);
+
+		// Отвязываем FBO 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Сбрасываем renderbuffer
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+		// Выключаем лишние режимы
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_SCISSOR_TEST);
+
+		// Сбрасываем цвет очистки 
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	void Scene::ProcessInputData()

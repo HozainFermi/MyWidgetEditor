@@ -1,0 +1,55 @@
+{
+    "connections": [],
+    "widgets": [
+        {
+            "bg_color": 4283443240,
+            "camera": {
+                "x": 0.11999999731779099,
+                "y": 3.950000047683716,
+                "z": 8.430000305175781,
+                "zoom": 45.0
+            },
+            "id": "widget_0",
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "models": [
+                {
+                    "fragment_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag",
+                    "model_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/marin_kitagawa_from_dress_up_darling/scene.gltf",
+                    "vert_shader_path": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert"
+                }
+            ],
+            "name": "RenderWidget1",
+            "position": [
+                404.0,
+                140.0
+            ],
+            "size": [
+                453.0,
+                477.0
+            ],
+            "type": 9,
+            "widget_class": "RenderWidget"
+        }
+    ],
+    "window": {
+        "always_on_bottom": true,
+        "always_on_top": false,
+        "bg_color": [
+            0.1568627506494522,
+            0.1568627506494522,
+            0.1568627506494522,
+            1.0
+        ],
+        "decorated": false,
+        "frag_shader": "",
+        "full_screen": true,
+        "height": 754,
+        "mouse_passthrougth": false,
+        "moveble": true,
+        "resizeble": true,
+        "rounding": 0.0,
+        "width": 1006,
+        "window_rounding": false
+    }
+}

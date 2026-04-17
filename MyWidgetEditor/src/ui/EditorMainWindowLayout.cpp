@@ -193,7 +193,17 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     wg::Widget* selected = widget_manager_.GetSelectedWidget();
 
-    static bool selections[] = { false,false,false,false,true,false,true,true };
+    static bool* selections[] = 
+    { 
+      &window_props_.full_screen,
+      &window_props_.always_on_top,
+      &window_props_.always_on_bottom,
+      &window_props_.window_rounding,
+      &window_props_.resizeble,
+      &window_props_.mouse_passthrougth,
+      &window_props_.moveble,
+      &window_props_.decorated
+    };
     static const char* items[] = {"Full screen" ,"Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
     static char VERTbuf[150];
     static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
@@ -225,20 +235,20 @@ void Editor::RenderRightPanel() {
     {
         for (int n = 0; n < IM_ARRAYSIZE(items); n++)
         {            
-            if (ImGui::Checkbox(items[n], &selections[n])){
-                if( selections[0] && selections[1])  {
-                    if (n == 0) {
-                        selections[1] = false;
-                    }
+            if (ImGui::Checkbox(items[n], selections[n])){
+                if( *selections[1] && *selections[2])  {
                     if (n == 1) {
-                        selections[0] = false;
+                        *selections[2] = false;
+                    }
+                    if (n == 2) {
+                        *selections[1] = false;
                     }
                 }
             }
         }
         ImGui::EndCombo();
     }
-    window_props_.SetProperties(selections);
+    //window_props_.SetProperties(selections);
 
     if (selections[3]) {
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
@@ -246,11 +256,6 @@ void Editor::RenderRightPanel() {
 
     //ImGui::Checkbox("Always on top", &window_props_.always_on_top);
     //ImGui::Checkbox("Moveble", &window_props_.moveble);
-
-    if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {
-        window_props_.frag_GLSLshader_file = FRAGbuf;        
-    }
-    ImGui::SameLine();
     if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,15)) ) {
         shaderNames.clear();
         shaders_paths.clear();
@@ -268,6 +273,11 @@ void Editor::RenderRightPanel() {
         }
         ImGui::OpenPopup("select_shader_popup");
     }
+    ImGui::SameLine();
+    if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {
+        window_props_.frag_GLSLshader_file = FRAGbuf;        
+    }
+
     if (ImGui::BeginPopup("select_shader_popup")) {
         for (size_t i = 0; i < shaderNames.size(); ++i) {
             if (ImGui::Selectable(shaderNames[i].c_str())) { window_props_.frag_GLSLshader_file = shaders_paths[i].generic_string(); }
@@ -543,7 +553,8 @@ void Editor::RenderCanvas() {
             //    glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
-        background_scene_.Draw();
+        
+        background_scene_.Draw();        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Восстанавливаем Viewport обратно для ImGui
@@ -551,12 +562,15 @@ void Editor::RenderCanvas() {
 
         ImVec2 pos = ImVec2(canvas_p0_.x + 0, canvas_p0_.y + 0);
 
+        ImGui::PushID("background_scene");
         ImGui::GetWindowDrawList()->AddImage(
             (ImTextureID)(intptr_t)background_scene_.textureColorBuffer,
             pos,
             ImVec2(pos.x + canvas_size_.x, pos.y + canvas_size_.y),
             ImVec2(0, 1), ImVec2(1, 0)
         );
+        ImGui::PopID();
+        
     }
     //========================================================================================================
 

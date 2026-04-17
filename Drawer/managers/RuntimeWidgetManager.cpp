@@ -89,6 +89,7 @@ namespace rn {
 
             if (widget) {                
                 widget->FromJson(widget_json);
+                widget->window_props = &window_props_;
                 widgets_by_id_[widget->GetId()] = widget.get();
                 widgets_.push_back(std::move(widget));                
             }

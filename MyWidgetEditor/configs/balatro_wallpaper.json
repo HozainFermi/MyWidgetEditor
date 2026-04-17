@@ -1,0 +1,24 @@
+{
+    "connections": [],
+    "widgets": [],
+    "window": {
+        "always_on_bottom": true,
+        "always_on_top": false,
+        "bg_color": [
+            0.1568627506494522,
+            0.1568627506494522,
+            0.1568627506494522,
+            1.0
+        ],
+        "decorated": false,
+        "frag_shader": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag",
+        "full_screen": true,
+        "height": 453,
+        "mouse_passthrougth": false,
+        "moveble": true,
+        "resizeble": true,
+        "rounding": 0.0,
+        "width": 470,
+        "window_rounding": false
+    }
+}
