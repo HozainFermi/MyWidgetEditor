@@ -19,33 +19,59 @@ class Process {
     pid_t pid;
 #endif
 
-
 public:
-    std::string GetName() {
-        return name;
-    }
+	Process(const Process&) = delete;
+	Process& operator=(const Process&) = delete;
 
 #ifdef _WIN32
-    Process(HANDLE handle, std::string config_name) {
-        hProcess = handle;
-        name = config_name;
-    }
+	Process(HANDLE handle, std::string config_name)
+		: name(std::move(config_name)), hProcess(handle) {
+	}
+	Process(Process&& o) noexcept
+		: name(std::move(o.name)), hProcess(o.hProcess) {
+		o.hProcess = nullptr;
+	}
+	Process& operator=(Process&& o) noexcept {
+		if (this != &o) {
+			if (hProcess)
+				CloseHandle(hProcess);
+			name = std::move(o.name);
+			hProcess = o.hProcess;
+			o.hProcess = nullptr;
+		}
+		return *this;
+	}
 #else
-    Process(pid_t pid, std::string config_name) {
-        this.pid = pid;
-        name = config_name;
-    }
+	Process(pid_t pid_in, std::string config_name)
+		: name(std::move(config_name)), pid(pid_in) {
+	}
+	Process(Process&& o) noexcept
+		: name(std::move(o.name)), pid(o.pid) {
+		o.pid = -1;
+	}
+	Process& operator=(Process&& o) noexcept {
+		if (this != &o) {
+			name = std::move(o.name);
+			pid = o.pid;
+			o.pid = -1;
+		}
+		return *this;
+	}
 #endif
+	std::string GetName() const {
+		return name;
+	}
 
     ~Process() {
 #ifdef _WIN32
-        if (hProcess != NULL) {
-            TerminateProcess(hProcess, 0); // Принудительно закрываем
-            CloseHandle(hProcess);         // ОБЯЗАТЕЛЬНО освобождаем хендл
+        if (hProcess) {
+			TerminateProcess(hProcess,0);
+            CloseHandle(hProcess);
+            hProcess = nullptr;
         }
 #else
         if (pid > 0) {
-            kill(pid, SIGTERM);            // Аналог закрытия в Unix
+            kill(pid, SIGTERM);            
         }
 #endif
     }

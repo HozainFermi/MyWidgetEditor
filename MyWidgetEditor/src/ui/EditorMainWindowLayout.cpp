@@ -50,12 +50,12 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     //Раздельная передача
 #ifdef _WIN32   
     HANDLE proc = IndependentLauncher::launch(exePath, configPath);
-    if (false) {///!!!
+    if (proc== nullptr) {///!!!
         std::cerr << "Failed to launch process\n";
     }
     else {
         Process created (proc,filename);        
-        processes_.push_back(created);
+        processes_.push_back(std::move(created));
     }
 #else
     pid_t pid = IndependentLauncher::launch(exePath, configPath);
@@ -63,7 +63,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
         std::cerr << "Failed to launch process\n";
     }
     else {
-        processes_.push_back(Process(pid));
+        processes_.push_back(Process(pid,filename));
     }
 #endif
 
@@ -137,8 +137,7 @@ void Editor::RenderMenuBar() {
                 snprintf(proc_num, sizeof(proc_num), "Process %zu: %s", i, processes_[i].GetName().c_str());
 
                 if (ImGui::BeginMenu(proc_num)) {
-                    if (ImGui::MenuItem("Kill Process")) {
-                        processes_[i].~Process();
+                    if (ImGui::MenuItem("Kill Process")) {                       
                         processes_.erase(processes_.begin() + i);
                     }                    
                     ImGui::EndMenu(); 

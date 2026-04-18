@@ -42,7 +42,7 @@ public:
 #ifdef _WIN32
     static HANDLE launch(const std::string& executablePath, const std::string& arguments) {
         //return launchWindowsExeArgs(executablePath, arguments);
-        return launchWindowsShellExA(executablePath, arguments);
+        return LaunchWithExeWorkingDir(executablePath, arguments);
     }
 #else
     static pid_t launch(const std::string& executablePath, const std::string& arguments) {
@@ -119,6 +119,55 @@ private:
 
         //return ((intptr_t)result > 32);
         return handle;
+    }
+
+    static std::string StripOuterQuotes(std::string s) {     
+        
+        if (s.size() >= 2 && s.front() == '"' && s.back() == '"') {
+            s = s.substr(1, s.size() - 2);
+        }
+        return s;
+    }
+
+    static HANDLE LaunchWithExeWorkingDir(std::string exeQuotedOrNot, std::string argQuotedOrNot) {
+        const std::string exe = StripOuterQuotes(exeQuotedOrNot);
+                
+        // рабочая директория = папка exe
+        std::string workDir;
+        const auto pos = exe.find_last_of("\\");
+        if (pos != std::string::npos) {
+            workDir = exe.substr(0, pos); 
+        }
+                
+        std::string cmdLine = exeQuotedOrNot+" "+argQuotedOrNot;
+        
+        std::vector<char> cmdBuf(cmdLine.begin(), cmdLine.end());
+        cmdBuf.push_back('\0');
+        STARTUPINFOA si{};
+        si.cb = sizeof(si);
+
+        PROCESS_INFORMATION pi{};
+        const BOOL ok = CreateProcessA(
+            nullptr,
+            cmdBuf.data(),
+            nullptr, 
+            nullptr,
+            FALSE,
+            CREATE_NEW_CONSOLE,
+            nullptr,
+            workDir.c_str(),
+            &si,
+            &pi
+        );
+                
+        if (!ok) {
+            DWORD e = GetLastError();
+            std::cerr << "CreateProcess failed, GetLastError=" << e
+                << "  exe=" << exeQuotedOrNot << "\n  arg=" << argQuotedOrNot << "\n  cwd=" << workDir << "\n";
+            return nullptr;
+        }
+        CloseHandle(pi.hThread);
+        return pi.hProcess; // закрой CloseHandle когда не нужен / после TerminateProcess
     }
 
     static HANDLE launchWindowsShellEx(const std::string& executablePath, const std::string& arguments) {
