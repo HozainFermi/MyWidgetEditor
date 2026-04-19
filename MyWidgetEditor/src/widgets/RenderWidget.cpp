@@ -1,4 +1,5 @@
 #include "RenderWidget.h"
+#include <IconText.h>
 
 
 
@@ -84,22 +85,36 @@ namespace wg {
 		static int selected_idx = 0;
 		static float Xoffset = 0.0f;
 		static float Yoffset = 0.0f;
-		static char modelPath[200] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/models/backpack/backpack.obj";
-		static char VERTbuf[200] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.vert";
-		static char FRAGbuf[200] = "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/backpack/1.model_loading.frag";
+		
+		static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";
+		static std::filesystem::path modelsFolderPath = std::string(ASSETS_SOURCE_DIR) + "/models";
+
+		static std::string modelPath= modelsFolderPath.string()  + "/backpack/backpack.obj";		 modelPath.resize(256);
+		static std::string VERTbuf =  shadersFolderPath.string() + "/backpack/1.model_loading.vert"; VERTbuf.resize(256);
+		static std::string FRAGbuf =  shadersFolderPath.string() + "/backpack/1.model_loading.frag"; FRAGbuf.resize(256);
+		
+		static std::vector<std::filesystem::path> frag_shaders_paths{};		
+		static std::vector<std::filesystem::path> vert_shaders_paths{};		
+		static std::vector<std::filesystem::path> models_paths{};
 
 		ImGui::Text("==Render Settings==");
 		ImGui::Separator();
 
-		ImGui::InputText("Model path", modelPath, IM_ARRAYSIZE(modelPath));
-		ImGui::PushID("ModelShaders");
-		if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
-			//window_props_.vertex_GLSLshader_file = VERTbuf;
-		}
-		if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf))) {
-			//window_props_.frag_GLSLshader_file = FRAGbuf;
-		}
-		ImGui::PopID();
+		ExplorerButton(modelPath,models_paths,modelsFolderPath,PathType::Model);
+		ImGui::SameLine();
+		ImGui::InputText("Model path##model", modelPath.data(), modelPath.capacity());
+		
+		
+		ExplorerButton(VERTbuf, vert_shaders_paths, shadersFolderPath, PathType::VertexShader);
+		ImGui::SameLine();
+		if (ImGui::InputText("Vert Shader##model", VERTbuf.data(), VERTbuf.capacity())) {}
+		
+		
+		ExplorerButton(FRAGbuf, frag_shaders_paths, shadersFolderPath, PathType::FragmentShader);
+		ImGui::SameLine();
+		if (ImGui::InputText("Frag Shader##model", FRAGbuf.data(), FRAGbuf.capacity())) {}
+		
+
 		if (ImGui::Button("Load model")) {
 			scene_.AddModel(modelPath,VERTbuf,FRAGbuf,"");
 			if (!scene_.models_.empty()) {
@@ -210,6 +225,45 @@ namespace wg {
 	void RenderWidget::GeneratePreviewData()
 	{
 
+	}
+
+	void RenderWidget::ExplorerButton(std::string& currentPath, std::vector<std::filesystem::path>& paths, std::filesystem::path& folderPath, PathType type) {
+		
+		ImGui::PushID(PathTypeToString(type).c_str());
+		if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(35, 20))) {
+			paths.clear();
+			for (const auto& folder : std::filesystem::directory_iterator(folderPath))
+			{
+				if (folder.is_directory()) {					
+						for (const auto& file : std::filesystem::directory_iterator(folder)) {							
+							if (type == PathType::Model) {
+								if (file.path().extension() == ".obj" || file.path().extension() == ".gltf") {
+									paths.push_back(file.path());
+								}
+							}
+							if (type == PathType::VertexShader) {
+								if (file.path().extension() == ".vert") {
+									paths.push_back(file.path());
+								}
+							}
+							if (type == PathType::FragmentShader) {
+								if (file.path().extension() == ".frag") {
+									paths.push_back(file.path());
+								}
+							}
+						}										
+				}
+			}
+			ImGui::OpenPopup("select_explorer_popup");
+		}
+
+		if (ImGui::BeginPopup("select_explorer_popup")) {
+			for (size_t i = 0; i < paths.size(); ++i) {				
+				if (ImGui::Selectable(paths[i].filename().string().c_str())) { currentPath = paths[i].generic_string(); }
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::PopID();
 	}
 
 }
