@@ -8,6 +8,12 @@
 
 namespace wg {
 
+    enum class PathType {
+        Model,
+        VertexShader,
+        FragmentShader
+    };
+
    
     class RenderWidget : public Widget {
     private:
@@ -39,7 +45,15 @@ namespace wg {
         std::vector<PortDesc> GetOutputPorts() const override { return {}; }
 
     private:
-        void GeneratePreviewData();       
-                   
+        void GeneratePreviewData();
+        void ExplorerButton(std::string& currentPath, std::vector<std::filesystem::path>& paths, std::filesystem::path& folderPath, PathType type);
+
+        std::string PathTypeToString(PathType& type) {
+            switch (type) {
+                case PathType::Model: return "Model";
+                case PathType::VertexShader: return "VertexShader";
+                case PathType::FragmentShader: return "FragmentShader";
+            }
+        }
     };
 }

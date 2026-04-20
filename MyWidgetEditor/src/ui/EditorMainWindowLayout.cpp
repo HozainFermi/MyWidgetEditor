@@ -50,12 +50,12 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     //Раздельная передача
 #ifdef _WIN32   
     HANDLE proc = IndependentLauncher::launch(exePath, configPath);
-    if (false) {///!!!
+    if (proc== nullptr) {///!!!
         std::cerr << "Failed to launch process\n";
     }
     else {
         Process created (proc,filename);        
-        processes_.push_back(created);
+        processes_.push_back(std::move(created));
     }
 #else
     pid_t pid = IndependentLauncher::launch(exePath, configPath);
@@ -63,7 +63,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
         std::cerr << "Failed to launch process\n";
     }
     else {
-        processes_.push_back(Process(pid));
+        processes_.push_back(Process(pid,filename));
     }
 #endif
 
@@ -137,8 +137,7 @@ void Editor::RenderMenuBar() {
                 snprintf(proc_num, sizeof(proc_num), "Process %zu: %s", i, processes_[i].GetName().c_str());
 
                 if (ImGui::BeginMenu(proc_num)) {
-                    if (ImGui::MenuItem("Kill Process")) {
-                        processes_[i].~Process();
+                    if (ImGui::MenuItem("Kill Process")) {                       
                         processes_.erase(processes_.begin() + i);
                     }                    
                     ImGui::EndMenu(); 
@@ -254,16 +253,13 @@ void Editor::RenderRightPanel() {
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
     }
 
-    //ImGui::Checkbox("Always on top", &window_props_.always_on_top);
-    //ImGui::Checkbox("Moveble", &window_props_.moveble);
     if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,15)) ) {
         shaderNames.clear();
         shaders_paths.clear();
         for (const auto& folder : std::filesystem::directory_iterator(shadersFolderPath) )
         {
             if (folder.is_directory()) {
-                for (const auto& file : std::filesystem::directory_iterator(folder)) {
-
+                for (const auto& file : std::filesystem::directory_iterator(folder)) {                    
                     if (file.path().extension() == ".frag") {                       
                         shaders_paths.push_back(file.path());                       
                         shaderNames.push_back( folder.path().filename().string() );                                                
@@ -274,12 +270,12 @@ void Editor::RenderRightPanel() {
         ImGui::OpenPopup("select_shader_popup");
     }
     ImGui::SameLine();
-    if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {
+    if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {        
         window_props_.frag_GLSLshader_file = FRAGbuf;        
     }
 
     if (ImGui::BeginPopup("select_shader_popup")) {
-        for (size_t i = 0; i < shaderNames.size(); ++i) {
+        for (size_t i = 0; i < shaderNames.size(); ++i) {           
             if (ImGui::Selectable(shaderNames[i].c_str())) { window_props_.frag_GLSLshader_file = shaders_paths[i].generic_string(); }
         }
         ImGui::EndPopup();                
