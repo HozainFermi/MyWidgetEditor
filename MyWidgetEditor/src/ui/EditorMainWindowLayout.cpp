@@ -220,7 +220,7 @@ void Editor::RenderRightPanel() {
     ImGui::Text("Height: %.0f", canvas_size_.y);
     ImGui::Text("Background color:");
 
-   
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
     if (ImGui::ColorEdit4("MainWindowColor", window_props_.bg_color_float, ImGuiColorEditFlags_DisplayHSV)) {
 
         window_props_.bg_color = ImGui::ColorConvertFloat4ToU32(
@@ -230,7 +230,8 @@ void Editor::RenderRightPanel() {
                 window_props_.bg_color_float[3]));
     }
 
-    if (ImGui::BeginCombo(".", "Window properties"))
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
+    if (ImGui::BeginCombo(" ", "Window properties"))
     {
         for (int n = 0; n < IM_ARRAYSIZE(items); n++)
         {            
@@ -249,11 +250,12 @@ void Editor::RenderRightPanel() {
     }
     //window_props_.SetProperties(selections);
 
-    if (selections[3]) {
+    if (*selections[3]) {
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
     }
 
-    if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,15)) ) {
+    if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,22)) ) {
         shaderNames.clear();
         shaders_paths.clear();
         for (const auto& folder : std::filesystem::directory_iterator(shadersFolderPath) )
@@ -270,6 +272,7 @@ void Editor::RenderRightPanel() {
         ImGui::OpenPopup("select_shader_popup");
     }
     ImGui::SameLine();
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.618f);
     if (ImGui::InputText("Frag Shader", FRAGbuf, IM_ARRAYSIZE(FRAGbuf) )) {        
         window_props_.frag_GLSLshader_file = FRAGbuf;        
     }
