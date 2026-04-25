@@ -30,6 +30,7 @@ namespace rn {
                 background_scene_.SCR_HEIGHT = ImGui::GetWindowSize().y;
 
                 if (window_props_.frag_GLSLshader_file != "" && window_props_.vertex_GLSLshader_file != "") {
+                    background_scene_.ResizeFramebuffer(background_scene_.SCR_WIDTH, background_scene_.SCR_HEIGHT);
                     // Сохраняем текущий Viewport, чтобы не сбить ImGui
                     GLint last_viewport[4];
                     glGetIntegerv(GL_VIEWPORT, last_viewport);

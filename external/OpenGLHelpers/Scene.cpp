@@ -117,6 +117,33 @@ namespace Styles {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
+	void Scene::ResizeFramebuffer(unsigned int w, unsigned int h)
+	{
+		if (w == 0 || h == 0) return;
+		if (fbo_width_ == w && fbo_height_ == h) return; // уже нужный размер
+
+		fbo_width_ = w;
+		fbo_height_ = h;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+		// color attachment
+		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)w, (GLsizei)h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		// depth/stencil attachment
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (GLsizei)w, (GLsizei)h);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			std::cout << "ERROR::FRAMEBUFFER:: resize incomplete\n";
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
 	void Scene::ProcessInputData()
 	{
 

@@ -519,6 +519,7 @@ void Editor::RenderCanvas() {
         background_scene_.SCR_WIDTH = canvas_size_.x;
         background_scene_.SCR_HEIGHT = canvas_size_.y;
 
+        background_scene_.ResizeFramebuffer(background_scene_.SCR_WIDTH, background_scene_.SCR_HEIGHT);
         // Сохраняем текущий Viewport, чтобы не сбить ImGui
         GLint last_viewport[4];
         glGetIntegerv(GL_VIEWPORT, last_viewport);
