@@ -31,7 +31,7 @@ namespace Styles {
 	};
 
 	class Scene {
-	public:
+	public:		
 		std::vector<ModelData> models_;
 		std::unique_ptr<Helpers::Camera> camera_;
 
@@ -60,5 +60,8 @@ namespace Styles {
 			const std::string& name);
 
 		void ProcessInputData();
+		unsigned int fbo_width_ = 0;
+		unsigned int fbo_height_ = 0;
+		void ResizeFramebuffer(unsigned int w, unsigned int h);
 	};
 }

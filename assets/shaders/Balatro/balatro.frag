@@ -22,6 +22,8 @@ uniform float iTime;
 vec4 effect(vec2 screenSize, vec2 screen_coords) {
     float pixel_size = length(screenSize.xy) / PIXEL_FILTER;
     vec2 uv = (floor(screen_coords.xy*(1./pixel_size))*pixel_size - 0.5*screenSize.xy)/length(screenSize.xy) - OFFSET;
+    //vec2 uv = (2.0 * screen_coords - screenSize) / min(screenSize.x, screenSize.y);
+    //uv -= OFFSET;
     float uv_len = length(uv);
     
     float speed = (SPIN_ROTATION*SPIN_EASE*0.2);
@@ -29,7 +31,9 @@ vec4 effect(vec2 screenSize, vec2 screen_coords) {
        speed = iTime * speed;
     }
     speed += 302.2;
+
     float new_pixel_angle = atan(uv.y, uv.x) + speed - SPIN_EASE*20.*(1.*SPIN_AMOUNT*uv_len + (1. - 1.*SPIN_AMOUNT));
+    //uv = uv_len * vec2(cos(new_pixel_angle), sin(new_pixel_angle));
     vec2 mid = (screenSize.xy/length(screenSize.xy))/2.;
     uv = (vec2((uv_len * cos(new_pixel_angle) + mid.x), (uv_len * sin(new_pixel_angle) + mid.y)) - mid);
     

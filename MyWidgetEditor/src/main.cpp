@@ -34,6 +34,8 @@
 #include <stb_image.h>
 #include <implot/implot.h>
 #include <IconText.h>
+#include <ImGuiObsStyle.h>
+
 
 
 
@@ -42,7 +44,6 @@ static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
-
 
 // Main code
 int main(int, char**)
@@ -106,13 +107,7 @@ int main(int, char**)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
-
-    // Setup scaling
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
-    style.FontScaleDpi = main_scale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+    ApplyObsLikeImGuiStyle(main_scale);
       
     io.Fonts->AddFontDefault();
     ImFontConfig config;
@@ -183,7 +178,7 @@ int main(int, char**)
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            //îòðèñîâêà ãëàâíîãî îêíà       
+            //˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜       
             editor->Render(&show_editor, ImGui::GetMainViewport(), window, templates);
 
             // Rendering

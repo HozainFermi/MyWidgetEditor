@@ -147,6 +147,7 @@ private:
         si.cb = sizeof(si);
 
         PROCESS_INFORMATION pi{};
+        
         const BOOL ok = CreateProcessA(
             nullptr,
             cmdBuf.data(),
