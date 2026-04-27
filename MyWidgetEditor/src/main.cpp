@@ -177,8 +177,7 @@ int main(int, char**)
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-
-            //˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜       
+            
             editor->Render(&show_editor, ImGui::GetMainViewport(), window, templates);
 
             // Rendering

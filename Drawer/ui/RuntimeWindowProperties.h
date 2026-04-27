@@ -6,7 +6,8 @@ namespace rn {
 	struct RuntimeWindowProperties {
 		ImU32 bg_color = IM_COL32(40, 40, 40, 255);
 		float bg_color_float[4]{ 0.15686275f,0.15686275f ,0.15686275f ,1.0f };
-
+		
+		bool wallpaper_mode = false;
 		bool full_screen = false;
 		bool always_on_top = false;
 		bool always_on_bottom = false;

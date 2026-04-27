@@ -100,7 +100,7 @@ namespace rn {
                 glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
             }        
         }
-        if (props.always_on_bottom) {
+        if (props.wallpaper_mode) {
             HWND hwnd = glfwGetWin32Window(window);
 
             // создал WorkerW
@@ -119,6 +119,19 @@ namespace rn {
                 // Если не нашли, используем запасной вариант (Progman)
                 SetParent(hwnd, progman);
             }
+        }
+        if (props.always_on_bottom) {
+            HWND hwnd = glfwGetWin32Window(window);
+
+            //Убираем из таскбара и запрещаем активацию при клике
+            LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+            exStyle |= WS_EX_TOOLWINDOW;   // Скрыть из панели задач
+            exStyle |= WS_EX_NOACTIVATE;   // Не выводить на передний план при клике
+            SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle);
+
+            HWND progman = FindWindowW(L"Progman", NULL);
+            SetWindowPos(hwnd, progman, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
         }
         
 #endif

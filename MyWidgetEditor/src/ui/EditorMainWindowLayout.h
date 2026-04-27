@@ -43,6 +43,7 @@ private:
     FileBrowserMode browsermode= FileBrowserMode::None;
     wg::RuntimeWindowProperties window_props_{};
     
+    std::string loaded_config;
     Styles::Scene background_scene_{};
     
     //Helpers::Shader background_shaders_{window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file};
@@ -202,6 +203,8 @@ private:
 
     // Сохранение/загрузка конфигурации с учётом connections_
     void SaveConfigWithConnections(const std::string& filename);
+
+    void CheckFileMenuHotKeys();
 
     // Создание виджетов
     void CreateWidgetFromTemplate(const std::string& type, const ImVec2& position);
