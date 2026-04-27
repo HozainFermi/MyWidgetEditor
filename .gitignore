@@ -6,6 +6,8 @@
 #Dear ImGui
 imgui.ini
 
+#configs
+/MyWidgetEditor/configs/*.json
 
 # User-specific files
 *.rsuser
