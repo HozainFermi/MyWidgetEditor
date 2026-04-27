@@ -21,6 +21,7 @@ static void HelpMarker(const char* desc)
 }
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
+    loaded_config = filename;
     widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+filename+".json", window_props_);
 
 }
@@ -93,21 +94,41 @@ void Editor::SaveConfigWithConnections(const std::string& filename)
     }
 }
 
+void Editor::CheckFileMenuHotKeys() {
+    ImGuiIO& io = ImGui::GetIO();
+    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_N)) {
+        filesave_open_ = true;
+    }
+    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_S))
+    {
+        if (!loaded_config.empty()) { SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + loaded_config + ".json"); }
+    }
+    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_L)) {
+        filebrowser_open_ = true;
+        browsermode = FileBrowserMode::Load;
+    }
+}
+
 // Реализация методов класса Editor
-void Editor::RenderMenuBar() {  
-    if (ImGui::BeginMenuBar()) {
-        //std::string FILEText = std::string(ICON(ICON_FILE_PLUS)) + " File";
+void Editor::RenderMenuBar() {
+
+    CheckFileMenuHotKeys();
+        
+    if (ImGui::BeginMenuBar()) {        
         if (ImGui::BeginMenu("File ")) {
+            if (ImGui::MenuItem("New", "Ctrl+N")) {                
+                filesave_open_ = true;                
+            }
             if (ImGui::MenuItem("Run", "")) {          
                 filebrowser_open_ = true;
                 browsermode = FileBrowserMode::Run;
             }
-            if (ImGui::MenuItem("Save ", "Ctrl+S")) {
-                filesave_open_ = true;                
+            if (ImGui::MenuItem("Save ", "Ctrl+S")) {                
+               if (!loaded_config.empty()) { SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + loaded_config + ".json"); }                
             }
             if (ImGui::MenuItem("Load", "Ctrl+L")) {                
                 filebrowser_open_ = true;
-                browsermode = FileBrowserMode::Load;
+                browsermode = FileBrowserMode::Load;                
             }
             if (ImGui::MenuItem("Exit")) {
                 // Логика выхода
@@ -194,6 +215,7 @@ void Editor::RenderRightPanel() {
 
     static bool* selections[] = 
     { 
+      &window_props_.wallpaper_mode,
       &window_props_.full_screen,
       &window_props_.always_on_top,
       &window_props_.always_on_bottom,
@@ -203,7 +225,7 @@ void Editor::RenderRightPanel() {
       &window_props_.moveble,
       &window_props_.decorated
     };
-    static const char* items[] = {"Full screen" ,"Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
+    static const char* items[] = {"Wallpaper mode", "Full screen", "Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
     static char VERTbuf[150];
     static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
     static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";
@@ -236,12 +258,23 @@ void Editor::RenderRightPanel() {
         for (int n = 0; n < IM_ARRAYSIZE(items); n++)
         {            
             if (ImGui::Checkbox(items[n], selections[n])){
-                if( *selections[1] && *selections[2])  {
-                    if (n == 1) {
-                        *selections[2] = false;
-                    }
+                if (*selections[0]) {
+                    *selections[1] = true;
+                    *selections[2] = false;
+                    *selections[3] = false;
+                    *selections[4] = false;
+                    *selections[5] = false;
+                    *selections[6] = false;
+                    *selections[7] = false;
+                    *selections[8] = false;                    
+                }
+
+                if( *selections[2] && *selections[3])  {                    
                     if (n == 2) {
-                        *selections[1] = false;
+                        *selections[3] = false;
+                    }
+                    if (n == 3) {
+                        *selections[2] = false;
                     }
                 }
             }
@@ -250,7 +283,7 @@ void Editor::RenderRightPanel() {
     }
     //window_props_.SetProperties(selections);
 
-    if (*selections[3]) {
+    if (*selections[4]) {
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
     }
@@ -470,6 +503,9 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 // Реализация RenderCanvas 
 void Editor::RenderCanvas() {
     
+    if(!loaded_config.empty()){
+        ImGui::Text("Loaded config: %s",loaded_config.c_str());       
+    }
     ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
     ImGui::Text("Grid size");
     
@@ -568,9 +604,7 @@ void Editor::RenderCanvas() {
         );
         ImGui::PopID();
         }
-
-        
-        
+                
     }
     //========================================================================================================
 

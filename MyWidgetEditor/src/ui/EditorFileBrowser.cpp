@@ -1,4 +1,5 @@
 #include "EditorMainWindowLayout.h"
+#include <iostream>
 
 void Editor::RenderFileBrowser(FileBrowserMode& mode) {
     if (filebrowser_open_) {
@@ -128,7 +129,7 @@ void Editor::RenderFileBrowser(FileBrowserMode& mode) {
 }
 
 void Editor::RenderSaveFileMenu() {
-    if (filesave_open_) {
+    if (filesave_open_) {       
         static char savefile_buffer[32];
         ImGui::OpenPopup("SaveFile");
         if (ImGui::BeginPopupModal("SaveFile", NULL,
@@ -136,7 +137,7 @@ void Editor::RenderSaveFileMenu() {
 
             if (ImGui::BeginChild("SaveFileChild", ImVec2(400, 80), true)) {
 
-                ImGui::InputText("l", savefile_buffer, IM_ARRAYSIZE(savefile_buffer));
+                ImGui::InputText("##", savefile_buffer, IM_ARRAYSIZE(savefile_buffer));
                 ImGui::SameLine();
                 ImGui::Text(".json");
                 ImGui::Dummy(ImVec2(0, 10));
