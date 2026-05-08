@@ -28,19 +28,24 @@ namespace rn {
 	void RenderWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
 	{
 		ImVec2 widget_size = GetSize();
+		scene_.SaveCurrentState();
 
 		scene_.SCR_WIDTH = widget_size.x;
 		scene_.SCR_HEIGHT = widget_size.y;
 
-		// Сохраняем текущий Viewport, чтобы не сбить ImGui
-		GLint last_viewport[4];
-		glGetIntegerv(GL_VIEWPORT, last_viewport);
+		scene_.ResizeFramebuffer(static_cast<unsigned int>(widget_size.x),
+								static_cast<unsigned int>(widget_size.y));
 
 		// Рендерим сцену в FBO
 		glBindFramebuffer(GL_FRAMEBUFFER, scene_.FBO);
 		glViewport(0, 0, (GLsizei)widget_size.x, (GLsizei)widget_size.y);
 		
-		glClearColor(window_props->bg_color_float[0], window_props->bg_color_float[1], window_props->bg_color_float[2], window_props->bg_color_float[3]);
+		if (window_props->frag_GLSLshader_file.empty()) {
+			glClearColor(window_props->bg_color_float[0], window_props->bg_color_float[1], window_props->bg_color_float[2], window_props->bg_color_float[3]);
+		}
+		else {
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		if (!scene_.models_.empty()) {
 			scene_.models_[0].model_mat =
@@ -50,11 +55,9 @@ namespace rn {
 		}
 
 		scene_.Draw();
+		scene_.RestorePrevState();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Восстанавливаем Viewport обратно для ImGui
-		glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-
+		
 		ImVec2 size = ImVec2(screen_max.x - screen_min.x - 10,
 			screen_max.y - screen_min.y - 10);
 		ImVec2 pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
@@ -62,8 +65,10 @@ namespace rn {
 		ImGui::SetNextWindowSize(size);
 		ImGui::PushID(this);
 		if (ImGui::BeginChild("##render", widget_size)) {
+			
+			ImVec2 avail = ImGui::GetContentRegionAvail();
 			ImGui::Image((ImTextureID)(intptr_t)scene_.textureColorBuffer,
-				ImVec2(widget_size.x, widget_size.y),
+				avail,
 				ImVec2(0, 1), ImVec2(1, 0));
 		}
 		ImGui::EndChild();

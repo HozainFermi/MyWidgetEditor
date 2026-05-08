@@ -17,7 +17,7 @@ namespace Styles {
 
 		glGenTextures(1, &textureColorBuffer);
 		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
@@ -82,39 +82,34 @@ namespace Styles {
 		}			
 	}
 
-	void Scene::ResetState()
+	void Scene::SaveCurrentState() {	
+		//Сохраняем текущий Viewport, чтобы не сбить ImGui
+		glGetIntegerv(GL_VIEWPORT, glState.last_viewport);		
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &glState.last_fbo);		
+		glGetIntegerv(GL_CURRENT_PROGRAM, &glState.last_program);		
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &glState.last_vao);		
+		glGetIntegerv(GL_ACTIVE_TEXTURE, &glState.last_active_tex);		
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &glState.last_tex_2d);
+		glState.was_depth = glIsEnabled(GL_DEPTH_TEST);
+		glState.was_blend = glIsEnabled(GL_BLEND);
+		glState.was_cull = glIsEnabled(GL_CULL_FACE);
+		glState.was_scissor = glIsEnabled(GL_SCISSOR_TEST);
+	}
+
+	void Scene::RestorePrevState()
 	{
-		// Отвязываем шейдер
-		glUseProgram(0);
-
-		// Отвязываем VAO 
-		glBindVertexArray(0);
-
-		// Отвязываем буферы
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		// Отвязываем текстуры (частично есть)
-		for (int i = 0; i < 8; i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		glActiveTexture(GL_TEXTURE0);
-
-		// Отвязываем FBO 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Сбрасываем renderbuffer
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-		// Выключаем лишние режимы
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
-		glDisable(GL_CULL_FACE);
-		glDisable(GL_SCISSOR_TEST);
-
-		// Сбрасываем цвет очистки 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(glState.last_fbo));
+		glViewport(glState.last_viewport[0], glState.last_viewport[1],
+			static_cast<GLsizei>(glState.last_viewport[2]),
+			static_cast<GLsizei>(glState.last_viewport[3]));
+		glUseProgram(static_cast<GLuint>(glState.last_program));
+		glBindVertexArray(static_cast<GLuint>(glState.last_vao));
+		glActiveTexture(static_cast<GLenum>(glState.last_active_tex));
+		glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(glState.last_tex_2d));
+		if (glState.was_depth) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+		if (glState.was_blend) glEnable(GL_BLEND); else glDisable(GL_BLEND);
+		if (glState.was_cull) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
+		if (glState.was_scissor) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
 	}
 
 	void Scene::ResizeFramebuffer(unsigned int w, unsigned int h)
@@ -129,7 +124,7 @@ namespace Styles {
 
 		// color attachment
 		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)w, (GLsizei)h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)w, (GLsizei)h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		// depth/stencil attachment
