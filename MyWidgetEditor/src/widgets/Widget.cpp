@@ -65,7 +65,7 @@ namespace wg {
 
         // Обрабатываем клик (если не заняты другие элементы)
         //&& !ImGui::IsAnyItemActive()
-        if (ImGui::IsMouseClicked(0) ) {
+        if (ImGui::IsMouseClicked(0) )  {
             if (hovered_handle != ResizeHandle::NONE) {
                 // Начинаем ресайз
                 is_resizing_ = true;
@@ -87,7 +87,7 @@ namespace wg {
             else if (io.KeyCtrl && is_selected_) {
                 SetSelected(true);
             }
-            else if (is_selected_ && ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopup)) {
+            else if (is_selected_ && ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopup) ) {
                 SetSelected(true);
             }
             else if (is_selected_ && !stay_selected_) {

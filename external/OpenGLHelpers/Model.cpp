@@ -26,7 +26,7 @@ namespace Helpers {
 			std::cout<< "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
 			return;
 		}
-		directory = path.string().substr(0,path.string().find_last_of('/'));
+		directory = path.parent_path().string();
 		processNode(scene->mRootNode,scene);
 
 	}
@@ -37,7 +37,21 @@ namespace Helpers {
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			meshes.push_back(processMesh(mesh, scene));
+
+			// Optional: skip outline submeshes entirely
+			if (mesh->mMaterialIndex >= 0) {
+				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+				aiString matName;
+				material->Get(AI_MATKEY_NAME, matName);
+				const std::string name = matName.C_Str();
+				if (name.find("OUTLINE") != std::string::npos ||
+					name.find("Outline") != std::string::npos ||
+					name.find("outline") != std::string::npos) {
+					continue;
+				}
+			}
+
+		meshes.push_back(processMesh(mesh, scene));
 		}
 		
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -54,7 +68,7 @@ namespace Helpers {
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
-			Vertex vertex;
+			Vertex vertex{};
 			// process vertex positions, normals and texture coordinates
 			glm::vec3 vector;
 			vector.x = mesh->mVertices[i].x;
@@ -67,29 +81,37 @@ namespace Helpers {
 			vector.y = mesh->mNormals[i].y;
 			vector.z = mesh->mNormals[i].z;
 			vertex.Normal = vector;
+			} else {
+				vertex.Normal = glm::vec3(0.0f, 1.0f, 0.0f);
 			}
 
 			
-
 			if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
 			{
 				glm::vec2 vec;
 				vec.x = mesh->mTextureCoords[0][i].x;
 				vec.y = mesh->mTextureCoords[0][i].y;
-				vertex.TexCoords = vec;
-				// tangent
-				vector.x = mesh->mTangents[i].x;
-				vector.y = mesh->mTangents[i].y;
-				vector.z = mesh->mTangents[i].z;
-				vertex.Tangent = vector;
-				// bitangent
-				vector.x = mesh->mBitangents[i].x;
-				vector.y = mesh->mBitangents[i].y;
-				vector.z = mesh->mBitangents[i].z;
-				vertex.Bitangent = vector;
+				vertex.TexCoords = vec;				
 			}
-			else
+			else{
 				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+			}
+
+			if (mesh->HasTangentsAndBitangents()) {
+				vertex.Tangent = glm::vec3(
+					mesh->mTangents[i].x,
+					mesh->mTangents[i].y,
+					mesh->mTangents[i].z
+				);
+				vertex.Bitangent = glm::vec3(
+					mesh->mBitangents[i].x,
+					mesh->mBitangents[i].y,
+					mesh->mBitangents[i].z
+				);
+			} else {
+				vertex.Tangent = glm::vec3(0.0f);
+				vertex.Bitangent = glm::vec3(0.0f);
+			}
 
 				vertices.push_back(vertex);
 		}
@@ -107,7 +129,18 @@ namespace Helpers {
 				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 				std::vector<Texture> diffuseMaps = loadMaterialTextures(material,
 					aiTextureType_DIFFUSE, "texture_diffuse");
-				textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+				std::vector<Texture> baseColorMaps = loadMaterialTextures(material,
+					aiTextureType_BASE_COLOR, "texture_diffuse");
+				
+				// Если diffuse нет, используем baseColor
+				if (diffuseMaps.empty()) {
+					textures.insert(textures.end(), baseColorMaps.begin(), baseColorMaps.end());
+				}
+				else {
+					textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+				}
+				
 				std::vector<Texture> specularMaps = loadMaterialTextures(material,
 					aiTextureType_SPECULAR, "texture_specular");
 				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
@@ -149,8 +182,9 @@ namespace Helpers {
 
 	unsigned int Model::TextureFromFile(std::string path, std::string directory)
 	{
-		std::string filename = directory + '/' + path;
-		std::cout << filename;
+		std::filesystem::path filenamePath = std::filesystem::path(directory) / path;
+		std::string filename = filenamePath.string();
+		std::cout << filename << std::endl;
 
 		unsigned int textureID;
 		glGenTextures(1, &textureID);

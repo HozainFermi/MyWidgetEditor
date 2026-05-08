@@ -34,15 +34,17 @@ namespace wg {
 	void RenderWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
 	{
 		ImVec2 widget_size = GetSize();
-		
+		//Save cur gl state
+		scene_.SaveCurrentState();
+
 		scene_.SCR_WIDTH = widget_size.x;
 		scene_.SCR_HEIGHT = widget_size.y;
 
-		// 1. Сохраняем текущий Viewport, чтобы не сбить ImGui
-		GLint last_viewport[4];
-		glGetIntegerv(GL_VIEWPORT, last_viewport);
+		scene_.ResizeFramebuffer(static_cast<unsigned int>(widget_size.x),
+								 static_cast<unsigned int>(widget_size.y));
 
-		// 2. Рендерим сцену в FBO
+	
+		// Рендерим сцену в FBO
 		glBindFramebuffer(GL_FRAMEBUFFER, scene_.FBO);
 		glViewport(0, 0, (GLsizei)widget_size.x, (GLsizei)widget_size.y);
 
@@ -57,11 +59,11 @@ namespace wg {
 
 		
 		scene_.Draw();
+		
+		// Restore GL state
+		scene_.RestorePrevState();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// 3. Восстанавливаем Viewport обратно для ImGui
-		glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-
+			
 		ImVec2 size = ImVec2(screen_max.x - screen_min.x - 10,
 			screen_max.y - screen_min.y - 10);
 		ImVec2 pos = ImVec2(screen_min.x + 5, screen_min.y + 5);

@@ -13,6 +13,19 @@
 
 namespace Styles {
 
+	struct GLState {
+		GLint last_viewport[4];		
+		GLint last_fbo = 0;		
+		GLint last_program = 0;	
+		GLint last_vao = 0;		
+		GLint last_active_tex = 0;		
+		GLint last_tex_2d = 0;		
+		GLboolean was_depth;
+		GLboolean was_blend;
+		GLboolean was_cull;
+		GLboolean was_scissor;
+	};
+
 	struct ModelData {
 		std::unique_ptr<Helpers::Model> model;
 		std::unique_ptr<Helpers::Shader> shader;
@@ -31,7 +44,8 @@ namespace Styles {
 	};
 
 	class Scene {
-	public:		
+	public:
+		GLState glState;
 		std::vector<ModelData> models_;
 		std::unique_ptr<Helpers::Camera> camera_;
 
@@ -53,7 +67,8 @@ namespace Styles {
 		~Scene() = default;
 
 		void Draw();
-		void ResetState();
+		void SaveCurrentState();
+		void RestorePrevState();
 		void AddModel(const std::filesystem::path& model_path,
 			const std::filesystem::path& vert_shader_path,
 			const std::filesystem::path& frag_shader_path,
