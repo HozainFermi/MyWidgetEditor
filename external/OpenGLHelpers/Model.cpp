@@ -37,7 +37,21 @@ namespace Helpers {
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			meshes.push_back(processMesh(mesh, scene));
+
+			// Optional: skip outline submeshes entirely
+			if (mesh->mMaterialIndex >= 0) {
+				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+				aiString matName;
+				material->Get(AI_MATKEY_NAME, matName);
+				const std::string name = matName.C_Str();
+				if (name.find("OUTLINE") != std::string::npos ||
+					name.find("Outline") != std::string::npos ||
+					name.find("outline") != std::string::npos) {
+					continue;
+				}
+			}
+
+		meshes.push_back(processMesh(mesh, scene));
 		}
 		
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
