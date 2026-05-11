@@ -91,6 +91,18 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
+    GLFWimage images[4];
+    images[0].pixels = stbi_load(ICONS_DIR"/icon_16.png", &images[0].width, &images[0].height, 0, 4);
+    images[1].pixels = stbi_load(ICONS_DIR"/icon_32.png", &images[1].width, &images[1].height, 0, 4);
+    images[2].pixels = stbi_load(ICONS_DIR"/icon_48.png", &images[1].width, &images[1].height, 0, 4);  
+  
+    glfwSetWindowIcon(window, 2, images); 
+    stbi_image_free(images[0].pixels);
+    stbi_image_free(images[1].pixels);
+    stbi_image_free(images[2].pixels);
+  
+
+
     if (!gladLoadGL(glfwGetProcAddress)) {
         std::cerr << "GLAD BROKE!" << std::endl;
         glfwTerminate();

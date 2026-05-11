@@ -7,6 +7,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h> // для ShellExecute как альтернативы
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
 #else
 #include <unistd.h>
 #include <sys/types.h>
@@ -17,6 +19,30 @@
 
 class IndependentLauncher {
 public:
+
+    
+    static BOOL CALLBACK InvalidateWorkerW(HWND hwnd, LPARAM) {
+        wchar_t cls[64]{};
+        if (GetClassNameW(hwnd, cls, 64) && wcscmp(cls, L"WorkerW") == 0) {
+            RedrawWindow(hwnd, nullptr, nullptr,
+                RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+        }
+        return TRUE;
+    }
+    static void RefreshDesktopWallpaperLayer() {
+        HWND progman = FindWindowW(L"Progman", nullptr);
+        if (progman)
+            SendMessageTimeoutW(progman, 0x052C, 0, 0, SMTO_NORMAL, 1000, nullptr);
+        EnumWindows(InvalidateWorkerW, 0);
+        HWND desk = GetDesktopWindow();
+        if (desk) {
+            RedrawWindow(desk, nullptr, nullptr,
+                RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+        }
+        InvalidateRect(nullptr, nullptr, TRUE);
+        
+        DwmFlush();
+    }
 
     /**
      * @brief Запускает процесс полностью независимо от родительского
@@ -54,6 +80,16 @@ public:
 
 private:
 #ifdef _WIN32
+
+   static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
+        HWND p = FindWindowEx(hwnd, NULL, "SHELLDLL_DefView", NULL);
+        if (p != NULL) {
+            // Находим следующее окно после того, где лежат иконки
+            *(HWND*)lParam = FindWindowEx(NULL, hwnd, "WorkerW", NULL);
+        }
+        return TRUE;
+    }
+
     //Использование CreateProcess с правильными параметрами
     static HANDLE launchWindows(const std::string& command) {
 
@@ -154,7 +190,7 @@ private:
             nullptr, 
             nullptr,
             FALSE,
-            CREATE_NEW_CONSOLE,
+            CREATE_NO_WINDOW,//CREATE_NEW_CONSOLE
             nullptr,
             workDir.c_str(),
             &si,
@@ -234,32 +270,55 @@ private:
 
         return pi.hProcess;
     }
-
-
+     
 #else
     static pid_t launchUnix(const std::string& command) {
-        
-        
-        //!!!NOT DONE
-        pid_t pid = fork();
+        int pipefd[2];
+        if (pipe(pipefd) == -1) return -1; 
 
-        if (pid == 0) {
-            // Дочерний процесс
-            setsid();
-            signal(SIGHUP, SIG_IGN);
+        pid_t pid1 = fork();
 
-            if (fork() == 0) {
+        if (pid1 < 0) {
+            return -1;
+        }
+
+        if (pid1 == 0) {
+            
+            close(pipefd[0]); 
+
+            pid_t pid2 = fork();
+
+            if (pid2 > 0) {
+                
+                write(pipefd[1], &pid2, sizeof(pid2));
+                close(pipefd[1]);
+                _exit(EXIT_SUCCESS);
+            }
+            else if (pid2 == 0) {
+                
+                setsid();
+                signal(SIGHUP, SIG_IGN);
+                
+                close(pipefd[1]);
+
                 execl("/bin/sh", "sh", "-c", command.c_str(), (char*)NULL);
                 _exit(EXIT_FAILURE);
             }
-            _exit(EXIT_SUCCESS);
+            _exit(EXIT_FAILURE);
         }
-        else if (pid > 0) {
-            waitpid(pid, NULL, 0);
-            return pid;
-        }
+        
+        close(pipefd[1]); // Закрываем запись
 
-        return pid;
+        pid_t actualPid;
+        if (read(pipefd[0], &actualPid, sizeof(actualPid)) <= 0) {
+            actualPid = -1; // Ошибка чтения
+        }
+        close(pipefd[0]);
+
+        // Обязательно ждем первого потомка 
+        waitpid(pid1, NULL, 0);
+
+        return actualPid; 
     }
 #endif
 };

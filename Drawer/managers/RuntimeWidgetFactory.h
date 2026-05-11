@@ -11,9 +11,9 @@ namespace rn {
 
     class RuntimeWidgetFactory {
     private:
-        // Два типа creator'ов:
-        // 1. CreatorFromJson - создаёт из JSON (знает о FromJson)
-        // 2. CreatorWithName - создаёт с именем и позицией
+        // Два типа creator ов:
+        // CreatorFromJson - создаёт из JSON (знает о FromJson)
+        
         using CreatorFromJson = std::function<std::unique_ptr<Widget>(const nlohmann::json&)>;       
 
         static std::map<std::string, CreatorFromJson>& GetJsonCreators() {
@@ -38,6 +38,7 @@ namespace rn {
         // Создание из JSON
         static std::unique_ptr<Widget> CreateFromJson(const nlohmann::json& json) {
             std::string type = json.value("widget_class", "");
+            std::cout << type;
 
             auto& creators = GetJsonCreators();
             auto it = creators.find(type);

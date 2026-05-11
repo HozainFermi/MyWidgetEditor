@@ -150,6 +150,9 @@ void Editor::RenderMenuBar() {
         }
         ImGui::Spacing();
         if (ImGui::BeginMenu("Processes")) {
+                if (ImGui::MenuItem("Refresh Desktop Wallpaper", NULL)) {
+                    IndependentLauncher::RefreshDesktopWallpaperLayer();
+                }
                 if (ImGui::MenuItem("Kill All",NULL)) {
                     processes_.clear();
                 }
@@ -584,9 +587,7 @@ void Editor::RenderCanvas() {
             background_scene_.models_[0].shader->setMat4("ortho_model", model);
             background_scene_.models_[0].shader->setMat4("ortho_view", view);
             background_scene_.models_[0].shader->setMat4("ortho_projection", proj);
-            //glm::rotate(background_scene_.models_[0].model_mat,
-            //    glm::radians(sin(static_cast<float>(glfwGetTime()))),
-            //    glm::vec3(0.0f, 1.0f, 0.0f));
+           
         background_scene_.Draw();        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -670,9 +671,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
             ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
             if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
-                // Обработка клика
-                //is_dragging_connection_ = true;
-                //drag_from_port_ = vis.ref;
+               
             }
 
             // Тултип при наведении
@@ -695,9 +694,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
             ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
             if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
-                // Обработка клика
-                //is_dragging_connection_ = true;
-                //drag_from_port_ = vis.ref;
+               
             }
 
             // Тултип при наведении
@@ -788,7 +785,7 @@ void Editor::RenderConnections(ImDrawList* draw_list)
         draw_list->AddBezierCubic(p1, c1, c2, p2,
             IM_COL32(150, 150, 255, 255), 2.0f);
 
-        // Приближённая точка "середины" линии
+        // Приближённая точка середины линии
         ImVec2 mid((p1.x + p2.x) * 0.5f, (p1.y + p2.y) * 0.5f);
         float dxm = mouse_pos.x - mid.x;
         float dym = mouse_pos.y - mid.y;

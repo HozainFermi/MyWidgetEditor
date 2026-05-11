@@ -106,7 +106,7 @@ set(ALL_HEADERS
     "${BB_DIR}/IconText.h")
 
 # Create executable
-add_executable(MyWidgetEditor ${ALL_SOURCES} ${ALL_HEADERS} ${IMGUI_SOURCES} ${IMPLOT_FILES})
+add_executable(MyWidgetEditor ${ALL_SOURCES} ${ALL_HEADERS} ${IMGUI_SOURCES} ${IMPLOT_FILES} )
 
 # Include directories
 target_include_directories(MyWidgetEditor PRIVATE
@@ -147,11 +147,17 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/configs
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
      FILES_MATCHING PATTERN "*.json")
 
+     
+
+add_definitions(-DASSETS_PATH="${ASSETS_PATH}/")
 
 get_directory_property(PARENT_DIR PARENT_DIRECTORY)
+
+set(ICONS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/icons")
 
 target_compile_definitions(MyWidgetEditor PRIVATE 
     PROJECT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
     ASSETS_SOURCE_DIR="${PARENT_DIR}/assets"
+    ICONS_DIR="${ICONS_PATH}"
 
 )

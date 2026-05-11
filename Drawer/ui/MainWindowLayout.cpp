@@ -30,6 +30,7 @@ namespace rn {
                 background_scene_.SCR_HEIGHT = ImGui::GetWindowSize().y;
 
                 if (window_props_.frag_GLSLshader_file != "" && window_props_.vertex_GLSLshader_file != "") {
+
                     background_scene_.ResizeFramebuffer(background_scene_.SCR_WIDTH, background_scene_.SCR_HEIGHT);
                     // Сохраняем текущий Viewport, чтобы не сбить ImGui
                     GLint last_viewport[4];
@@ -60,8 +61,8 @@ namespace rn {
                         background_scene_.models_[0].shader->setMat4("ortho_view", view);
                         background_scene_.models_[0].shader->setMat4("ortho_projection", proj);
 
-                    background_scene_.Draw();
-                    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                        background_scene_.Draw();
+                    glBindFramebuffer(GL_FRAMEBUFFER, 0);                   
 
                     // Восстанавливаем Viewport обратно для ImGui
                     glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);

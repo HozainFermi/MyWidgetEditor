@@ -12,8 +12,8 @@ namespace wg {
     class WidgetFactory {
     private:
         // Два типа creator'ов:
-        // 1. CreatorFromJson - создаёт из JSON (знает о FromJson)
-        // 2. CreatorWithName - создаёт с именем и позицией
+        // CreatorFromJson - создаёт из JSON (знает о FromJson)
+        // CreatorWithName - создаёт с именем и позицией
         using CreatorFromJson = std::function<std::unique_ptr<Widget>(const nlohmann::json&)>;
         using CreatorWithName = std::function<std::unique_ptr<Widget>(const std::string&, const ImVec2&)>;
 

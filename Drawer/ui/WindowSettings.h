@@ -88,8 +88,8 @@ namespace rn {
 
     inline void SetupWindowStyle(GLFWwindow* window, RuntimeWindowProperties& props) {
 #ifdef _WIN32
-
-
+        HWND hwnd = glfwGetWin32Window(window);
+        
         if (props.window_rounding) {        
             if (IsWindows11OrGreater()) {            
                     int preference = 2; // DWMWCP_ROUND
@@ -101,7 +101,12 @@ namespace rn {
             }        
         }
         if (props.wallpaper_mode) {
-            HWND hwnd = glfwGetWin32Window(window);
+            //HWND hwnd = glfwGetWin32Window(window);
+            //Убираем из таскбара
+            LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+            exStyle &= ~WS_EX_APPWINDOW;
+            exStyle |= WS_EX_TOOLWINDOW;   // Скрыть из панели задач        
+            SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle);
 
             // создал WorkerW
             HWND progman = FindWindowW(L"Progman", NULL);
@@ -121,17 +126,25 @@ namespace rn {
             }
         }
         if (props.always_on_bottom) {
-            HWND hwnd = glfwGetWin32Window(window);
+            //HWND hwnd = glfwGetWin32Window(window);
 
             //Убираем из таскбара и запрещаем активацию при клике
             LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+            exStyle &= ~WS_EX_APPWINDOW;
             exStyle |= WS_EX_TOOLWINDOW;   // Скрыть из панели задач
             exStyle |= WS_EX_NOACTIVATE;   // Не выводить на передний план при клике
             SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle);
 
             HWND progman = FindWindowW(L"Progman", NULL);
-            SetWindowPos(hwnd, progman, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            SetWindowPos(hwnd, progman, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
+        }
+        if (props.always_on_top) {
+            //Убираем из таскбара
+            LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+            exStyle &= ~WS_EX_APPWINDOW;
+            exStyle |= WS_EX_TOOLWINDOW;   // Скрыть из панели задач        
+            SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle);
         }
         
 #endif
