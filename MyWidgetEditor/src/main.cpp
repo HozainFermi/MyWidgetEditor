@@ -91,6 +91,18 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
+    GLFWimage images[4];
+    images[0].pixels = stbi_load(ICONS_DIR"/icon_16.png", &images[0].width, &images[0].height, 0, 4);
+    images[1].pixels = stbi_load(ICONS_DIR"/icon_32.png", &images[1].width, &images[1].height, 0, 4);
+    images[2].pixels = stbi_load(ICONS_DIR"/icon_48.png", &images[1].width, &images[1].height, 0, 4);  
+  
+    glfwSetWindowIcon(window, 2, images); 
+    stbi_image_free(images[0].pixels);
+    stbi_image_free(images[1].pixels);
+    stbi_image_free(images[2].pixels);
+  
+
+
     if (!gladLoadGL(glfwGetProcAddress)) {
         std::cerr << "GLAD BROKE!" << std::endl;
         glfwTerminate();
@@ -116,8 +128,11 @@ int main(int, char**)
     //std::string fonts_path { "%s/assets/fonts/OpenFontIcons.ttf",PROJECT_SOURCE_DIR };
     //C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf
     static const ImWchar icon_ranges[] = { ICON_MIN, ICON_MAX, 0 };
-    io.Fonts->AddFontFromFileTTF("C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf", 13.0f, &config);
-    io.Fonts->AddFontFromFileTTF("C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf", 25.0f, &config);
+    std::string fontPath = ASSETS_SOURCE_DIR;
+    fontPath += "/fonts/OpenFontIcons.ttf";
+    
+    io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 13.0f, &config);
+    io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 25.0f, &config);
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);

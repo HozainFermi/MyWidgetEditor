@@ -38,7 +38,7 @@ namespace Helpers {
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-			// Optional: skip outline submeshes entirely
+			//skip outline submeshes entirely
 			if (mesh->mMaterialIndex >= 0) {
 				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 				aiString matName;
@@ -168,7 +168,7 @@ namespace Helpers {
 				}
 			}
 			if (!skip)
-			{   // if texture hasn't been loaded already, load it
+			{   // if texture hasnt been loaded already, load it
 				Texture texture;
 				texture.id = TextureFromFile(str.C_Str(), directory);
 				texture.type = typeName;

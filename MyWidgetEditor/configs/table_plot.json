@@ -94,13 +94,13 @@
         "decorated": true,
         "frag_shader": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag",
         "full_screen": false,
-        "height": 634,
+        "height": 809,
         "mouse_passthrougth": false,
         "moveble": true,
         "resizeble": true,
         "rounding": 0.0,
         "wallpaper_mode": false,
-        "width": 896,
+        "width": 1031,
         "window_rounding": false
     }
 }
