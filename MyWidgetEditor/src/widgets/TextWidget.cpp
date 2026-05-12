@@ -142,9 +142,7 @@ namespace wg {
         ImGui::PopStyleColor(1);
         ImGui::SetWindowFontScale(1.0f);
         
-        if (ImGui::InputTextMultiline("check", &text_)) {
-            stay_selected_ = true;
-        }
+        
         ImGui::InputText("##textwContent", &text_, flags);
         if (ImGui::IsItemDeactivatedAfterEdit()) {            
                       

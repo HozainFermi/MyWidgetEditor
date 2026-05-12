@@ -128,8 +128,11 @@ int main(int, char**)
     //std::string fonts_path { "%s/assets/fonts/OpenFontIcons.ttf",PROJECT_SOURCE_DIR };
     //C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf
     static const ImWchar icon_ranges[] = { ICON_MIN, ICON_MAX, 0 };
-    io.Fonts->AddFontFromFileTTF("C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf", 13.0f, &config);
-    io.Fonts->AddFontFromFileTTF("C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf", 25.0f, &config);
+    std::string fontPath = ASSETS_SOURCE_DIR;
+    fontPath += "/fonts/OpenFontIcons.ttf";
+    
+    io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 13.0f, &config);
+    io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 25.0f, &config);
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
