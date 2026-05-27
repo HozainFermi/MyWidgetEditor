@@ -38,6 +38,8 @@ namespace rn {
     }
 
     void RuntimeWidgetManager::DeleteWidget(const std::string& id) {
+        // Remove from id map first to avoid stale pointers being used by callbacks.
+        widgets_by_id_.erase(id);
         for (auto it = widgets_.begin(); it != widgets_.end(); ++it) {
             if ((*it)->GetId() == id) {
                 widgets_.erase(it);
@@ -62,6 +64,8 @@ namespace rn {
     
     void RuntimeWidgetManager::FromJson(const nlohmann::json& json) {
         widgets_.clear();
+        widgets_by_id_.clear();
+        connections_.clear();
 
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;        
@@ -96,24 +100,28 @@ namespace rn {
             else {std::cerr << "Фабрика не смогла создать (неверный формат или не зарегистрирован)";}            
         }
 
-            // Добавляем OnInput связанного виджета в коллбеки текущего виджета                
-            for (auto& widget : widgets_) {
-                for (auto& connection : connections_) {
-                if (connection.from.widget_id == widget->GetId()) {
-                    Widget* target_widget = widgets_by_id_[connection.to.widget_id];
+            // Добавляем OnInput связанного виджета в коллбеки текущего виджета                         
+        for (auto& connection : connections_) {
+            Widget* source_widget = widgets_by_id_[connection.from.widget_id];
+            const std::string target_id = connection.to.widget_id;
 
-                    if (target_widget) {
-                        // Сохраняем лямбду, которая вызывает метод OnInput у target_widget
-                        widget->from_port_callbacks_[connection.from.port] =
-                            [target_widget](const std::string from_widget_id, std::string from_port, const std::vector<WidgetValue>& data) {
-                            target_widget->OnInput(from_widget_id, from_port, data);
-                            };
+            if (source_widget && widgets_by_id_.count(target_id) > 0) {
+           
+                source_widget->SetPortCallback(connection.from.port, 
+                    
+                    [this, target_id](const std::string from_widget_id,
+                    std::string from_port,
+                    const std::vector<WidgetValue>& data) {
+                        auto it = widgets_by_id_.find(target_id);
+                        if (it != widgets_by_id_.end() && it->second) {
+                            it->second->OnInput(from_widget_id, from_port, data);
+                        }
                     }
-                }
-                }
+                );
+                
             }
-    
-    
+        }
+                        
     }
 
     void RuntimeWidgetManager::WindowPropsFromJson(const std::string& filename)

@@ -125,6 +125,7 @@ namespace wg {
     void WidgetManager::FromJson(const nlohmann::json& json, wg::RuntimeWindowProperties& mw_props) {
         widgets_.clear();
         widgets_by_id_.clear();
+		connections_.clear();
                
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;

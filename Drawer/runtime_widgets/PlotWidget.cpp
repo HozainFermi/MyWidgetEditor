@@ -91,6 +91,7 @@ namespace rn {
 
     void PlotWidget::OnInput(const std::string& from_widget_id,const std::string& from_port, const std::vector<WidgetValue>& value)
     {                
+        std::cout << "INSIDE ONINPUT" << std::endl;
         if (from_port != "data" ) return;
 
         // Очистка старых данных

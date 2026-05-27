@@ -5,6 +5,24 @@
             "from_widget": "widget_0",
             "to_port": "data",
             "to_widget": "widget_1"
+        },
+        {
+            "from_port": "data",
+            "from_widget": "widget_0",
+            "to_port": "data",
+            "to_widget": "widget_1"
+        },
+        {
+            "from_port": "data",
+            "from_widget": "widget_0",
+            "to_port": "data",
+            "to_widget": "widget_1"
+        },
+        {
+            "from_port": "data",
+            "from_widget": "widget_0",
+            "to_port": "data",
+            "to_widget": "widget_1"
         }
     ],
     "widgets": [
@@ -40,14 +58,14 @@
             "min_width": 30.0,
             "name": "TableWidget1",
             "position": [
-                14.0,
-                1.0
+                6.0,
+                232.0
             ],
             "show_borders": true,
             "show_headers": true,
             "size": [
-                400.0,
-                321.0
+                393.0,
+                310.0
             ],
             "type": 8,
             "update_interval": 20,
@@ -69,12 +87,12 @@
             "name": "PlotWidget2",
             "plot_type": 0,
             "position": [
-                483.0,
-                9.0
+                7.0,
+                547.0
             ],
             "size": [
-                432.0,
-                310.0
+                410.0,
+                290.0
             ],
             "type": 7,
             "widget_class": "PlotWidget",
@@ -101,18 +119,19 @@
             ],
             "name": "RenderWidget1",
             "position": [
-                451.0,
-                336.0
+                431.0,
+                454.0
             ],
             "size": [
-                475.0,
-                407.0
+                446.0,
+                384.0
             ],
             "type": 9,
             "widget_class": "RenderWidget"
         },
         {
             "bg_color": 4283443240,
+            "center_alignment": true,
             "font_scale": 1.0,
             "id": "widget_4",
             "left_alignment": true,
@@ -120,9 +139,10 @@
             "min_width": 30.0,
             "name": "TextWidget1",
             "position": [
-                37.0,
-                354.0
+                429.0,
+                392.0
             ],
+            "right_alignment": true,
             "size": [
                 319.0,
                 59.0
@@ -135,23 +155,23 @@
     ],
     "window": {
         "always_on_bottom": false,
-        "always_on_top": false,
+        "always_on_top": true,
         "bg_color": [
             0.2374163717031479,
+            0.7236235737800598,
             0.729411780834198,
-            0.729411780834198,
-            1.0
+            0.0
         ],
         "decorated": false,
         "frag_shader": "",
-        "full_screen": true,
-        "height": 771,
-        "mouse_passthrougth": false,
+        "full_screen": false,
+        "height": 847,
+        "mouse_passthrougth": true,
         "moveble": false,
         "resizeble": false,
         "rounding": 0.0,
-        "wallpaper_mode": true,
-        "width": 974,
+        "wallpaper_mode": false,
+        "width": 1840,
         "window_rounding": false
     }
 }

@@ -60,6 +60,7 @@ namespace rn {
                   
         mutable std::mutex data_mutex_;
         std::atomic<bool> is_loading_{ false };
+        std::atomic<bool> data_dirty_{ false };
         std::string latest_json_response_;
 
         

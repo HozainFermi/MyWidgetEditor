@@ -1,31 +1,22 @@
 #include "TableWidget.h"
 #include <imgui_internal.h>
+#include "Widget.h"
 
 namespace rn {
 
     REGISTER_WIDGET(TableWidget);
 
     TableWidget::TableWidget() :
-        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // ˜˜˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜ ˜˜˜˜˜˜˜˜˜
+        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
-
-        // ˜˜˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜
-        //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id",50.0f, true }, std::vector < std::string>{}));
-        //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
-        //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
-
+      
         SetWidgetClass("TableWidget");
     }
 
     TableWidget::TableWidget(const std::string& name, const ImVec2& pos) :
-        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // ˜˜˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜ ˜˜˜˜˜˜˜˜˜
+        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
-
-        // ˜˜˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜
-       //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id", 50.0f,true }, std::vector < std::string>{}) );
-       //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
-       //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
-
+      
         SetWidgetClass("TableWidget");
     }
 
@@ -44,15 +35,13 @@ namespace rn {
             screen_max.y - screen_min.y - 10);
         ImVec2 pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
 
-        if (!is_loading_) {
-            Emit("data", rows_);
-        }
+        // Emit moved to UpdateTableData() to avoid per-frame recalculation and spam.
 
-        // Îãğàíè÷èâàåì îáëàñòü òàáëèöû
+        // ˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
 
-        // Èñïîëüçóåì îêíî áåç çàãîëîâêà äëÿ îãğàíè÷åíèÿ îáëàñòè
+        // ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
         if (update_trigger_!=UpdateTrigger::NONE) {
@@ -68,7 +57,7 @@ namespace rn {
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_AlwaysUseWindowPadding)) {
 
-            // Ïîëó÷àåì äîñòóïíóş îáëàñòü âíóòğè îêíà
+            // ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜˜˜
             ImVec2 content_size = ImGui::GetContentRegionAvail();
 
             std::lock_guard<std::mutex> lock(data_mutex_);
@@ -77,7 +66,7 @@ namespace rn {
                 flags_,
                 content_size)) {
 
-                // Óñòàíàâëèâàåì çàãîëîâêè êîëîíîê
+                // ˜˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
                 for (const auto& col : columns_) {
                     ImGui::TableSetupColumn(col.first.header.c_str(),
                         col.first.sortable ? ImGuiTableColumnFlags_None :
@@ -86,12 +75,12 @@ namespace rn {
                 }
 
                 if (show_headers_) {
-                    ImGui::TableSetupScrollFreeze(0, 1); // Çàãîëîâîê ôèêñèğîâàí ïğè ñêğîëëå
+                    ImGui::TableSetupScrollFreeze(0, 1); // ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜
                     ImGui::TableHeadersRow();
                 }
 
                 static char buf[256];               
-                // Îïğåäåëÿåì ğåàëüíîå êîëè÷åñòâî ñòğîê äëÿ îòîáğàæåíèÿ
+                // ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜˜˜˜˜
                 int rows_to_display = 0;
                 if (!columns_.empty() && !columns_[0].second.empty()) {
                     rows_to_display = std::min((int)columns_[0].second.size(), max_display_rows_);
@@ -102,14 +91,7 @@ namespace rn {
 
                     for (int col = 0; col < (int)columns_.size(); col++) {
                         ImGui::TableSetColumnIndex(col);
-
-                        //if (row < (int)columns_[col].second.size()) {
-                        //    sprintf_s(buf, columns_[col].second[row].c_str());
-                        //}
-                        //else {
-                        //    sprintf_s(buf, "");
-                        //}
-
+                     
                         ImGui::PushID(row * 1000 + col);
                         ImGui::Selectable(columns_[col].second[row].c_str(), column_selected[col]);
                         ImGui::PopID();
@@ -156,10 +138,6 @@ namespace rn {
     httplib::Result TableWidget::LoadTableData()
     {
 
-        //for (auto& element : columns_) {
-        //    element.second.clear();
-        //}
-
         if (data_source_type_ != DataSourceType::NONE &&
             data_source_type_ != DataSourceType::STATIC_DATA) {
 
@@ -189,6 +167,16 @@ namespace rn {
 
     bool TableWidget::UpdateTableData()
     {        
+        // If background load updated rows_, emit once from UI thread.
+        if (data_dirty_.exchange(false) && !is_loading_) {
+            std::vector<WidgetValue> rows_snapshot;
+            {
+                std::lock_guard<std::mutex> lock(data_mutex_);
+                rows_snapshot = rows_;
+            }
+            Emit("data", rows_snapshot);
+        }
+
         switch (update_trigger_) {
 
 
@@ -206,8 +194,8 @@ namespace rn {
                         }
                         is_loading_ = false;
                     });
-                    // Îòïğàâëÿåì äàííûå äàëüøå
-                    //Emit("data", rows_);
+                    
+                    
                 }
                 last_update_ = std::chrono::steady_clock::now();
                 return true;
@@ -245,13 +233,15 @@ namespace rn {
     void TableWidget::FromResponseJsonToColumns(const std::string& body)
     {
         std::vector<std::pair<TableColumnConfig, std::vector<std::string>>> temporary_data;
+        std::vector<WidgetValue> new_rows;
 
         try {          
             nlohmann::json json = nlohmann::json::parse(body);
 
             if (json.is_array()) {
                 max_display_rows_ = (int)json.size();
-                rows_.clear();
+                new_rows.clear();
+                new_rows.reserve(json.size());
                 if (temporary_data.empty() && !json.empty() && json[0].is_object()) {
                     for (auto& [key, value] : json[0].items()) {
                         temporary_data.push_back(std::pair{ TableColumnConfig{ key, key,50.0f, false }, std::vector<std::string>{} });
@@ -266,7 +256,7 @@ namespace rn {
                                 temporary_data[i].second.push_back(value.dump());
                                 i++;
                             }
-                            rows_.push_back(line);
+                            new_rows.push_back(line);
                         }
                         else {
                             std::cout << "Line has " << line.size() << " fields, but table has " << temporary_data.size() << " columns" << std::endl;
@@ -280,8 +270,10 @@ namespace rn {
 
                 {
                     std::lock_guard<std::mutex> lock(data_mutex_);
-                    columns_ = std::move(temporary_data); 
+                    columns_ = std::move(temporary_data);
+                    rows_ = std::move(new_rows);
                 }
+                data_dirty_ = true;
                 
             }
             else {
@@ -302,7 +294,6 @@ namespace rn {
     void TableWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);
 
-        // ˜˜˜˜˜˜˜
         if (json.contains("columns") && json["columns"].is_array()) {
             columns_.clear();
             for (const auto& col_json : json["columns"]) {
@@ -312,7 +303,7 @@ namespace rn {
             }
         }
 
-        // ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜
+
         if (json.contains("data_source_type")) {
             data_source_type_ = (DataSourceType)json["data_source_type"].get<int>();
         }
@@ -327,7 +318,6 @@ namespace rn {
             update_interval_millisec_= std::chrono::milliseconds{ update_interval_ * 1000 };
         }
 
-        // ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
         if (json.contains("flags")) {
             flags_ = json["flags"].get<int>();
         }
@@ -344,7 +334,7 @@ namespace rn {
             max_display_rows_ = json["max_display_rows"].get<int>();
         }
 
-        // ˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜
+ 
         if (json.contains("static_data") && json["static_data"].is_array()) {
             static_data_.clear();
             for (const auto& row_json : json["static_data"]) {

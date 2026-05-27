@@ -228,7 +228,18 @@ void Editor::RenderRightPanel() {
       &window_props_.moveble,
       &window_props_.decorated
     };
-    static const char* items[] = {"Wallpaper mode", "Full screen", "Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
+    static const char* items[] = 
+    {
+        "Wallpaper mode", 
+        "Full screen", 
+        "Always on top", 
+        "Always on bottom", 
+        "Window rounding", 
+        "Resizeble", 
+        "Mouse passthrougth", 
+        "Moveble",
+        "Decorated"
+    };
     static char VERTbuf[150];
     static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
     static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";
@@ -357,6 +368,8 @@ void Editor::RenderRightPanel() {
         // Тип виджета (только для чтения)
         ImGui::Text("Type: %s", selected->TypeToString(selected->GetType()).c_str());
         ImGui::Separator();
+
+        if (ImGui::Checkbox("Visibility", &selected->visibility)) {}
 
         // Кнопки действий
         if (ImGui::Button("Delete", ImVec2(-1, 0))) {
@@ -507,6 +520,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 void Editor::RenderCanvas() {
     
     if(!loaded_config.empty()){
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(loaded_config.c_str()).x)*0.5f );
         ImGui::Text("Loaded config: %s",loaded_config.c_str());       
     }
     ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   

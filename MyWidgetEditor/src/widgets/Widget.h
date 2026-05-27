@@ -63,8 +63,8 @@ namespace wg {
         ImU32 border_color_ = IM_COL32(100, 100, 100, 255);
         ImU32 selected_border_color_ = IM_COL32(199, 197, 135, 255);
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
-        float border_thickness_ = 2.0f;
-
+        float border_thickness_ = 2.0f;        
+        
         // Для ресайза
         ImVec2 drag_offset_;
         ImVec2 resize_start_size_;
@@ -75,6 +75,8 @@ namespace wg {
         float min_height_ = 20.0f;
 
     public:
+        bool visibility = true;
+
         Widget();
         Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size);
         virtual ~Widget() = default;
@@ -98,13 +100,30 @@ namespace wg {
         virtual std::vector<PortDesc> GetInputPorts() const { return {}; }
         virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
 
-        virtual void OnInput(const std::string& port, const WidgetValue& value) {}
-        
-        using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const WidgetValue& value)>;
-        void SetEmitCallback(EmitCallback cb) { emit_callback_ = std::move(cb); }
-        void Emit(const std::string& port, const WidgetValue& value) {
-            if (emit_callback_) {
-                emit_callback_(id_, port, value);
+        virtual void OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) {}
+                
+        using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const std::vector<WidgetValue>& value)>;
+        std::unordered_map<std::string, std::vector<EmitCallback>> from_port_callbacks_;
+
+        // Установить callback для конкретного порта
+        void SetPortCallback(const std::string& port, EmitCallback cb) {
+            from_port_callbacks_[port].push_back(std::move(cb));
+        }
+
+        // Очистить все callback для порта
+        void ClearPortCallbacks(const std::string& port) {
+            from_port_callbacks_.erase(port);
+        }
+
+        // Обновленный метод Emit
+        void Emit(const std::string& from_port, const std::vector<WidgetValue>& value) {
+            auto it = from_port_callbacks_.find(from_port);
+            if (it != from_port_callbacks_.end()) {
+                for (const auto& callback : it->second) {
+                    if (callback) {  // Проверка что callback валидный
+                        callback(id_, from_port, value);
+                    }
+                }
             }
         }
 

@@ -12,11 +12,14 @@ namespace rn {
         ImGui::SetNextWindowSize(viewport->WorkSize);
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, window_props_.rounding);
+        ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 0.0f);
+
         if (ImGui::Begin("main_window", p_open,
-            ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoCollapse |
-            ImGuiWindowFlags_NoResize   |
-            ImGuiWindowFlags_NoBackground)) {
+            ImGuiWindowFlags_NoTitleBar   |
+            ImGuiWindowFlags_NoCollapse   |
+            ImGuiWindowFlags_NoResize     |
+            ImGuiWindowFlags_NoBackground |
+            ImGuiWindowFlags_NoScrollbar  )) {
 
         ImDrawList* drawlist = ImGui::GetWindowDrawList();
         ImVec2 main_screen_max = { ImGui::GetWindowPos().x + ImGui::GetWindowSize().x, ImGui::GetWindowPos().y + ImGui::GetWindowSize().y };
@@ -92,6 +95,7 @@ namespace rn {
 
         }       
         ImGui::End();
+        ImGui::PopStyleVar();
         ImGui::PopStyleVar();
     }
 }

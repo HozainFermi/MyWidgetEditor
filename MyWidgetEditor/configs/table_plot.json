@@ -5,7 +5,7 @@
             "from_widget": "widget_0",
             "to_port": "data",
             "to_widget": "widget_1"
-        }
+        }        
     ],
     "widgets": [
         {
@@ -40,8 +40,8 @@
             "min_width": 30.0,
             "name": "TableWidget1",
             "position": [
-                5.0,
-                67.0
+                1.0,
+                512.0
             ],
             "show_borders": true,
             "show_headers": true,
@@ -69,11 +69,11 @@
             "name": "PlotWidget2",
             "plot_type": 0,
             "position": [
-                432.0,
-                69.0
+                1.0,
+                197.0
             ],
             "size": [
-                367.0,
+                398.0,
                 308.0
             ],
             "type": 7,
@@ -84,23 +84,23 @@
     ],
     "window": {
         "always_on_bottom": false,
-        "always_on_top": false,
+        "always_on_top": true,
         "bg_color": [
             0.19738562405109406,
             0.5689350366592407,
             0.5921568870544434,
-            0.3607843220233917
+            0.0
         ],
-        "decorated": true,
-        "frag_shader": "C:/Users/dedde/source/repos/MyWidgetEditor/assets/shaders/Balatro/balatro.frag",
+        "decorated": false,
+        "frag_shader": "",
         "full_screen": false,
-        "height": 809,
-        "mouse_passthrougth": false,
-        "moveble": true,
-        "resizeble": true,
+        "height": 847,
+        "mouse_passthrougth": true,
+        "moveble": false,
+        "resizeble": false,
         "rounding": 0.0,
         "wallpaper_mode": false,
-        "width": 1031,
+        "width": 1176,
         "window_rounding": false
     }
 }
