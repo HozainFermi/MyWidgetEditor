@@ -28,6 +28,7 @@ namespace rn {
 
 	void NotificationWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
 	{
+        if (visibility_ == false) return;
         PruneExpired();
 
         ImDrawList* dl = ImGui::GetWindowDrawList();

@@ -31,6 +31,7 @@ namespace rn {
 
     void PlotWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
     {
+        if (visibility_ == false) return;
         ImVec2 size(screen_max.x - screen_min.x - 10.0f,
                     screen_max.y - screen_min.y - 10.0f);
         ImVec2 pos(screen_min.x + 5.0f, screen_min.y + 5.0f);

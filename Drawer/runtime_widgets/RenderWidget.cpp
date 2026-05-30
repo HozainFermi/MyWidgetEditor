@@ -27,6 +27,7 @@ namespace rn {
 
 	void RenderWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
 	{
+		if (visibility_ == false) return;
 		ImVec2 widget_size = GetSize();
 		scene_.SaveCurrentState();
 

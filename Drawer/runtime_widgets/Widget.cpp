@@ -50,6 +50,7 @@ namespace rn {
         if (json.contains("bg_color")) bg_color_ = json["bg_color"];
         if (json.contains("min_width")) min_width_ = json["min_width"];
         if (json.contains("min_height")) min_height_ = json["min_height"];
+        if (json.contains("visibility")) visibility_ = json["visibility"];
     }
 
 

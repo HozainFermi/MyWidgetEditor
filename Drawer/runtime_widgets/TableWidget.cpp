@@ -37,15 +37,16 @@ namespace rn {
 
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
-
-        
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
+                
         if (update_trigger_!=UpdateTrigger::NONE) {
             if(!is_loading_){
                UpdateTableData();
             }
         }
+        if (visibility_ == false) return;
+        
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
 
         if (ImGui::BeginChild(("##table_child_" + GetId()).c_str(),
             size,

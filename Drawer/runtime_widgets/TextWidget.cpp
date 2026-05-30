@@ -19,7 +19,7 @@ namespace rn {
     void TextWidget::Render(ImDrawList* draw_list) {
         // Вызываем базовую отрисовку (фон, рамка, имя)
         //Widget::Render(draw_list);
-
+		if (visibility_ == false) return;
 
         // Отрисовываем текст
         ImVec2 screen_max = GetScreenMax();

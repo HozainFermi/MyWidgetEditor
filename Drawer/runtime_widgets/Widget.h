@@ -52,6 +52,7 @@ namespace rn {
         bool is_hovered_ = false;
         bool is_selected_ = false;
         bool stay_selected_ = false;
+        bool visibility_ = true;
 
         //стили
         ImU32 bg_color_ = IM_COL32(40, 40, 80, 255);
