@@ -190,8 +190,8 @@ namespace wg {
         return {};
     }
 
-    void PlotWidget::OnInput(const std::string& port, const WidgetValue& value) {
-        if (port != "data" || !value.is_array()) return;
+    void PlotWidget::OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) {
+        if (from_port != "data" ) return;
 
         // Очистка старых данных
         for (auto& chart : all_charts_) {

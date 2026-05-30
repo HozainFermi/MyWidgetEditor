@@ -1,11 +1,11 @@
 #pragma once
 #include "Widget.h"
-#include "WidgetFactory.h"
+#include "../managers/RuntimeWidgetFactory.h"
 #include <string>
 #include <deque>
 #include <vector>
 
-namespace wg {
+namespace rn {
 
     struct ToastStyle {
         ImU32 bg_color = IM_COL32(30, 30, 40, 230);
@@ -64,15 +64,13 @@ namespace wg {
         NotificationWidget();
         NotificationWidget(const std::string& name, const ImVec2& pos);
 
-        void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
-        void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
-        void RenderProperties() override;
+        void Render(ImDrawList* draw_list) override;
+        void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;        
 
         std::vector<PortDesc> GetInputPorts() const override;
         std::vector<PortDesc> GetOutputPorts() const override;
         void OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) override;
-
-        nlohmann::json ToJson() const override;
+       
         void FromJson(const nlohmann::json& json) override;
 
     private:

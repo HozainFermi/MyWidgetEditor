@@ -70,7 +70,7 @@ namespace wg {
         // Порты: один вход "data" (массив чисел), один вход "event" для обновления
         std::vector<PortDesc> GetInputPorts() const override;
         std::vector<PortDesc> GetOutputPorts() const override;
-        void OnInput(const std::string& port, const WidgetValue& value) override;
+        void OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) override;
     };
 }
 

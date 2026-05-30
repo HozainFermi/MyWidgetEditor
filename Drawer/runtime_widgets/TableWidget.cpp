@@ -35,13 +35,10 @@ namespace rn {
             screen_max.y - screen_min.y - 10);
         ImVec2 pos = ImVec2(screen_min.x + 5, screen_min.y + 5);
 
-        // Emit moved to UpdateTableData() to avoid per-frame recalculation and spam.
-
-        // ˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
 
-        // ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
+        
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
         if (update_trigger_!=UpdateTrigger::NONE) {
@@ -57,7 +54,7 @@ namespace rn {
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_AlwaysUseWindowPadding)) {
 
-            // ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜˜˜
+            
             ImVec2 content_size = ImGui::GetContentRegionAvail();
 
             std::lock_guard<std::mutex> lock(data_mutex_);
@@ -66,7 +63,7 @@ namespace rn {
                 flags_,
                 content_size)) {
 
-                // ˜˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
+                
                 for (const auto& col : columns_) {
                     ImGui::TableSetupColumn(col.first.header.c_str(),
                         col.first.sortable ? ImGuiTableColumnFlags_None :
@@ -80,8 +77,8 @@ namespace rn {
                 }
 
                 static char buf[256];               
-                // ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜˜˜˜˜
                 int rows_to_display = 0;
+
                 if (!columns_.empty() && !columns_[0].second.empty()) {
                     rows_to_display = std::min((int)columns_[0].second.size(), max_display_rows_);
                 }
@@ -167,7 +164,7 @@ namespace rn {
 
     bool TableWidget::UpdateTableData()
     {        
-        // If background load updated rows_, emit once from UI thread.
+        
         if (data_dirty_.exchange(false) && !is_loading_) {
             std::vector<WidgetValue> rows_snapshot;
             {

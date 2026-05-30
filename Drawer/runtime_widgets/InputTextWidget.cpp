@@ -33,6 +33,7 @@ namespace rn {
     }
 
     void InputTextWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
+        if(){}
 
         ImVec2 size = ImVec2(screen_max.x - screen_min.x,
             screen_max.y - screen_min.y);

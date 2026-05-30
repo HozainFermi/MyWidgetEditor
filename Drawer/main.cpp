@@ -48,12 +48,12 @@ int main(int argc, char** argv)
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/table_plot.json";
+    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/notification.json";
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
     if (argc > 1) {
         manager->WindowPropsFromJson(argv[1]);
     }
-    else {//table_plot
+    else {
         manager->WindowPropsFromJson(test_str);
     }
     // Decide GL+GLSL versions
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
     if (argc > 1) {
         manager->LoadFromFile(argv[1]);
     }
-    else {//table_plot
+    else {
         manager->LoadFromFile(test_str);
     }
     glEnable(GL_DEPTH_TEST);

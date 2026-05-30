@@ -100,8 +100,7 @@ namespace rn {
                 glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
             }        
         }
-        if (props.wallpaper_mode) {
-            //HWND hwnd = glfwGetWin32Window(window);
+        if (props.wallpaper_mode) {            
             //Убираем из таскбара
             LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
             exStyle &= ~WS_EX_APPWINDOW;
@@ -125,8 +124,7 @@ namespace rn {
                 SetParent(hwnd, progman);
             }
         }
-        if (props.always_on_bottom) {
-            //HWND hwnd = glfwGetWin32Window(window);
+        if (props.always_on_bottom) {          
 
             //Убираем из таскбара и запрещаем активацию при клике
             LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);

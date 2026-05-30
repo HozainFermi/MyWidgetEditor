@@ -2,7 +2,8 @@
 #include <algorithm>
 #include <imgui.h>
 
-namespace wg {	
+namespace rn {
+
 	REGISTER_WIDGET(NotificationWidget);
 
 	NotificationWidget::NotificationWidget()
@@ -19,81 +20,10 @@ namespace wg {
         rules_.push_back(ToastRule{});
 	}
 
-	void NotificationWidget::RenderProperties()
-	{
-        ImGui::TextUnformatted("Toasts");
-        ImGui::SliderInt("Max toasts", &max_number_of_toasts_, 1, 50);
-        ImGui::SliderFloat("Toast width", &toast_width_, 160.0f, 500.0f, "%.0f");
-        ImGui::SliderFloat("Padding", &toast_padding_, 2.0f, 20.0f, "%.0f");
-        ImGui::SliderFloat("Gap", &toast_gap_, 0.0f, 20.0f, "%.0f");
-        ImGui::Checkbox("Stack from bottom", &stack_from_bottom_);
-        ImGui::Checkbox("Newest on top", &newest_on_top_);
-        ImGui::SliderFloat("Dismiss slide (px)", &dismiss_slide_px_, 0.0f, 200.0f, "%.0f");
-
-        ImGui::Separator();
-        ImGui::TextUnformatted("Rules (trigger on input 'data' or 'event')");
-
-        if (ImGui::Button("Add rule")) {
-            ToastRule r;
-            r.name = "Rule " + std::to_string((int)rules_.size() + 1);
-            rules_.push_back(std::move(r));
-        }
-
-        for (int i = 0; i < (int)rules_.size(); ++i) {
-            auto& r = rules_[i];
-            ImGui::PushID(i);
-
-            if (ImGui::CollapsingHeader(r.name.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-                ImGui::Checkbox("Enabled", &r.enabled);
-                ImGui::InputText("Name", r.name.data(), 256);
-
-                static const char* kOps[] = {
-                    "Any row",
-                    "Column exists",
-                    "Any value < number",
-                    "Any value > number",
-                    "Any value == text/number",
-                    "Any value contains text"
-                };
-                int op_i = (int)r.op;
-                if (ImGui::Combo("Condition", &op_i, kOps, IM_ARRAYSIZE(kOps))) {
-                    r.op = (ToastOp)op_i;
-                }
-
-                ImGui::InputText("Column", r.column.data(), 256);
-                ImGui::InputFloat("Number", &r.number);
-                ImGui::InputText("Text", r.text.data(), 256);
-
-                ImGui::InputText("Message", r.message.data(), 256);
-                ImGui::SliderFloat("Duration (sec)", &r.duration_sec, 0.5f, 30.0f, "%.1f");
-
-                ImVec4 bg = ImGui::ColorConvertU32ToFloat4(r.style.bg_color);
-                ImVec4 border = ImGui::ColorConvertU32ToFloat4(r.style.border_color);
-                ImVec4 text = ImGui::ColorConvertU32ToFloat4(r.style.text_color);
-                if (ImGui::ColorEdit4("BG", &bg.x)) r.style.bg_color = ImGui::ColorConvertFloat4ToU32(bg);
-                if (ImGui::ColorEdit4("Border", &border.x)) r.style.border_color = ImGui::ColorConvertFloat4ToU32(border);
-                if (ImGui::ColorEdit4("Text color", &text.x)) r.style.text_color = ImGui::ColorConvertFloat4ToU32(text);
-                ImGui::SliderFloat("Border thickness", &r.style.border_thickness, 0.0f, 6.0f, "%.1f");
-
-                if (ImGui::Button("Test toast")) {
-                    PushToast(r.message, r.style, r.duration_sec);
-                }
-
-                ImGui::SameLine();
-                if (ImGui::Button("Delete rule")) {
-                    rules_.erase(rules_.begin() + i);
-                    ImGui::PopID();
-                    break;
-                }
-            }
-
-            ImGui::PopID();
-        }
-	}
 	
-	void NotificationWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0)
+	void NotificationWidget::Render(ImDrawList* draw_list)
 	{
-		Widget::Render(draw_list,canvas_p0);
+		Widget::Render(draw_list);
 	}
 
 	void NotificationWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max)
@@ -169,7 +99,8 @@ namespace wg {
 
 	void NotificationWidget::OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value)
 	{
-        (void)from_widget_id;
+        //(void)from_widget_id;
+        std::cout << "NotificationWidget::OnInput" << std::endl;
 
         if (from_port == "event") {
             bool matched = false;
@@ -197,38 +128,6 @@ namespace wg {
         }
 	}
 	
-	nlohmann::json NotificationWidget::ToJson() const
-	{
-        nlohmann::json rules = nlohmann::json::array();
-        for (const auto& r : rules_) {
-            rules.push_back({
-                {"enabled", r.enabled},
-                {"name", r.name},
-                {"op", (int)r.op},
-                {"column", r.column},
-                {"number", r.number},
-                {"text", r.text},
-                {"message", r.message},
-                {"duration_sec", r.duration_sec},
-                {"style", {
-                    {"bg", r.style.bg_color},
-                    {"border", r.style.border_color},
-                    {"text", r.style.text_color},
-                    {"thickness", r.style.border_thickness}
-                }}
-            });
-        }
-
-        nlohmann::json j = Widget::ToJson();
-        j["max_number_of_toasts"] = max_number_of_toasts_;
-        j["toast_width"] = toast_width_;
-        j["toast_padding"] = toast_padding_;
-        j["toast_gap"] = toast_gap_;
-        j["newest_on_top"] = newest_on_top_;
-        j["rules"] = std::move(rules);
-        return j;
-	}
-
 	void NotificationWidget::FromJson(const nlohmann::json& json)
 	{
         Widget::FromJson(json);

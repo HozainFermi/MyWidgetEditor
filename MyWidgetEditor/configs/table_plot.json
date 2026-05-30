@@ -5,7 +5,13 @@
             "from_widget": "widget_0",
             "to_port": "data",
             "to_widget": "widget_1"
-        }        
+        },
+        {
+            "from_port": "data",
+            "from_widget": "widget_0",
+            "to_port": "data",
+            "to_widget": "widget_2"
+        }
     ],
     "widgets": [
         {
@@ -41,7 +47,7 @@
             "name": "TableWidget1",
             "position": [
                 1.0,
-                512.0
+                502.0
             ],
             "show_borders": true,
             "show_headers": true,
@@ -52,6 +58,7 @@
             "type": 8,
             "update_interval": 20,
             "update_trigger": 1,
+            "visibility": true,
             "widget_class": "TableWidget"
         },
         {
@@ -77,9 +84,51 @@
                 308.0
             ],
             "type": 7,
+            "visibility": true,
             "widget_class": "PlotWidget",
             "x_plot_label": "Id",
             "y_plot_label": "Price"
+        },
+        {
+            "bg_color": 4283443240,
+            "id": "widget_2",
+            "max_number_of_toasts": 10,
+            "min_height": 20.0,
+            "min_width": 30.0,
+            "name": "NotificationWidget1",
+            "newest_on_top": true,
+            "position": [
+                1333.0,
+                524.0
+            ],
+            "rules": [
+                {
+                    "column": "",
+                    "duration_sec": 10.800000190734863,
+                    "enabled": true,
+                    "message": "Notification",
+                    "name": "Rule",
+                    "number": 0.0,
+                    "op": 0,
+                    "style": {
+                        "bg": 3861388830,
+                        "border": 4286080100,
+                        "text": 4294967295,
+                        "thickness": 3.0
+                    },
+                    "text": ""
+                }
+            ],
+            "size": [
+                400.0,
+                300.0
+            ],
+            "toast_gap": 10.0,
+            "toast_padding": 6.0,
+            "toast_width": 375.0,
+            "type": 11,
+            "visibility": true,
+            "widget_class": "NotificationWidget"
         }
     ],
     "window": {
@@ -93,14 +142,14 @@
         ],
         "decorated": false,
         "frag_shader": "",
-        "full_screen": false,
-        "height": 847,
+        "full_screen": true,
+        "height": 832,
         "mouse_passthrougth": true,
         "moveble": false,
         "resizeble": false,
         "rounding": 0.0,
         "wallpaper_mode": false,
-        "width": 1176,
+        "width": 1739,
         "window_rounding": false
     }
 }

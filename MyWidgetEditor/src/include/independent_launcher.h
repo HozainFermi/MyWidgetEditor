@@ -190,7 +190,7 @@ private:
             nullptr, 
             nullptr,
             FALSE,
-            CREATE_NO_WINDOW,//CREATE_NEW_CONSOLE
+            CREATE_NO_WINDOW,//CREATE_NEW_CONSOLE | CREATE_NO_WINDOW
             nullptr,
             workDir.c_str(),
             &si,

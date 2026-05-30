@@ -97,7 +97,7 @@ namespace rn {
                 widgets_by_id_[widget->GetId()] = widget.get();
                 widgets_.push_back(std::move(widget));                
             }
-            else {std::cerr << "Фабрика не смогла создать (неверный формат или не зарегистрирован)";}            
+            else {std::cerr << "Fabric could not create widget (invalid format or not registered)" << std::endl;}            
         }
 
             // Добавляем OnInput связанного виджета в коллбеки текущего виджета                         

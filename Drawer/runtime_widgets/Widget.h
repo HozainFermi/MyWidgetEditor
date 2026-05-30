@@ -46,26 +46,26 @@ namespace rn {
         ImVec2 position_;     // Левый верхний угол относительно канваса (локальные координаты в канвасе)
         ImVec2 size_;          // Ширина и высота
 
-        //���������состояние
+        //состояние
         bool is_dragging_ = false;
         bool is_resizing_ = false;
         bool is_hovered_ = false;
         bool is_selected_ = false;
         bool stay_selected_ = false;
 
-        //����стили
+        //стили
         ImU32 bg_color_ = IM_COL32(40, 40, 80, 255);
         ImU32 border_color_ = IM_COL32(100, 100, 100, 255);
         ImU32 selected_border_color_ = IM_COL32(199, 197, 135, 255);
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
         float border_thickness_ = 2.0f;        
 
-        //�� ������для ресайза
+        //для ресайза
         ImVec2 drag_offset_;
         ImVec2 resize_start_size_;
         ImVec2 resize_start_pos_;
 
-        //���������� �������минимальные размеры
+        //минимальные размеры
         float min_width_ = 30.0f;
         float min_height_ = 20.0f;
 
@@ -110,6 +110,9 @@ namespace rn {
             auto it = from_port_callbacks_.find(from_port);
             if (it != from_port_callbacks_.end()) {                          
                 auto callbacks = it->second;
+
+				std::cout << "EMIT CALLED FOR PORT: " << from_port << " with " << callbacks.size() << " callbacks" << std::endl;
+
                 for (auto& callback : callbacks) {
                     if (callback) {
                         callback(id_, from_port, value);
@@ -175,7 +178,6 @@ namespace rn {
         bool ProcessResizing(const ImVec2& mouse_pos, bool proportional);
         void DrawCommonElements(ImDrawList* draw_list, const ImRect& screen_rect);
 
-        // ����������� ���������
         //ImRect GetScreenRect(const ImVec2& canvas_p0) { return ImRect(canvas_p0.x + position_.x, canvas_p0.y + position_.y, canvas_p0.x + position_.x + size_.x, canvas_p0.y + position_.y + size_.y); };
 
     private:

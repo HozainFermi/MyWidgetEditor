@@ -38,7 +38,7 @@ namespace rn {
         // Создание из JSON
         static std::unique_ptr<Widget> CreateFromJson(const nlohmann::json& json) {
             std::string type = json.value("widget_class", "");
-            std::cout << type;
+            std::cout << type << std::endl;
 
             auto& creators = GetJsonCreators();
             auto it = creators.find(type);

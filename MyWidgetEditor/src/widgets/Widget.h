@@ -56,6 +56,7 @@ namespace wg {
         bool is_hovered_ = false;
         bool is_selected_ = false;
         bool stay_selected_ = false;
+        bool visibility = true;
         ResizeHandle active_handle_ = ResizeHandle::NONE;
 
         // Стиль
@@ -75,7 +76,7 @@ namespace wg {
         float min_height_ = 20.0f;
 
     public:
-        bool visibility = true;
+        
 
         Widget();
         Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size);
