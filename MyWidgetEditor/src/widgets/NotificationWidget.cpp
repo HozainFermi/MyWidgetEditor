@@ -1,6 +1,7 @@
 #include "NotificationWidget.h"
 #include <algorithm>
 #include <imgui.h>
+#include <imgui_stdlib.h>
 
 namespace wg {	
 	REGISTER_WIDGET(NotificationWidget);
@@ -45,7 +46,8 @@ namespace wg {
 
             if (ImGui::CollapsingHeader(r.name.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
                 ImGui::Checkbox("Enabled", &r.enabled);
-                ImGui::InputText("Name", r.name.data(), 256);
+                //ImGui::InputText("Name", r.name.data(), 256);
+                ImGui::InputText("Name", &r.name);
 
                 static const char* kOps[] = {
                     "Any row",
@@ -59,12 +61,16 @@ namespace wg {
                 if (ImGui::Combo("Condition", &op_i, kOps, IM_ARRAYSIZE(kOps))) {
                     r.op = (ToastOp)op_i;
                 }
-
-                ImGui::InputText("Column", r.column.data(), 256);
+                
+                ImGui::InputText("Column", &r.column);
+                ImGui::InputText("Text", &r.text);
                 ImGui::InputFloat("Number", &r.number);
-                ImGui::InputText("Text", r.text.data(), 256);
+                ImGui::InputText("Message", &r.message);
 
-                ImGui::InputText("Message", r.message.data(), 256);
+                //ImGui::InputText("Column", r.column.data(), 256);
+                //ImGui::InputText("Text", r.text.data(), 256);
+                //ImGui::InputText("Message", r.message.data(), 256);
+
                 ImGui::SliderFloat("Duration (sec)", &r.duration_sec, 0.5f, 30.0f, "%.1f");
 
                 ImVec4 bg = ImGui::ColorConvertU32ToFloat4(r.style.bg_color);

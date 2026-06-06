@@ -264,6 +264,7 @@ namespace rn {
             if (rule.op == ToastOp::AnyValueLessThan || rule.op == ToastOp::AnyValueGreaterThan) {
                 bool ok_n = false;
                 float n = TryParseNumber(cell, ok_n);
+                std::cout << n<<std::endl;
                 if (!ok_n) continue;
                 if (rule.op == ToastOp::AnyValueLessThan && n < rule.number) return true;
                 if (rule.op == ToastOp::AnyValueGreaterThan && n > rule.number) return true;
