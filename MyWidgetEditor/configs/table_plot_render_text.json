@@ -70,6 +70,7 @@
             "type": 8,
             "update_interval": 20,
             "update_trigger": 1,
+            "visibility": true,
             "widget_class": "TableWidget"
         },
         {
@@ -95,6 +96,7 @@
                 290.0
             ],
             "type": 7,
+            "visibility": true,
             "widget_class": "PlotWidget",
             "x_plot_label": "id`s",
             "y_plot_label": "prices"
@@ -127,6 +129,7 @@
                 384.0
             ],
             "type": 9,
+            "visibility": true,
             "widget_class": "RenderWidget"
         },
         {
@@ -149,6 +152,7 @@
             ],
             "text": "[wave]Sample text[/wave]",
             "type": 0,
+            "visibility": true,
             "widget_class": "TextWidget",
             "wrap_text": true
         }
@@ -157,21 +161,21 @@
         "always_on_bottom": false,
         "always_on_top": true,
         "bg_color": [
-            0.2374163717031479,
-            0.7236235737800598,
-            0.729411780834198,
-            0.0
+            0.008989349938929081,
+            0.49978646636009216,
+            0.5528455376625061,
+            1.0
         ],
         "decorated": false,
         "frag_shader": "",
-        "full_screen": false,
-        "height": 847,
+        "full_screen": true,
+        "height": 848,
         "mouse_passthrougth": true,
         "moveble": false,
         "resizeble": false,
         "rounding": 0.0,
         "wallpaper_mode": false,
-        "width": 1840,
+        "width": 1239,
         "window_rounding": false
     }
 }

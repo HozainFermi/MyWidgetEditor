@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/notification_test.json";
+    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/TABLE_PLOT_newapi.json";
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
     if (argc > 1) {
         manager->WindowPropsFromJson(argv[1]);
