@@ -77,7 +77,7 @@ namespace rn {
         if (json.contains("connections")) {
             for (const auto& connection : json["connections"])
             {
-                connections_.push_back(Connection{
+                AddConnectionUnique(Connection{
                      PortRef{connection["from_port"],connection["from_widget"]},
                      PortRef{connection["to_port"],connection["to_widget"]}
                     });

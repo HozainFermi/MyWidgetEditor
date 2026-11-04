@@ -18,6 +18,17 @@ namespace wg {
         // === Соединения ===
         std::vector<Connection> connections_;
 
+        // Добавляет связь, если такой ещё нет. Возвращает false для дубликата
+        bool AddConnection(const Connection& connection) {
+            for (const auto& existing : connections_) {
+                if (SameConnection(existing, connection)) {
+                    return false;
+                }
+            }
+            connections_.push_back(connection);
+            return true;
+        }
+
         // Добавляет виджет в менеджер
         void AddWidget(std::unique_ptr<Widget> widget) {            
             widgets_by_id_[widget.get()->GetId()] = widget.get();

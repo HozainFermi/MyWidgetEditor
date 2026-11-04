@@ -486,6 +486,11 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
            
 
             // Центральная панель (60%)
+            // Ширина канваса сохраняется в imgui.ini. Если окно стало меньше, без ограничения
+            // правая панель уезжает за край, поэтому оставляем ей минимум места
+            const float right_panel_min_width = 250.0f;
+            const float canvas_max_width = ImMax(200.0f, ImGui::GetContentRegionAvail().x - right_panel_min_width);
+            ImGui::SetNextWindowSizeConstraints(ImVec2(200.0f, 0.0f), ImVec2(canvas_max_width, FLT_MAX));
             ImGui::BeginChild("CanvasPanel", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, 0),
                 ImGuiChildFlags_ResizeX |ImGuiChildFlags_ResizeY | ImGuiChildFlags_Borders);
             RenderCanvas();
@@ -747,10 +752,21 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
                 float dx2 = mouse_pos.x - vis.pos.x;
                 float dy2 = mouse_pos.y - vis.pos.y;
                 if (dx2 * dx2 + dy2 * dy2 <= hit_radius * hit_radius) {
-                    // Не соединяем порт сам с собой
-                    if (!(vis.ref.widget_id == drag_from_port_.widget_id &&
-                          vis.ref.port == drag_from_port_.port)) {
-                        widget_manager_.connections_.push_back({ drag_from_port_, vis.ref });
+                    // Соединяем только выход со входом разных виджетов.
+                    // Если тянули от входа к выходу - разворачиваем связь.
+                    const PortVisual* from_vis = nullptr;
+                    for (const auto& candidate : port_visuals_) {
+                        if (SamePort(candidate.ref, drag_from_port_)) {
+                            from_vis = &candidate;
+                            break;
+                        }
+                    }
+                    if (from_vis && from_vis->is_input != vis.is_input &&
+                        vis.ref.widget_id != drag_from_port_.widget_id) {
+                        Connection connection = from_vis->is_input
+                            ? Connection{ vis.ref, drag_from_port_ }
+                            : Connection{ drag_from_port_, vis.ref };
+                        widget_manager_.AddConnection(connection);
                     }
                     break;
                 }

@@ -83,6 +83,13 @@ namespace Helpers {
         }
 
         // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
+        void SetRotation(float yaw, float pitch)
+        {
+            Yaw = yaw;
+            Pitch = pitch;
+            updateCameraVectors();
+        }
+
         void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
         {
             xoffset *= MouseSensitivity;

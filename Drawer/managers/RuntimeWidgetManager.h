@@ -23,6 +23,17 @@ namespace rn {
         };
         std::vector<Connection> connections_;
 
+        // Старые конфиги могли содержать дубли - они вызвали бы OnInput дважды
+        void AddConnectionUnique(const Connection& c) {
+            for (const auto& e : connections_) {
+                if (e.from.port == c.from.port && e.from.widget_id == c.from.widget_id &&
+                    e.to.port == c.to.port && e.to.widget_id == c.to.widget_id) {
+                    return;
+                }
+            }
+            connections_.push_back(c);
+        }
+
     public:
         rn::RuntimeWindowProperties window_props_;
 

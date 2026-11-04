@@ -164,7 +164,7 @@ namespace wg {
        if (json.contains("connections") && json["connections"].is_array()) {
            for (const auto& connection : json["connections"])
            {
-               connections_.push_back(Connection{
+               AddConnection(Connection{
                     PortRef{connection["from_port"],connection["from_widget"]},
                     PortRef{connection["to_port"],connection["to_widget"]}
                    });

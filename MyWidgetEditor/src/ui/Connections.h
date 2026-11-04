@@ -24,6 +24,14 @@ struct Connection {
     PortRef to;
 };
 
+inline bool SamePort(const PortRef& a, const PortRef& b) {
+    return a.port == b.port && a.widget_id == b.widget_id;
+}
+
+inline bool SameConnection(const Connection& a, const Connection& b) {
+    return SamePort(a.from, b.from) && SamePort(a.to, b.to);
+}
+
 // для отрисовки и взаимодействия
 struct PortVisual {
     PortRef ref;

@@ -121,9 +121,13 @@ int main(int, char**)
     // Setup Dear ImGui style
     ApplyObsLikeImGuiStyle(main_scale);
       
-    // Основной шрифт с кириллицей. ImGui 1.92 растеризует его под нужный размер и DPI, поэтому он не мылится
-    std::string mainFontPath = std::string(ASSETS_SOURCE_DIR) + "/fonts/Roboto-Medium.ttf";
-    if (!io.Fonts->AddFontFromFileTTF(mainFontPath.c_str(), 15.0f)) {
+    // Terminus: пиксельный шрифт с кириллицей. Без оверсэмплинга и с привязкой к пикселям, чтобы не мылился
+    std::string mainFontPath = std::string(ASSETS_SOURCE_DIR) + "/fonts/TerminusTTF.ttf";
+    ImFontConfig mainFontConfig;
+    mainFontConfig.OversampleH = 1;
+    mainFontConfig.OversampleV = 1;
+    mainFontConfig.PixelSnapH = true;
+    if (!io.Fonts->AddFontFromFileTTF(mainFontPath.c_str(), 16.0f, &mainFontConfig)) {
         io.Fonts->AddFontDefault();
     }
     ImFontConfig config;

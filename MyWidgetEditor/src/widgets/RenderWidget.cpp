@@ -199,6 +199,8 @@ namespace wg {
 		camera_json["y"] = scene_.camera_->Position.y;
 		camera_json["z"] = scene_.camera_->Position.z;
 		camera_json["zoom"] = scene_.camera_->Zoom;
+		camera_json["yaw"] = scene_.camera_->Yaw;
+		camera_json["pitch"] = scene_.camera_->Pitch;
 		
 		json["camera"] = camera_json;
 		return json;
@@ -207,14 +209,15 @@ namespace wg {
 	void RenderWidget::FromJson(const nlohmann::json& json)
 	{
 		Widget::FromJson(json);
-		auto camera_json = json["camera"];
-
+		// value() вместо operator[]: у const json operator[] на отсутствующий ключ - UB
+		auto camera_json = json.value("camera", nlohmann::json::object());
 		scene_.camera_->Position.x = camera_json.value("x", 0.0f);
 		scene_.camera_->Position.y = camera_json.value("y", 0.0f);
 		scene_.camera_->Position.z = camera_json.value("z", 0.0f);
 		scene_.camera_->Zoom = camera_json.value("zoom", 45.0f);
+		scene_.camera_->SetRotation(camera_json.value("yaw", Helpers::YAW), camera_json.value("pitch", Helpers::PITCH));
 
-		for (const auto& model : json["models"]) {
+		for (const auto& model : json.value("models", nlohmann::json::array())) {
 			scene_.AddModel(
 				model.value("model_path", ""),
 				model.value("vert_shader_path", ""),

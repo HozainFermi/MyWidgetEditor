@@ -137,9 +137,13 @@ int main(int argc, char** argv)
 #endif
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Шрифт с кириллицей (встроенный ProggyClean её не содержит)
-    std::string font_path = std::string(ASSETS_SOURCE_DIR) + "/fonts/Roboto-Medium.ttf";
-    if (!io.Fonts->AddFontFromFileTTF(font_path.c_str(), 15.0f)) {
+    // Terminus: пиксельный шрифт с кириллицей (во встроенном ProggyClean её нет)
+    std::string font_path = std::string(ASSETS_SOURCE_DIR) + "/fonts/TerminusTTF.ttf";
+    ImFontConfig font_config;
+    font_config.OversampleH = 1;
+    font_config.OversampleV = 1;
+    font_config.PixelSnapH = true;
+    if (!io.Fonts->AddFontFromFileTTF(font_path.c_str(), 16.0f, &font_config)) {
         io.Fonts->AddFontDefault();
     }
 
