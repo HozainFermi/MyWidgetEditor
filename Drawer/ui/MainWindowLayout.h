@@ -1,6 +1,7 @@
 #pragma once
 #include <imgui.h>
 #include "../managers/RuntimeWidgetManager.h"
+#include <core/WindowProperties.h>
 #include <Scene.hpp>
 #include <GLFW/glfw3.h>
 
@@ -10,7 +11,7 @@ namespace rn {
 	 class MainWindowLayout {
      private:
          Styles::Scene background_scene_{};
-         static RuntimeWindowProperties window_props_;
+         static core::WindowProperties window_props_;
                          	     
      public:
          
@@ -65,7 +66,7 @@ namespace rn {
              background_scene_.models_.push_back(std::move(model_data));
          }
 
-        static MainWindowLayout* Get(RuntimeWindowProperties props) {
+        static MainWindowLayout* Get(const core::WindowProperties& props) {
             window_props_ = props;
             static MainWindowLayout instance;
             return &instance;

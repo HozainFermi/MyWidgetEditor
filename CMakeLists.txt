@@ -53,5 +53,6 @@ endif()
 
 # Подключаем подпроекты
 add_subdirectory(${ASSIMP_DIR} assimp_build)
+add_subdirectory(WidgetCore)
 add_subdirectory(MyWidgetEditor)
 add_subdirectory(Drawer)

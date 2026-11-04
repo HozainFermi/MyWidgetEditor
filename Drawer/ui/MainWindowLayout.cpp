@@ -3,7 +3,7 @@
 
 
 namespace rn {
-    RuntimeWindowProperties MainWindowLayout::window_props_;
+    core::WindowProperties MainWindowLayout::window_props_;
 
 
     void MainWindowLayout::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window,RuntimeWidgetManager* manager)
@@ -81,8 +81,8 @@ namespace rn {
                 }
 
                 manager->UpdateAll();
-                manager->RenderAll(drawlist);
-                manager->RenderContentAll();
+                manager->RenderAll(drawlist, main_screen_min);
+                manager->RenderContentAll(main_screen_min);
             }
             ImGui::EndChild();
             ImGui::PopStyleVar();

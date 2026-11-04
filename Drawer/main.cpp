@@ -34,6 +34,7 @@
 #include "../external/implot/implot.h"
 #include <WindowSettings.h>
 #include <stb_image.h>
+#include <widgets/RegisterAllWidgets.h>
 
 
 
@@ -50,6 +51,7 @@ int main(int argc, char** argv)
         return 1;
     // Без аргумента запускаем демо-конфиг из репозитория
     std::string test_str = std::string(PROJECT_SOURCE_DIR) + "/../MyWidgetEditor/configs/table_plot.json";
+    core::RegisterAllWidgets();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
     if (argc > 1) {
         manager->WindowPropsFromJson(argv[1]);

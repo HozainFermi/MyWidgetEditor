@@ -1,6 +1,6 @@
 #pragma once
 #include <GLFW/glfw3.h>
-#include "../ui/RuntimeWindowProperties.h"
+#include <core/WindowProperties.h>
 #include <windows.h>
 #include <GLFW/glfw3.h>
 
@@ -12,7 +12,7 @@
 
 namespace rn {
 
-	inline void SetGLFWHints(RuntimeWindowProperties& props) {
+	inline void SetGLFWHints(const core::WindowProperties& props) {
 			
 		glfwWindowHint(GLFW_DECORATED, props.decorated ? GLFW_TRUE : GLFW_FALSE);		
 		glfwWindowHint(GLFW_FLOATING, props.always_on_top ? GLFW_TRUE : GLFW_FALSE);		
@@ -86,7 +86,7 @@ namespace rn {
 
 #endif
 
-    inline void SetupWindowStyle(GLFWwindow* window, RuntimeWindowProperties& props) {
+    inline void SetupWindowStyle(GLFWwindow* window, const core::WindowProperties& props) {
 #ifdef _WIN32
         HWND hwnd = glfwGetWin32Window(window);
         

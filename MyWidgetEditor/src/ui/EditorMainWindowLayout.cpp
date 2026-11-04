@@ -1,7 +1,7 @@
 #include "EditorMainWindowLayout.h"
 #include <iostream>
-#include "WidgetFactory.h"
-#include "RuntimeWindowProperties.h"
+#include <core/WidgetFactory.h>
+#include <core/Config.h>
 #include "independent_launcher.h"
 #include <filesystem>
 #include <fstream>
@@ -74,24 +74,10 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
 
 void Editor::SaveConfigWithConnections(const std::string& filename)
 {
-    // Базовый json с окном и виджетами
-    nlohmann::json json = widget_manager_.ToJson(window_props_);
-
-    // Сериализуем connections_
-    nlohmann::json conn = nlohmann::json::array();
-    for (const auto& c : widget_manager_.connections_) {
-        conn.push_back({
-            {"from_widget", c.from.widget_id},
-            {"from_port",   c.from.port},
-            {"to_widget",   c.to.widget_id},
-            {"to_port",     c.to.port}
-        });
-    }
-    json["connections"] = conn;
-
-    std::ofstream file(filename);
-    if (file.is_open()) {
-        file << json.dump(4);
+    // Окно, виджеты и связи
+    std::string error;
+    if (!core::SaveConfig(filename, widget_manager_.ToJson(window_props_), &error)) {
+        std::cerr << error << std::endl;
     }
 }
 
@@ -209,16 +195,15 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     ImGui::SameLine();
     HelpMarker("Click to select");
     ImGui::Separator();
-    auto widgetsptrs = widget_manager_.GetAllWidgets();
-    for (int i = 0; i < widget_manager_.GetCount(); i++) {
-       if(ImGui::Selectable(widgetsptrs[i]->GetId().c_str(), widgetsptrs[i]->IsSelected())) {
-           widgetsptrs[i]->SetSelected(true);
-       }
+    for (core::Widget* widget : widget_manager_.GetAllWidgets()) {
+        if (ImGui::Selectable(widget->GetId().c_str(), widget_manager_.IsSelected(widget))) {
+            widget_manager_.Select(widget->GetId());
+        }
     }
 }
 
 void Editor::RenderRightPanel() {
-    wg::Widget* selected = widget_manager_.GetSelectedWidget();
+    core::Widget* selected = widget_manager_.GetSelectedWidget();
 
     static bool* selections[] = 
     { 
@@ -359,30 +344,27 @@ void Editor::RenderRightPanel() {
         }
 
         // Тип виджета (только для чтения)
-        ImGui::Text("Type: %s", selected->TypeToString(selected->GetType()).c_str());
+        ImGui::Text("Type: %s", core::WidgetTypeToString(selected->GetType()));
         ImGui::Separator();
 
         // Кнопки действий
-        if (ImGui::Button("Delete", ImVec2(-1, 0))) {
-            widget_manager_.DeleteWidget(selected->GetId());
-            selected = nullptr;
-            widget_manager_.SelectWidget(-1);
-            widget_manager_.DeselectAll();
-        }
+        bool delete_pressed = ImGui::Button("Delete", ImVec2(-1, 0));
 
         if (ImGui::Button("Duplicate", ImVec2(-1, 0))) {
             // Логика дублирования
         }
 
         if (ImGui::Button("Bring to Front", ImVec2(-1, 0))) {
-            // Логика поднятия наверх
             widget_manager_.BringToFront(selected->GetId());
         }
         ImGui::Separator();
-        if (selected) {
-            selected->RenderProperties();        
+        selected->RenderProperties();
+
+        // Удаляем в конце: дальше по коду selected уже не нужен
+        if (delete_pressed) {
+            widget_manager_.DeleteWidget(selected->GetId());
+            selected = nullptr;
         }
-        
     }
     else {       
         
@@ -412,21 +394,16 @@ ImVec2 Editor::GetMousePosRelativeToCanvas() const {
 }
 
 void Editor::CreateWidgetFromTemplate(const std::string& widget_class, const ImVec2& position) {
-    static int widget_counter = 1; 
-    std::string name = widget_class + std::to_string(widget_counter++);
-   
-    // Создаем через фабрику
-    std::unique_ptr<wg::Widget> widget = wg::WidgetFactory::CreateWithName(widget_class, name, position);
+    static int widget_counter = 1;
 
-    if (widget) {
-        // Добавляем в менеджер        
-        widget_manager_.AddWidget(std::move(widget));
-
-    }
-    else {
-        // Обработка ошибки: виджет не зарегистрирован
+    std::unique_ptr<core::Widget> widget = core::WidgetFactory::Create(widget_class);
+    if (!widget) {
         std::cerr << "Widget class not registered: " << widget_class << std::endl;
-    }   
+        return;
+    }
+    widget->SetName(widget_class + std::to_string(widget_counter++));
+    widget->SetPosition(position);
+    widget_manager_.AddWidget(std::move(widget));
 }
 
 void Editor::DrawGrid(ImDrawList* draw_list) const {
@@ -500,10 +477,8 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
             
             // Правая панель (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
-            wg::Widget* selected = widget_manager_.GetSelectedWidget();
             RenderRightPanel();
-            
-            if (selected) { selected->SetStaySelected(ImGui::IsWindowHovered()); }
+            widget_manager_.SetKeepSelection(ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows));
             ImGui::EndChild();            
         }
         ImGui::EndChild();
@@ -522,9 +497,17 @@ void Editor::RenderCanvas() {
     ImGui::Text("Grid size");
     
     ImGui::Checkbox("Grid", &show_grid_);
-    ImGui::SameLine();     
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
     ImGui::DragFloat(" ", &grid_size_, 1.0f, 5.0f, 100.0f);
-    
+    ImGui::SameLine();
+    bool live_data = widget_manager_.IsLiveData();
+    if (ImGui::Checkbox("Live data", &live_data)) {
+        widget_manager_.SetLiveData(live_data);
+    }
+    ImGui::SameLine();
+    HelpMarker("Off: widgets show preview data.\nOn: widgets load real data (HTTP requests etc.) like in the running widget.");
+
     ImGui::Spacing();
     ImVec2 curmouse= GetMousePosRelativeToCanvas();
 
@@ -793,8 +776,9 @@ void Editor::RenderConnections(ImDrawList* draw_list)
     ImVec2 mouse_pos = io.MousePos;
     const float remove_radius = 8.0f;
 
-    for (int i = (int)widget_manager_.connections_.size() - 1; i >= 0; --i) {
-        const auto& c = widget_manager_.connections_[i];
+    const auto& connections = widget_manager_.GetConnections();
+    for (int i = (int)connections.size() - 1; i >= 0; --i) {
+        const auto& c = connections[i];
         ImVec2 p1 = find_pos(c.from);
         ImVec2 p2 = find_pos(c.to);
 
@@ -810,7 +794,7 @@ void Editor::RenderConnections(ImDrawList* draw_list)
         float dym = mouse_pos.y - mid.y;
         if (dxm * dxm + dym * dym <= remove_radius * remove_radius &&
             ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-            widget_manager_.connections_.erase(widget_manager_.connections_.begin() + i);
+            widget_manager_.RemoveConnection(i);
         }
     }
 }

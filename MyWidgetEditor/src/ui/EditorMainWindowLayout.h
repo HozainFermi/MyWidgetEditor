@@ -3,7 +3,7 @@
 #include <glad/gl.h> 
 #include <GLFW/glfw3.h>
 #include "WidgetManager.h"
-#include "RuntimeWindowProperties.h"
+#include <core/WindowProperties.h>
 #include "Connections.h"
 #include "Mesh.h"
 #include "Scene.hpp"
@@ -41,7 +41,7 @@ private:
     bool filebrowser_open_ = false;
     bool filesave_open_ = false;
     FileBrowserMode browsermode= FileBrowserMode::None;
-    wg::RuntimeWindowProperties window_props_{};
+    core::WindowProperties window_props_{};
     
     std::string loaded_config;
     Styles::Scene background_scene_{};
@@ -54,6 +54,9 @@ public:
     
     Editor()
     {
+        // Виджеты видят цвет фона и шейдер окна (например, RenderWidget для цвета очистки)
+        widget_manager_.SetWindowProperties(&window_props_);
+
         std::vector<Helpers::Vertex> vertices_{
 
         Helpers::Vertex{

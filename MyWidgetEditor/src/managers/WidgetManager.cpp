@@ -1,192 +1,403 @@
 #include "WidgetManager.h"
-#include "TextWidget.h"
-#include "InputTextWidget.h"
-#include <fstream>
-#include <iostream>
 #include <algorithm>
-
-
-
+#include <iostream>
+#include <core/Config.h>
 
 namespace wg {
-    void WidgetManager::UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size) {
-        for (size_t i = 0; i < widgets_.size(); i++) {
-            widgets_[i]->UpdateInteraction(canvas_p0,canvas_size, (int)i);            
+
+    namespace {
+        const ImU32 kBorderColor = IM_COL32(100, 100, 100, 255);
+        const ImU32 kSelectedBorderColor = IM_COL32(199, 197, 135, 255);
+        const ImU32 kNameColor = IM_COL32(255, 255, 255, 255);
+        const float kHandleSize = 4.0f;
+
+        ImRect ScreenRect(const core::Widget& widget, const ImVec2& canvas_p0) {
+            return ImRect(widget.GetScreenMin(canvas_p0), widget.GetScreenMax(canvas_p0));
+        }
+
+        // Центры 8 ручек ресайза в порядке ResizeHandle (1..8)
+        void HandlePositions(const ImRect& rect, ImVec2 out[8]) {
+            out[0] = rect.Min;
+            out[1] = ImVec2((rect.Min.x + rect.Max.x) * 0.5f, rect.Min.y);
+            out[2] = ImVec2(rect.Max.x, rect.Min.y);
+            out[3] = ImVec2(rect.Min.x, (rect.Min.y + rect.Max.y) * 0.5f);
+            out[4] = ImVec2(rect.Max.x, (rect.Min.y + rect.Max.y) * 0.5f);
+            out[5] = ImVec2(rect.Min.x, rect.Max.y);
+            out[6] = ImVec2((rect.Min.x + rect.Max.x) * 0.5f, rect.Max.y);
+            out[7] = rect.Max;
         }
     }
 
-    void WidgetManager::RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0) {
-        for (auto& widget : widgets_) {
-            if (widget) {
-            widget->Render(draw_list, canvas_p0);
-            }
+    WidgetManager::WidgetManager() {
+        context_.is_editor = true;
+        context_.live_data = false;  // по умолчанию в редакторе превью
+    }
+
+    // ================= Виджеты =================
+
+    void WidgetManager::AddWidget(std::unique_ptr<core::Widget> widget) {
+        widget->SetContext(&context_);
+        CanvasItem item;
+        item.widget = std::move(widget);
+        items_.push_back(std::move(item));
+        ports_dirty_ = true;
+    }
+
+    void WidgetManager::DeleteWidget(const std::string& id) {
+        // Удаляем все связи виджета, а не только первую
+        connections_.erase(
+            std::remove_if(connections_.begin(), connections_.end(), [&id](const core::Connection& c) {
+                return c.from.widget_id == id || c.to.widget_id == id;
+            }),
+            connections_.end());
+
+        items_.erase(
+            std::remove_if(items_.begin(), items_.end(), [&id](const CanvasItem& item) {
+                return item.widget->GetId() == id;
+            }),
+            items_.end());
+        ports_dirty_ = true;
+    }
+
+    void WidgetManager::ClearAll() {
+        items_.clear();
+        connections_.clear();
+        ports_dirty_ = true;
+    }
+
+    void WidgetManager::BringToFront(const std::string& id) {
+        auto it = std::find_if(items_.begin(), items_.end(), [&id](const CanvasItem& item) {
+            return item.widget->GetId() == id;
+        });
+        if (it != items_.end()) {
+            std::rotate(it, it + 1, items_.end());
         }
     }
 
-    void WidgetManager::RenderContentAll(const ImVec2& canvas_p0) {
-        for (auto& widget : widgets_) {
-            if (widget) {
-            ImVec2 screen_min = widget->GetScreenMin(canvas_p0);
-            ImVec2 screen_max = widget->GetScreenMax(canvas_p0); 
-
-            widget->RenderContent(screen_min, screen_max);
-            }
-        }
-    }
-
-    void WidgetManager::SelectWidget(int index)
-    {
-        selected_widget_index_ = index;
-    }
-
-    void WidgetManager::DeselectAll()
-    {
-
-    }
-
-    Widget* WidgetManager::GetSelectedWidget() {
-        
-        for (int i = 0; i < widgets_.size();++i) {
-            if (widgets_[i]->IsSelected()) {
-                selected_widget_index_ = i;
-                return widgets_[i].get();
+    CanvasItem* WidgetManager::FindItem(const std::string& id) {
+        for (auto& item : items_) {
+            if (item.widget->GetId() == id) {
+                return &item;
             }
         }
         return nullptr;
     }
 
-    void WidgetManager::DeleteWidget(const std::string& id) {
+    core::Widget* WidgetManager::GetWidget(const std::string& id) const {
+        for (const auto& item : items_) {
+            if (item.widget->GetId() == id) {
+                return item.widget.get();
+            }
+        }
+        return nullptr;
+    }
 
-        // Удаляем все связи виджета, а не только первую
-        connections_.erase(
-            std::remove_if(connections_.begin(), connections_.end(), [&id](const Connection& p) {
-                return p.from.widget_id == id || p.to.widget_id == id;
-            }),
-            connections_.end());
+    std::vector<core::Widget*> WidgetManager::GetAllWidgets() const {
+        std::vector<core::Widget*> result;
+        result.reserve(items_.size());
+        for (const auto& item : items_) {
+            result.push_back(item.widget.get());
+        }
+        return result;
+    }
 
-        widgets_by_id_.erase(id);
-        for (auto it = widgets_.begin(); it != widgets_.end(); ++it) {
-            if ((*it)->GetId() == id) {
-                widgets_.erase(it);
-                break;
+    // ================= Связи =================
+
+    bool WidgetManager::AddConnection(const core::Connection& connection) {
+        if (!core::AddUniqueConnection(connections_, connection)) {
+            return false;
+        }
+        ports_dirty_ = true;
+        return true;
+    }
+
+    void WidgetManager::RemoveConnection(size_t index) {
+        if (index < connections_.size()) {
+            connections_.erase(connections_.begin() + index);
+            ports_dirty_ = true;
+        }
+    }
+
+    void WidgetManager::ConnectPortsIfNeeded() {
+        if (!ports_dirty_) {
+            return;
+        }
+        core::ConnectPorts(GetAllWidgets(), connections_);
+        ports_dirty_ = false;
+    }
+
+    // ================= Выделение =================
+
+    core::Widget* WidgetManager::GetSelectedWidget() const {
+        for (const auto& item : items_) {
+            if (item.selected) {
+                return item.widget.get();
+            }
+        }
+        return nullptr;
+    }
+
+    bool WidgetManager::IsSelected(const core::Widget* widget) const {
+        for (const auto& item : items_) {
+            if (item.widget.get() == widget) {
+                return item.selected;
+            }
+        }
+        return false;
+    }
+
+    void WidgetManager::Select(const std::string& id) {
+        for (auto& item : items_) {
+            item.selected = (item.widget->GetId() == id);
+        }
+    }
+
+    void WidgetManager::DeselectAll() {
+        for (auto& item : items_) {
+            item.selected = false;
+        }
+    }
+
+    void WidgetManager::SetLiveData(bool live) {
+        if (context_.live_data == live) {
+            return;
+        }
+        context_.live_data = live;
+        for (auto& item : items_) {
+            item.widget->OnContextChanged();
+        }
+        ports_dirty_ = true;
+    }
+
+    // ================= Кадр =================
+
+    void WidgetManager::UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size) {
+        ConnectPortsIfNeeded();
+        for (auto& item : items_) {
+            item.widget->Update();
+        }
+
+        // Клик обрабатываем, только если он внутри канваса и не по всплывающему окну поверх него.
+        // Иначе выбор виджета в левой панели сразу сбрасывался бы этим же кликом.
+        const ImVec2 mouse = ImGui::GetIO().MousePos;
+        const ImRect canvas(canvas_p0, ImVec2(canvas_p0.x + canvas_size.x, canvas_p0.y + canvas_size.y));
+        const bool click_on_canvas = ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+            canvas.Contains(mouse) && !keep_selection_ &&
+            // В этот момент активна невидимая кнопка канваса - без флага ImGui считал бы окно "не под курсором"
+            ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+
+        // Клик получает только верхний виджет под курсором (раньше тащились все перекрытые сразу)
+        int click_owner = -1;
+        if (click_on_canvas) {
+            for (int i = (int)items_.size() - 1; i >= 0; --i) {
+                const CanvasItem& item = items_[i];
+                ImRect rect = ScreenRect(*item.widget, canvas_p0);
+                if (rect.Contains(mouse) || (item.selected && GetHoveredHandle(mouse, rect) != ResizeHandle::NONE)) {
+                    click_owner = i;
+                    break;
+                }
             }
         }
 
-    }
-
-    void WidgetManager::SaveToFile(const std::string& filename, const wg::RuntimeWindowProperties& mw_props) const {
-        nlohmann::json json = ToJson(mw_props);
-        std::ofstream file(filename);
-        if (file.is_open()) {
-            file << json.dump(4);
+        for (int i = 0; i < (int)items_.size(); ++i) {
+            CanvasItem& item = items_[i];
+            if (click_on_canvas && i != click_owner && item.selected && !ImGui::GetIO().KeyCtrl) {
+                item.selected = false;  // клик по другому месту канваса
+            }
+            UpdateInteraction(item, canvas_p0, canvas_size, click_on_canvas && i == click_owner);
         }
     }
 
-    void WidgetManager::LoadFromFile(const std::string& filename, wg::RuntimeWindowProperties& mw_props) {
-        std::ifstream file(filename);
-        if (file.is_open()) {
-            nlohmann::json json;
-            file >> json;           
-            FromJson(json, mw_props);
-        }
-    }
+    void WidgetManager::UpdateInteraction(CanvasItem& item, const ImVec2& canvas_p0, const ImVec2& canvas_size, bool click_is_mine) {
+        const ImVec2 mouse = ImGui::GetIO().MousePos;
+        const ImRect rect = ScreenRect(*item.widget, canvas_p0);
+        item.hovered = rect.Contains(mouse);
 
-    nlohmann::json WidgetManager::ToJson(const wg::RuntimeWindowProperties& mw_props) const {
-        nlohmann::json json_array = nlohmann::json::array();
-        nlohmann::json window;
-        
-        window["bg_color"] = nlohmann::json::array({
-                mw_props.bg_color_float[0],
-                mw_props.bg_color_float[1],
-                mw_props.bg_color_float[2],
-                mw_props.bg_color_float[3]
-            });
-
-        window["wallpaper_mode"] = mw_props.wallpaper_mode;
-        window["full_screen"] = mw_props.full_screen;
-        window["always_on_top"] = mw_props.always_on_top;
-        window["always_on_bottom"] = mw_props.always_on_bottom;
-        window["window_rounding"] = mw_props.window_rounding;
-        window["resizeble"] = mw_props.resizeble;
-        window["mouse_passthrougth"] = mw_props.mouse_passthrougth;
-        window["moveble"] = mw_props.moveble;
-        window["decorated"] = mw_props.decorated;
-
-        window["frag_shader"] = mw_props.frag_GLSLshader_file;
-        window["width"] = mw_props.width;
-        window["height"] = mw_props.height;
-        window["rounding"] = mw_props.rounding;
-
-        for (const auto& widget : widgets_) {
-            json_array.push_back(widget->ToJson());
-        }
-                
-        return { {"window", window},{"widgets", json_array}};
-    }
-
-    void WidgetManager::FromJson(const nlohmann::json& json, wg::RuntimeWindowProperties& mw_props) {
-        widgets_.clear();
-        widgets_by_id_.clear();
-        connections_.clear();
-               
-        if (!json.contains("widgets") || !json["widgets"].is_array()) {
-            return;
-        }
-        if (!json.contains("window")) {            
-            return;
-        }
-
-       const nlohmann::json& windowjs = json["window"];
-
-      if (windowjs.contains("bg_color") && windowjs["bg_color"].is_array()) {
-          mw_props.bg_color_float[0] = windowjs["bg_color"].at(0).get<float>();
-          mw_props.bg_color_float[1] = windowjs["bg_color"].at(1).get<float>();
-          mw_props.bg_color_float[2] = windowjs["bg_color"].at(2).get<float>();
-          mw_props.bg_color_float[3] = windowjs["bg_color"].at(3).get<float>();
-      }
-      
-      mw_props.wallpaper_mode = windowjs.value("wallpaper_mode", false);
-      mw_props.full_screen = windowjs.value("full_screen", false);
-      mw_props.always_on_top = windowjs.value("always_on_top",false);
-      mw_props.always_on_bottom = windowjs.value("always_on_bottom", false);
-      mw_props.window_rounding = windowjs.value("window_rounding", false);
-      mw_props.resizeble = windowjs.value("resizeble", true);
-      mw_props.mouse_passthrougth = windowjs.value("mouse_passthrougth", false);
-      mw_props.moveble = windowjs.value("moveble", true);
-      mw_props.decorated = windowjs.value("decorated", true);
-
-       mw_props.frag_GLSLshader_file = windowjs.value("frag_shader", "");
-       mw_props.width = windowjs.value("width", 150);
-       mw_props.height = windowjs.value("height", 300);
-       mw_props.rounding = windowjs.value("rounding", 0.0f);
-                   
-       //Check connections
-       if (json.contains("connections") && json["connections"].is_array()) {
-           for (const auto& connection : json["connections"])
-           {
-               AddConnection(Connection{
-                    PortRef{connection["from_port"],connection["from_widget"]},
-                    PortRef{connection["to_port"],connection["to_widget"]}
-                   });
-           }
-       }
-       
-        for (const auto& widget_json : json["widgets"]) {
-            // Пробуем создать виджет через фабрику
-            std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);            
-            if (widget) {                           
-                // Виджет уже создан и FromJson 
-                widget.get()->FromJson(widget_json);
-                widgets_by_id_[widget.get()->GetId()] = widget.get();
-                widgets_.push_back(std::move(widget));
-
+        if (click_is_mine) {
+            ResizeHandle handle = item.selected ? GetHoveredHandle(mouse, rect) : ResizeHandle::NONE;
+            if (handle != ResizeHandle::NONE) {
+                item.resizing = true;
+                item.active_handle = handle;
+                item.resize_start_size = item.widget->GetSize();
             }
             else {
-                std::cout << "Фабрика не смогла создать (старый формат или не зарегистрирован)";
-                
+                item.dragging = true;
+                item.drag_offset = ImVec2(mouse.x - rect.Min.x, mouse.y - rect.Min.y);
+                item.selected = true;
             }
+        }
+
+        if (item.dragging && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+            item.widget->SetPosition(ImVec2(
+                mouse.x - canvas_p0.x - item.drag_offset.x,
+                mouse.y - canvas_p0.y - item.drag_offset.y));
+            KeepInsideCanvas(item, canvas_p0, canvas_size);
+        }
+
+        if (item.resizing && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+            ProcessResizing(item);
+            KeepInsideCanvas(item, canvas_p0, canvas_size);
+        }
+
+        if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+            item.dragging = false;
+            item.resizing = false;
+            item.active_handle = ResizeHandle::NONE;
         }
     }
 
-    
+    bool WidgetManager::KeepInsideCanvas(CanvasItem& item, const ImVec2& canvas_p0, const ImVec2& canvas_size) {
+        core::Widget& widget = *item.widget;
+        ImVec2 pos = widget.GetPosition();
+        ImVec2 size = widget.GetSize();
+
+        size.x = std::min(size.x, canvas_size.x);
+        size.y = std::min(size.y, canvas_size.y);
+        ImVec2 clamped(
+            std::clamp(pos.x, 0.0f, std::max(0.0f, canvas_size.x - size.x)),
+            std::clamp(pos.y, 0.0f, std::max(0.0f, canvas_size.y - size.y)));
+
+        bool changed = clamped.x != pos.x || clamped.y != pos.y || size.x != widget.GetSize().x || size.y != widget.GetSize().y;
+        widget.SetPosition(clamped);
+        widget.SetSize(size);
+        return changed;
+    }
+
+    ResizeHandle WidgetManager::GetHoveredHandle(const ImVec2& mouse_pos, const ImRect& rect) const {
+        ImVec2 handles[8];
+        HandlePositions(rect, handles);
+        for (int i = 0; i < 8; i++) {
+            ImRect handle_rect(handles[i].x - kHandleSize, handles[i].y - kHandleSize,
+                handles[i].x + kHandleSize, handles[i].y + kHandleSize);
+            if (handle_rect.Contains(mouse_pos)) {
+                return static_cast<ResizeHandle>(i + 1);
+            }
+        }
+        return ResizeHandle::NONE;
+    }
+
+    bool WidgetManager::ProcessResizing(CanvasItem& item) {
+        core::Widget& widget = *item.widget;
+        const ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
+        const ImVec2 start = item.resize_start_size;
+        const bool proportional = ImGui::GetIO().KeyShift;  // Shift - сохранять пропорции
+        ImVec2 new_size = start;
+
+        switch (item.active_handle) {
+        case ResizeHandle::TOP_LEFT:
+            new_size.x -= delta.x;
+            new_size.y -= proportional ? delta.x : delta.y;
+            break;
+        case ResizeHandle::TOP:
+            new_size.y -= delta.y;
+            if (proportional) new_size.x = new_size.y * (start.x / start.y);
+            break;
+        case ResizeHandle::TOP_RIGHT:
+            new_size.x += delta.x;
+            new_size.y += proportional ? delta.x : -delta.y;
+            break;
+        case ResizeHandle::LEFT:
+            new_size.x -= delta.x;
+            if (proportional) new_size.y = new_size.x * (start.y / start.x);
+            break;
+        case ResizeHandle::RIGHT:
+            new_size.x += delta.x;
+            if (proportional) new_size.y = new_size.x * (start.y / start.x);
+            break;
+        case ResizeHandle::BOTTOM_LEFT:
+            new_size.x -= delta.x;
+            new_size.y += proportional ? delta.x : delta.y;
+            break;
+        case ResizeHandle::BOTTOM:
+            new_size.y += delta.y;
+            if (proportional) new_size.x = new_size.y * (start.x / start.y);
+            break;
+        case ResizeHandle::BOTTOM_RIGHT:
+            new_size.x += delta.x;
+            new_size.y += proportional ? delta.x : delta.y;
+            break;
+        default:
+            return false;
+        }
+
+        const ImVec2 min_size = widget.GetMinSize();
+        new_size.x = ImMax(new_size.x, ImMax(10.0f, min_size.x));
+        new_size.y = ImMax(new_size.y, ImMax(10.0f, min_size.y));
+
+        // Противоположная от ручки сторона остаётся на месте
+        ImRect r(widget.GetPosition(), ImVec2(widget.GetPosition().x + widget.GetSize().x, widget.GetPosition().y + widget.GetSize().y));
+        switch (item.active_handle) {
+        case ResizeHandle::TOP_LEFT:     r.Min.x = r.Max.x - new_size.x; r.Min.y = r.Max.y - new_size.y; break;
+        case ResizeHandle::TOP:          r.Min.y = r.Max.y - new_size.y; break;
+        case ResizeHandle::TOP_RIGHT:    r.Max.x = r.Min.x + new_size.x; r.Min.y = r.Max.y - new_size.y; break;
+        case ResizeHandle::LEFT:         r.Min.x = r.Max.x - new_size.x; break;
+        case ResizeHandle::RIGHT:        r.Max.x = r.Min.x + new_size.x; break;
+        case ResizeHandle::BOTTOM_LEFT:  r.Min.x = r.Max.x - new_size.x; r.Max.y = r.Min.y + new_size.y; break;
+        case ResizeHandle::BOTTOM:       r.Max.y = r.Min.y + new_size.y; break;
+        case ResizeHandle::BOTTOM_RIGHT: r.Max.x = r.Min.x + new_size.x; r.Max.y = r.Min.y + new_size.y; break;
+        default: break;
+        }
+        widget.SetPosition(r.Min);
+        widget.SetSize(ImVec2(r.Max.x - r.Min.x, r.Max.y - r.Min.y));
+        return true;
+    }
+
+    void WidgetManager::RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0) {
+        for (const auto& item : items_) {
+            const ImRect rect = ScreenRect(*item.widget, canvas_p0);
+            draw_list->AddRectFilled(rect.Min, rect.Max, item.widget->GetBgColor());
+            DrawFrame(draw_list, item, rect);
+            draw_list->AddText(ImVec2(rect.Min.x + 5, rect.Min.y + 5), kNameColor, item.widget->GetName().c_str());
+            item.widget->Render(draw_list, rect.Min, rect.Max);
+        }
+    }
+
+    void WidgetManager::DrawFrame(ImDrawList* draw_list, const CanvasItem& item, const ImRect& rect) const {
+        const ImU32 color = item.selected ? kSelectedBorderColor : kBorderColor;
+        draw_list->AddRect(rect.Min, rect.Max, color, 0.0f, 0, 2.0f);
+
+        ImVec2 handles[8];
+        HandlePositions(rect, handles);
+        for (const ImVec2& h : handles) {
+            draw_list->AddRectFilled(ImVec2(h.x - kHandleSize, h.y - kHandleSize), ImVec2(h.x + kHandleSize, h.y + kHandleSize), color);
+        }
+    }
+
+    void WidgetManager::RenderContentAll(const ImVec2& canvas_p0) {
+        for (const auto& item : items_) {
+            item.widget->RenderContent(item.widget->GetScreenMin(canvas_p0), item.widget->GetScreenMax(canvas_p0));
+        }
+    }
+
+    // ================= Сериализация =================
+
+    nlohmann::json WidgetManager::ToJson(const core::WindowProperties& window) const {
+        std::vector<const core::Widget*> widgets;
+        for (const auto& item : items_) {
+            widgets.push_back(item.widget.get());
+        }
+        return core::ConfigToJson(window, widgets, connections_);
+    }
+
+    bool WidgetManager::LoadFromFile(const std::string& filename, core::WindowProperties& window) {
+        core::ConfigData data;
+        std::string error;
+        if (!core::LoadConfig(filename, data, &error)) {
+            std::cerr << error << std::endl;
+            return false;
+        }
+
+        // Путь к вершинному шейдеру в конфиге не хранится - оставляем текущий
+        std::string vertex_shader = window.vertex_GLSLshader_file;
+        window = data.window;
+        window.vertex_GLSLshader_file = vertex_shader;
+
+        ClearAll();
+        for (auto& widget : data.widgets) {
+            AddWidget(std::move(widget));
+        }
+        connections_ = std::move(data.connections);
+        ports_dirty_ = true;
+        return true;
+    }
 }

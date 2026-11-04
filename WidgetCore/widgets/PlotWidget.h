@@ -1,16 +1,17 @@
 #pragma once
-#include "Widget.h"
-#include <vector>
 #include <string>
-#include "WidgetFactory.h"
+#include <vector>
+#include "core/Widget.h"
 
-namespace wg {
+namespace core {
 
     struct ChartData {
         std::string name;
         std::vector<float> x_data;
-        std::vector<float> y_data;        
+        std::vector<float> y_data;
     };
+
+    // Какие поля входных JSON-строк идут на оси графика
     struct ChartMapping {
         std::string title_column;
         std::string x_column;
@@ -20,15 +21,14 @@ namespace wg {
             return {
                 {"chart_title", title_column},
                 {"x_key", x_column},
-                {"y_key", y_column}                
+                {"y_key", y_column}
             };
         }
         void FromJson(const nlohmann::json& json) {
             title_column = json.value("chart_title", "");
             x_column = json.value("x_key", "");
-            y_column = json.value("y_key", "");            
+            y_column = json.value("y_key", "");
         }
-
     };
 
     enum class PlotType {
@@ -42,35 +42,30 @@ namespace wg {
         None
     };
 
-
     class PlotWidget : public Widget {
-    private:
-        // Данные для графика        
-        PlotType plot_type_{0};
-
-        std::string plot_name_ = "Plot";
-        std::string x_plot_label_="x values";
-        std::string y_plot_label_ = "y values";
-        
-        std::vector<ChartMapping> chart_configs_;
-        std::vector<ChartData> all_charts_;
-
-
     public:
         PlotWidget();
-        PlotWidget(const std::string& name, const ImVec2& pos);
 
-        void Render(ImDrawList* draw_list, const ImVec2& canvas_p0) override;
-        void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
+        void RenderContent(const ImVec2& min, const ImVec2& max) override;
         void RenderProperties() override;
 
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;
 
-        // Порты: один вход "data" (массив чисел), один вход "event" для обновления
+        // Входы: "data" (массив JSON-объектов) и "refresh" (событие)
         std::vector<PortDesc> GetInputPorts() const override;
-        std::vector<PortDesc> GetOutputPorts() const override;
-        void OnInput(const std::string& port, const WidgetValue& value) override;
+        void OnInput(const std::string& to_port, const std::string& from_widget_id, const std::vector<WidgetValue>& value) override;
+
+    private:
+        void RenderPreviewPlot();
+        void RenderDataPlot();
+
+        PlotType plot_type_ = PlotType::LinePlot;
+        std::string plot_name_ = "Plot";
+        std::string x_plot_label_ = "x values";
+        std::string y_plot_label_ = "y values";
+
+        std::vector<ChartMapping> chart_configs_;
+        std::vector<ChartData> all_charts_;
     };
 }
-

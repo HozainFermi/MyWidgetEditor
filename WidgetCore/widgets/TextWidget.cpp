@@ -1,34 +1,18 @@
 #include "TextWidget.h"
+#include <cmath>
+#include <iostream>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <IconText.h>
 
-namespace rn {
-
-    REGISTER_WIDGET(TextWidget);
+namespace core {
 
     TextWidget::TextWidget()
-    {
-        SetWidgetClass("TextWidget");
+        : Widget(WidgetType::TEXT, ImVec2(150, 60)) {
+        Reparse();
     }
 
-    TextWidget::TextWidget(const std::string& name, const ImVec2& pos)
-        : Widget(name, WidgetType::TEXT, pos, ImVec2(150, 60)) {
-        SetWidgetClass("TextWidget");
-    }
-
-    void TextWidget::Render(ImDrawList* draw_list) {
-        // Вызываем базовую отрисовку (фон, рамка, имя)
-        //Widget::Render(draw_list);
-
-
-        // Отрисовываем текст
-        ImVec2 screen_max = GetScreenMax();
-        ImVec2 screen_min = GetScreenMin();
-        
-        DrawTextContent(draw_list, screen_min, screen_max);
-    }
-
-    void TextWidget::DrawTextContent(ImDrawList* draw_list, const ImVec2& screen_min, const ImVec2& screen_max) {
+    void TextWidget::Render(ImDrawList* draw_list, const ImVec2& screen_min, const ImVec2& screen_max) {
         const float font_size = 13.0f * font_scale_;
         const float wrap_width = size_.x - 20;
         ImFont* font = ImGui::GetFont();
@@ -130,25 +114,32 @@ namespace rn {
         }
     }
 
-    void TextWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
-        // Для текстового виджета не нужно ImGui содержимое
-        // Всё рисуется через DrawList
-    }
+    void TextWidget::RenderProperties()
+    {
+        auto flags = ImGuiInputTextFlags_NoHorizontalScroll | ImGuiInputTextFlags_NoUndoRedo;
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.16f, 0.16f, 0.16f, 1.0f));
+        ImVec2 btn_size{ 25, 20 };
+        ImGui::SetWindowFontScale(1.5f);
 
-   
+        ImGui::PushID("btn-align");
+        if (ImGui::Button(ICON(ICON_ALIGN_LEFT), btn_size)) { left_alignment_ = true;  center_alignment_ = false; right_alignment_ = false; }
+        ImGui::SameLine();
+        if (ImGui::Button(ICON(ICON_ALIGN_CENTER), btn_size)) { left_alignment_ = false;  center_alignment_ = true; right_alignment_ = false; }
+        ImGui::SameLine();
+        if (ImGui::Button(ICON(ICON_ALIGN_RIGHT), btn_size)) { left_alignment_ = false;  center_alignment_ = false; right_alignment_ = true; }
+        ImGui::PopID();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(1);
+        ImGui::SetWindowFontScale(1.0f);
 
-    void TextWidget::FromJson(const nlohmann::json& json) {
-        Widget::FromJson(json);
-        text_ = json.value("text", "");
-        font_scale_ = json.value("font_scale", 1.0f);
-        wrap_text_ = json.value("wrap_text", false);
-
-        left_alignment_ = json.value("left_alignment", false);
-        center_alignment_ = json.value("center_alignment", false);
-        right_alignment_ = json.value("right_alignment", false);
-        if (!left_alignment_ && !right_alignment_) { center_alignment_ = true; }
-
-        Reparse();
+        ImGui::InputText("##textwContent", &text_, flags);
+        if (ImGui::IsItemDeactivatedAfterEdit()) {
+            Reparse();
+        }
+        if (parsing_error_) {
+            ImGui::BulletText("%s", error_message_.c_str());
+        }
     }
 
     void TextWidget::Reparse() {
@@ -163,5 +154,31 @@ namespace rn {
             parsing_error_ = true;
             error_message_ = ex.what();
         }
+    }
+
+    nlohmann::json TextWidget::ToJson() const {
+        auto json = Widget::ToJson();
+        json["text"] = text_;
+        json["font_scale"] = font_scale_;
+        json["wrap_text"] = wrap_text_;
+
+        if (left_alignment_)   { json["left_alignment"] = true; }
+        if (center_alignment_) { json["center_alignment"] = true; }
+        if (right_alignment_)  { json["right_alignment"] = true; }
+        return json;
+    }
+
+    void TextWidget::FromJson(const nlohmann::json& json) {
+        Widget::FromJson(json);
+        text_ = json.value("text", "");
+        font_scale_ = json.value("font_scale", 1.0f);
+        wrap_text_ = json.value("wrap_text", false);
+
+        left_alignment_ = json.value("left_alignment", false);
+        center_alignment_ = json.value("center_alignment", false);
+        right_alignment_ = json.value("right_alignment", false);
+        if (!left_alignment_ && !right_alignment_) { center_alignment_ = true; }
+
+        Reparse();
     }
 }

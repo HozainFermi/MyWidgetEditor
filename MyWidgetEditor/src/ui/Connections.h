@@ -1,38 +1,13 @@
 #pragma once
-#include <string>
-#include <vector>
-#include "imgui.h"
+#include <imgui.h>
+#include <core/Ports.h>
 
+using core::Connection;
+using core::PortKey;
+using core::PortRef;
+using core::SamePort;
 
-// Связи между виджетами
-struct PortRef {
-    std::string port;
-    std::string widget_id;
-    //оператор сравнения для поиска в векторе
-    //bool operator==(const PortRef& other) const {
-    //    return port == other.port && widget_id == other.widget_id;
-    //}
-};
-
-// Ключ порта для поиска в map: "<widget_id>/<port>"
-inline std::string PortKey(const PortRef& ref) {
-    return ref.widget_id + '/' + ref.port;
-}
-
-struct Connection {
-    PortRef from;
-    PortRef to;
-};
-
-inline bool SamePort(const PortRef& a, const PortRef& b) {
-    return a.port == b.port && a.widget_id == b.widget_id;
-}
-
-inline bool SameConnection(const Connection& a, const Connection& b) {
-    return SamePort(a.from, b.from) && SamePort(a.to, b.to);
-}
-
-// для отрисовки и взаимодействия
+// Порт на канвасе редактора: для отрисовки и перетаскивания связей
 struct PortVisual {
     PortRef ref;
     ImVec2  pos;

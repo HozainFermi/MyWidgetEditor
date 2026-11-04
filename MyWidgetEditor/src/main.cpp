@@ -35,6 +35,8 @@
 #include <implot/implot.h>
 #include <IconText.h>
 #include <ImGuiObsStyle.h>
+#include <core/WidgetFactory.h>
+#include <widgets/RegisterAllWidgets.h>
 
 
 
@@ -46,7 +48,7 @@ static void glfw_error_callback(int error, const char* description)
 }
 
 // Main code
-int main(int, char**)
+int main(int argc, char** argv)
 {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -156,23 +158,14 @@ int main(int, char**)
     static bool USE_GRID = false;
     bool show_editor = true;
 
-    std::vector<std::string> templates;
-    std::filesystem::path widgetsPath = std::string(PROJECT_SOURCE_DIR) + "/src/widgets";
+    // Список шаблонов берём из фабрики: раньше он собирался сканированием .h в папке исходников
+    core::RegisterAllWidgets();
+    std::vector<std::string> templates = core::WidgetFactory::GetRegisteredTypes();
 
-    std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
-
-    for (const auto& entry : std::filesystem::directory_iterator(widgetsPath)) {       
-        if (entry.is_regular_file()) {
-            std::filesystem::path filename_path = entry.path().filename();
-            
-            if (filename_path.extension() == ".h") {
-                std::string tempname = filename_path.stem().string();
-                if (tempname == "Widget") { continue; }
-                std::cout << tempname << std::endl;
-                templates.push_back(tempname);
-            }
-        }
-    }    
+    // MyWidgetEditor.exe <имя конфига из папки configs> - сразу открыть конфиг
+    if (argc > 1) {
+        editor->OnFileForLoadSelected(argv[1]);
+    }
 
         ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
