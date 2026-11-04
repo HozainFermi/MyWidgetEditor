@@ -25,6 +25,8 @@ namespace core {
         int width = 500;
         int height = 500;
         float rounding = 0.0f;
+        // Максимум кадров в секунду для Drawer (0 - без ограничения, только vsync)
+        int fps_limit = 60;
 
         // Пересчитывает bg_color из bg_color_float
         void FloatToImU32();

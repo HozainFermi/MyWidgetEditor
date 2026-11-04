@@ -114,6 +114,17 @@ namespace core {
         }
     }
 
+    float TextWidget::GetDesiredFps() const
+    {
+        // Волна, радуга и тряска анимированы, обычный текст можно почти не перерисовывать
+        for (const auto& segment : parse_result_) {
+            if (segment.flags & TextEffect_Mask) {
+                return 30.0f;
+            }
+        }
+        return 1.0f;
+    }
+
     void TextWidget::RenderProperties()
     {
         auto flags = ImGuiInputTextFlags_NoHorizontalScroll | ImGuiInputTextFlags_NoUndoRedo;

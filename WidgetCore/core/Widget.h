@@ -48,6 +48,9 @@ namespace core {
         virtual void RenderProperties() {}
         // Контекст изменился (например, в редакторе переключили превью/живые данные)
         virtual void OnContextChanged() {}
+        // Сколько кадров в секунду нужно виджету без действий пользователя. Окно рисуется с частотой
+        // самого требовательного виджета (но не выше лимита окна). Анимациям нужно ~30, статике хватит 1-2
+        virtual float GetDesiredFps() const { return 2.0f; }
 
         // === Порты ===
         virtual std::vector<PortDesc> GetInputPorts() const { return {}; }

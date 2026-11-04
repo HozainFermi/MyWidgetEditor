@@ -1,4 +1,5 @@
 #include "RuntimeWidgetManager.h"
+#include <algorithm>
 #include <iostream>
 #include <core/Config.h>
 
@@ -39,6 +40,14 @@ namespace rn {
         }
         bus_.SetRoutes(widgets, connections_);
         return true;
+    }
+
+    float RuntimeWidgetManager::GetDesiredFps() const {
+        float fps = 1.0f;
+        for (const auto& widget : widgets_) {
+            fps = std::max(fps, widget->GetDesiredFps());
+        }
+        return fps;
     }
 
     void RuntimeWidgetManager::UpdateAll() {

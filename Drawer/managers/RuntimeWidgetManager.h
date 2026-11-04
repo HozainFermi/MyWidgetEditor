@@ -33,6 +33,8 @@ namespace rn {
         void RenderContentAll(const ImVec2& origin);
 
         size_t GetCount() const { return widgets_.size(); }
+        // Наибольший FPS, который нужен виджетам без действий пользователя
+        float GetDesiredFps() const;
 
     private:
         RuntimeWidgetManager();

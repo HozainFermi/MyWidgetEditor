@@ -20,6 +20,7 @@ namespace core {
 
         void RenderContent(const ImVec2& min, const ImVec2& max) override;
         void RenderProperties() override;
+        float GetDesiredFps() const override { return 30.0f; }  // модель вращается
 
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;

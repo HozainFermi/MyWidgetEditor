@@ -27,6 +27,7 @@ namespace core {
         window["width"] = props.width;
         window["height"] = props.height;
         window["rounding"] = props.rounding;
+        window["fps_limit"] = props.fps_limit;
         return window;
     }
 
@@ -51,6 +52,7 @@ namespace core {
         props.width = window.value("width", 150);
         props.height = window.value("height", 300);
         props.rounding = window.value("rounding", 0.0f);
+        props.fps_limit = window.value("fps_limit", 60);
         props.FloatToImU32();
     }
 }

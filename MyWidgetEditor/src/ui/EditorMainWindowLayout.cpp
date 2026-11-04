@@ -280,6 +280,13 @@ void Editor::RenderRightPanel() {
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
     }
 
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
+    ImGui::DragInt("FPS limit", &window_props_.fps_limit, 1, 0, 240);
+    ImGui::SameLine();
+    HelpMarker("Max frames per second of the running widget (0 = no limit, vsync).\n"
+               "Without user input it redraws only as often as its widgets need:\n"
+               "static widgets ~1-2 FPS, animations ~30. A shader background always uses the limit.");
+
     if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,22)) ) {
         shaderNames.clear();
         shaders_paths.clear();

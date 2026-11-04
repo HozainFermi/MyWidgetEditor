@@ -37,6 +37,7 @@
 #include <ImGuiObsStyle.h>
 #include <core/WidgetFactory.h>
 #include <widgets/RegisterAllWidgets.h>
+#include <core/FrameLimiter.h>
 
 
 
@@ -91,7 +92,7 @@ int main(int argc, char** argv)
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); // Enable vsync
+    glfwSwapInterval(0); // кадры отмеряет FrameLimiter (ожидание vsync в драйвере грузило ядро на 100%)
 
     GLFWimage images[4];
     images[0].pixels = stbi_load(ICONS_DIR"/icon_16.png", &images[0].width, &images[0].height, 0, 4);
@@ -179,10 +180,11 @@ int main(int argc, char** argv)
 #else
         stbi_set_flip_vertically_on_load(true);
         glEnable(GL_DEPTH_TEST);
+        core::FrameLimiter frame_limiter;
         while (!glfwWindowShouldClose(window))
 #endif
-        {            
-            glfwPollEvents();
+        {
+            frame_limiter.WaitForNextFrame(30.0, 60.0);
             if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
             {
                 ImGui_ImplGlfw_Sleep(10);

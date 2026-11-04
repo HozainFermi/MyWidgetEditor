@@ -39,6 +39,7 @@ namespace core {
         void RenderProperties() override;
         void OnContextChanged() override;
         void OnPortsConnected() override;
+        float GetDesiredFps() const override { return 30.0f; }  // анимированные иконки
 
         std::vector<PortDesc> GetOutputPorts() const override;
 

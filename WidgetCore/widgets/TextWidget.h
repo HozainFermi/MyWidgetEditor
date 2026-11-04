@@ -13,6 +13,7 @@ namespace core {
 
         void Render(ImDrawList* draw_list, const ImVec2& min, const ImVec2& max) override;
         void RenderProperties() override;
+        float GetDesiredFps() const override;
 
         void SetText(const std::string& text) { text_ = text; Reparse(); }
         const std::string& GetText() const { return text_; }

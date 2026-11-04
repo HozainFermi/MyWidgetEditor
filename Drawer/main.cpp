@@ -35,6 +35,7 @@
 #include <WindowSettings.h>
 #include <stb_image.h>
 #include <widgets/RegisterAllWidgets.h>
+#include <core/FrameLimiter.h>
 
 
 
@@ -111,7 +112,9 @@ int main(int argc, char** argv)
         return 1;
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); // Enable vsync
+    // С лимитом FPS кадры отмеряет FrameLimiter. Ожидание vsync у OpenGL-драйвера часто крутит
+    // процессор на 100% одного ядра, поэтому vsync включаем только без лимита
+    glfwSwapInterval(manager->window_props_.fps_limit > 0 ? 0 : 1);
 
     if (!gladLoadGL(glfwGetProcAddress)) {
         std::cerr << "GLAD BROKE!" << std::endl;
@@ -170,10 +173,15 @@ int main(int argc, char** argv)
         manager->LoadFromFile(test_str);
     }
     glEnable(GL_DEPTH_TEST);
+    core::FrameLimiter frame_limiter;
     while (!glfwWindowShouldClose(window))
 #endif
     {
-        glfwPollEvents();
+        // Без действий пользователя рисуем так часто, как нужно виджетам; шейдерный фон анимирован всегда
+        const double fps_limit = manager->window_props_.fps_limit;
+        const bool shader_background = !manager->window_props_.frag_GLSLshader_file.empty();
+        const double idle_fps = shader_background ? fps_limit : std::min<double>(fps_limit, manager->GetDesiredFps());
+        frame_limiter.WaitForNextFrame(idle_fps, fps_limit);
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
         {
             ImGui_ImplGlfw_Sleep(10);

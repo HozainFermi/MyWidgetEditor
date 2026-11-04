@@ -21,6 +21,7 @@ namespace core {
         void RenderProperties() override;
         void OnContextChanged() override;
         void OnPortsConnected() override;
+        float GetDesiredFps() const override { return 1.0f; }  // данные меняются раз в секунду
 
         std::vector<PortDesc> GetOutputPorts() const override;
 
