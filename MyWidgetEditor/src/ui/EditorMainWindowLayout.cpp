@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <IconText.h>
+#include <unordered_map>
 
 
 static void HelpMarker(const char* desc)
@@ -96,14 +97,17 @@ void Editor::SaveConfigWithConnections(const std::string& filename)
 
 void Editor::CheckFileMenuHotKeys() {
     ImGuiIO& io = ImGui::GetIO();
-    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_N)) {
+    // Не перехватываем Ctrl+буква, пока пользователь печатает в поле ввода
+    if (!io.KeyCtrl || io.WantTextInput) {
+        return;
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_N, false)) {
         filesave_open_ = true;
     }
-    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_S))
-    {
+    if (ImGui::IsKeyPressed(ImGuiKey_S, false)) {
         if (!loaded_config.empty()) { SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + loaded_config + ".json"); }
     }
-    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_L)) {
+    if (ImGui::IsKeyPressed(ImGuiKey_L, false)) {
         filebrowser_open_ = true;
         browsermode = FileBrowserMode::Load;
     }
@@ -322,7 +326,7 @@ void Editor::RenderRightPanel() {
 
     if (ImGui::Button("Compile shader")) {
         std::unique_ptr shaders = std::make_unique<Helpers::Shader>(window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file);
-        background_scene_.models_[0].shader.release();
+        // Присваивание unique_ptr само удалит старый шейдер (release() его терял)
         background_scene_.models_[0].shader = std::move(shaders);
     }
     //if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
@@ -758,16 +762,15 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
 
 void Editor::RenderConnections(ImDrawList* draw_list)
 {
-    // Нужно актуальное положение портов из port_visuals_
-    //TODO: заменить на map
-    auto find_pos = [this](const PortRef& ref) -> ImVec2 {
-        for (auto& v : port_visuals_) {                
-            if (v.ref.widget_id == ref.widget_id && v.ref.port == ref.port) {
-                return v.pos;
-            }
-        }
-        //std::cout <<"NOT FOUND:" << std::endl;
-        return ImVec2(0, 0);
+    // Актуальные позиции портов из port_visuals_ (map вместо линейного поиска)
+    std::unordered_map<std::string, ImVec2> port_positions;
+    port_positions.reserve(port_visuals_.size());
+    for (const auto& v : port_visuals_) {
+        port_positions[PortKey(v.ref)] = v.pos;
+    }
+    auto find_pos = [&port_positions](const PortRef& ref) -> ImVec2 {
+        auto it = port_positions.find(PortKey(ref));
+        return it != port_positions.end() ? it->second : ImVec2(0, 0);
     };
 
     ImGuiIO& io = ImGui::GetIO();

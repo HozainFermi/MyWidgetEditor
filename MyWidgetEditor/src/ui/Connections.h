@@ -14,6 +14,11 @@ struct PortRef {
     //}
 };
 
+// Ключ порта для поиска в map: "<widget_id>/<port>"
+inline std::string PortKey(const PortRef& ref) {
+    return ref.widget_id + '/' + ref.port;
+}
+
 struct Connection {
     PortRef from;
     PortRef to;

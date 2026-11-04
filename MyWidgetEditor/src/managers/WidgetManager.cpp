@@ -3,6 +3,7 @@
 #include "InputTextWidget.h"
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 
 
@@ -56,11 +57,12 @@ namespace wg {
 
     void WidgetManager::DeleteWidget(const std::string& id) {
 
-        auto it = std::find_if(connections_.begin(), connections_.end(), [id](const Connection& p) {
-            return p.from.widget_id == id || p.to.widget_id == id;
-            });
-
-        if (it != connections_.end()) { connections_.erase(it); }
+        // Удаляем все связи виджета, а не только первую
+        connections_.erase(
+            std::remove_if(connections_.begin(), connections_.end(), [&id](const Connection& p) {
+                return p.from.widget_id == id || p.to.widget_id == id;
+            }),
+            connections_.end());
 
         widgets_by_id_.erase(id);
         for (auto it = widgets_.begin(); it != widgets_.end(); ++it) {
@@ -125,6 +127,7 @@ namespace wg {
     void WidgetManager::FromJson(const nlohmann::json& json, wg::RuntimeWindowProperties& mw_props) {
         widgets_.clear();
         widgets_by_id_.clear();
+        connections_.clear();
                
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;
@@ -143,9 +146,10 @@ namespace wg {
       }
       
       mw_props.wallpaper_mode = windowjs.value("wallpaper_mode", false);
-      mw_props.always_on_top = windowjs.value("full_screen", false);
+      mw_props.full_screen = windowjs.value("full_screen", false);
       mw_props.always_on_top = windowjs.value("always_on_top",false);
       mw_props.always_on_bottom = windowjs.value("always_on_bottom", false);
+      mw_props.window_rounding = windowjs.value("window_rounding", false);
       mw_props.resizeble = windowjs.value("resizeble", true);
       mw_props.mouse_passthrougth = windowjs.value("mouse_passthrougth", false);
       mw_props.moveble = windowjs.value("moveble", true);

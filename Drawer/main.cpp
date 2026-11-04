@@ -48,7 +48,8 @@ int main(int argc, char** argv)
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-    std::string test_str = "C:/Users/dedde/source/repos/MyWidgetEditor/MyWidgetEditor/configs/bunny_new_test.json";
+    // Без аргумента запускаем демо-конфиг из репозитория
+    std::string test_str = std::string(PROJECT_SOURCE_DIR) + "/../MyWidgetEditor/configs/table_plot.json";
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
     if (argc > 1) {
         manager->WindowPropsFromJson(argv[1]);
@@ -98,7 +99,8 @@ int main(int argc, char** argv)
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(primaryMonitor); // Valid on GLFW 3.3+ only
 
     if (manager->window_props_.full_screen) {
-       window = glfwCreateWindow((int)(mode->width * main_scale), (int)(mode->height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
+       // Размер экрана уже в пикселях, масштаб DPI сюда не применяем (иначе окно больше экрана)
+       window = glfwCreateWindow(mode->width, mode->height, "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
     }
     else {
         window = glfwCreateWindow((int)(manager->window_props_.width * main_scale), (int)(manager->window_props_.height * main_scale), "MyWidgetEditor GLFW+OpenGL3", nullptr, nullptr);
@@ -134,6 +136,12 @@ int main(int argc, char** argv)
     ImGui_ImplGlfw_InstallEmscriptenCallbacks(window, "#canvas");
 #endif
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // Шрифт с кириллицей (встроенный ProggyClean её не содержит)
+    std::string font_path = std::string(ASSETS_SOURCE_DIR) + "/fonts/Roboto-Medium.ttf";
+    if (!io.Fonts->AddFontFromFileTTF(font_path.c_str(), 15.0f)) {
+        io.Fonts->AddFontDefault();
+    }
 
    static bool open = true;
     
@@ -184,9 +192,11 @@ int main(int argc, char** argv)
 
         glfwSwapBuffers(window);
 
+#ifdef _WIN32
         if (manager->window_props_.always_on_bottom) {
             SetWindowPos(glfwGetWin32Window(window), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         }
+#endif
     }
 #ifdef __EMSCRIPTEN__
     EMSCRIPTEN_MAINLOOP_END;

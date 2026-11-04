@@ -92,32 +92,35 @@ namespace rn {
         // == Порты и пайплайн (по умолчанию отсутствуют) ==
         //В коллбеке находится ссылка на OnInput связанного виджета
         using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const std::vector<WidgetValue>& value) > ;
-        std::unordered_map<std::string, EmitCallback> from_port_callbacks_;  // Храним callback'и для каждого выходного порта
+        // Для каждого выходного порта - список callback'ов (один порт может вести в несколько виджетов)
+        std::unordered_map<std::string, std::vector<EmitCallback>> from_port_callbacks_;
         virtual std::vector<PortDesc> GetInputPorts() const { return {}; }
         virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
         virtual void OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) {}
 
        
         // Установить callback для конкретного порта
-        void SetPortCallback(const std::string& port, EmitCallback cb) {
-            from_port_callbacks_[port] = std::move(cb);
+        void AddPortCallback(const std::string& port, EmitCallback cb) {
+            from_port_callbacks_[port].push_back(std::move(cb));
         }
 
-        // Очистить callback для порта
-        void ClearPortCallback(const std::string& port) {
+        void ClearPortCallbacks(const std::string& port) {
             from_port_callbacks_.erase(port);
         }
 
-        // Обновленный метод Emit
+        // Отправляет данные во все виджеты, подключённые к порту
         void Emit(const std::string& from_port, const std::vector<WidgetValue>& value) {
-            // Ищем callback для этого порта           
             auto it = from_port_callbacks_.find(from_port);
-            if (it != from_port_callbacks_.end() && it->second) {
-                // Вызываем callback, передавая ID виджета, порт и значение               
-                it->second(id_, from_port, value);
+            if (it == from_port_callbacks_.end()) {
+                return;
+            }
+            for (auto& cb : it->second) {
+                if (cb) {
+                    cb(id_, from_port, value);
+                }
             }
         }
-        
+
 
         // === Сериализация ===    
         virtual void FromJson(const nlohmann::json& json);

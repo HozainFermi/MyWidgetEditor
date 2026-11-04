@@ -367,3 +367,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# assimp sources caught by the VS rules above (Obj/, Win32/)
+!external/assimp/code/AssetLib/Obj/
+!external/assimp/contrib/zlib/win32/
+!assets/**/*.obj

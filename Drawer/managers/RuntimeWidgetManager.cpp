@@ -62,6 +62,8 @@ namespace rn {
     
     void RuntimeWidgetManager::FromJson(const nlohmann::json& json) {
         widgets_.clear();
+        widgets_by_id_.clear();
+        connections_.clear();
 
         if (!json.contains("widgets") || !json["widgets"].is_array()) {
             return;        
@@ -100,14 +102,15 @@ namespace rn {
             for (auto& widget : widgets_) {
                 for (auto& connection : connections_) {
                 if (connection.from.widget_id == widget->GetId()) {
-                    Widget* target_widget = widgets_by_id_[connection.to.widget_id];
+                    auto target_it = widgets_by_id_.find(connection.to.widget_id);
+                    Widget* target_widget = target_it != widgets_by_id_.end() ? target_it->second : nullptr;
 
                     if (target_widget) {
                         // Сохраняем лямбду, которая вызывает метод OnInput у target_widget
-                        widget->from_port_callbacks_[connection.from.port] =
-                            [target_widget](const std::string from_widget_id, std::string from_port, const std::vector<WidgetValue>& data) {
-                            target_widget->OnInput(from_widget_id, from_port, data);
-                            };
+                        widget->AddPortCallback(connection.from.port,
+                            [target_widget](const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& data) {
+                                target_widget->OnInput(from_widget_id, from_port, data);
+                            });
                     }
                 }
                 }

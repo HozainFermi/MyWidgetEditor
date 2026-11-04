@@ -117,13 +117,26 @@ namespace rn {
             EnumWindows(EnumWindowsProc, (LPARAM)&workerw);
 
             // Если WorkerW найден — встраиваемся В него
-            if (workerw != NULL) {
-                SetParent(hwnd, workerw);
-            }
-            else {
-                // Если не нашли, используем запасной вариант (Progman)
-                SetParent(hwnd, progman);
-            }
+            HWND parent = workerw != NULL ? workerw : progman; // запасной вариант - Progman
+            SetParent(hwnd, parent);
+
+            // После SetParent координаты окна считаются от родителя (левый верхний угол всего
+            // виртуального экрана), а не от монитора. Без этого окно остаётся там, где его
+            // создал GLFW, и по краям видно обои.
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+            int monitor_x = 0, monitor_y = 0;
+            glfwGetMonitorPos(monitor, &monitor_x, &monitor_y);
+            POINT origin{ monitor_x, monitor_y };
+            ScreenToClient(parent, &origin);
+            SetWindowPos(hwnd, NULL, origin.x, origin.y, mode->width, mode->height,
+                SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        }
+        else if (props.full_screen) {
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            int monitor_x = 0, monitor_y = 0;
+            glfwGetMonitorPos(monitor, &monitor_x, &monitor_y);
+            glfwSetWindowPos(window, monitor_x, monitor_y);
         }
         if (props.always_on_bottom) {
             //HWND hwnd = glfwGetWin32Window(window);

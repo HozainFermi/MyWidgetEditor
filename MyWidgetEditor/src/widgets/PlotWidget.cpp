@@ -1,6 +1,7 @@
 #include "PlotWidget.h"
 #include <imgui_internal.h>
 #include <implot/implot.h>
+#include <imgui_stdlib.h>
 
 
 
@@ -85,10 +86,6 @@ namespace wg {
 
     void PlotWidget::RenderProperties()
     {
-        static char plot_name_buf[128];
-        static char x_label_buf[128];
-        static char y_label_buf[128];
-        
         const char* plot_names[] = { "LinePlot", "FilledLinePlot", "ScatterPlot", "BubblePlot","PieChart","RealTimePlot","CandleStickChart"};
 
         ImGui::Text("PlotWidget");
@@ -114,59 +111,47 @@ namespace wg {
             ImGui::EndCombo();
         }
 
-        ImGui::SetNextItemWidth(60);
-        if(ImGui::InputText("Plot name", plot_name_buf, (sizeof(plot_name_buf)) ) ) {
-            plot_name_ = plot_name_buf;
-        }
-        ImGui::SetNextItemWidth(60);
-        if (ImGui::InputText("X axis lable", x_label_buf, (sizeof(x_label_buf)))) {
-            x_plot_label_ = x_label_buf;
-        }
-        ImGui::SameLine();        ;
-        ImGui::SetNextItemWidth(60);
-        if (ImGui::InputText("Y axis lable", y_label_buf, (sizeof(y_label_buf)))) {
-            y_plot_label_ = y_label_buf;
-        }
+        // Поля привязаны напрямую к строкам виджета: раньше static-буферы были общими
+        // для всех графиков и показывали значения предыдущего выбранного виджета
+        const float field_width = ImGui::GetContentRegionAvail().x * 0.6f;
+        ImGui::SetNextItemWidth(field_width);
+        ImGui::InputText("Plot name", &plot_name_);
+        ImGui::SetNextItemWidth(field_width);
+        ImGui::InputText("X axis label", &x_plot_label_);
+        ImGui::SetNextItemWidth(field_width);
+        ImGui::InputText("Y axis label", &y_plot_label_);
 
-        // Настройки графиков
+        ImGui::Spacing();
         ImGui::Text("Charts:");
+        ImGui::SameLine();
+        ImGui::TextDisabled("(title / x key / y key)");
+
         for (size_t i = 0; i < chart_configs_.size(); i++) {
-
-            char titile_buf[128];
-            char x_column_buf[128];
-            char y_column_buf[128];
-            
-            strncpy_s(titile_buf, chart_configs_[i].title_column.c_str(), sizeof(titile_buf));
-            strncpy_s(x_column_buf, chart_configs_[i].x_column.c_str(), sizeof(x_column_buf));
-            strncpy_s(y_column_buf, chart_configs_[i].y_column.c_str(), sizeof(y_column_buf));
-            
             ImGui::PushID((int)i);
-
             ImGui::Text("Chart %d:", (int)i + 1);
-            ImGui::SetNextItemWidth(50);           
-            if (ImGui::InputText("##title_column", titile_buf, sizeof(titile_buf))) {
-                chart_configs_[i].title_column= titile_buf;
-            }
 
-            //ImGui::DragFloat("##width", &columns_[i].width, 1.0f, 20.0f, 500.0f);
+            // Три поля делят ширину панели, кнопка удаления справа
+            const float spacing = ImGui::GetStyle().ItemSpacing.x;
+            const float remove_width = ImGui::CalcTextSize("Remove").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+            const float column_width = ImMax(60.0f, (ImGui::GetContentRegionAvail().x - remove_width - spacing * 3.0f) / 3.0f);
+
+            ImGui::SetNextItemWidth(column_width);
+            ImGui::InputTextWithHint("##title_column", "title", &chart_configs_[i].title_column);
             ImGui::SameLine();
-            ImGui::SetNextItemWidth(50);
-            if (ImGui::InputText("##x_column", x_column_buf, sizeof(x_column_buf))) {
-                chart_configs_[i].x_column = x_column_buf;
-            }
+            ImGui::SetNextItemWidth(column_width);
+            ImGui::InputTextWithHint("##x_column", "x key", &chart_configs_[i].x_column);
             ImGui::SameLine();
-            ImGui::SetNextItemWidth(50);
-            if (ImGui::InputText("##y_column", y_column_buf, sizeof(y_column_buf))) {
-                chart_configs_[i].y_column = y_column_buf;
-            }
+            ImGui::SetNextItemWidth(column_width);
+            ImGui::InputTextWithHint("##y_column", "y key", &chart_configs_[i].y_column);
 
             ImGui::SameLine();
-            if (ImGui::Button("Remove")) {                
-                chart_configs_.erase(chart_configs_.begin() + i);
-                i--; // Уменьшаем индекс после удаления
-            }
-
+            bool remove = ImGui::Button("Remove");
             ImGui::PopID();
+
+            if (remove) {
+                chart_configs_.erase(chart_configs_.begin() + i);
+                i--;
+            }
         }
 
         if (ImGui::Button("Add chart")) {            

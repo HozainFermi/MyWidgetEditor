@@ -121,7 +121,11 @@ int main(int, char**)
     // Setup Dear ImGui style
     ApplyObsLikeImGuiStyle(main_scale);
       
-    io.Fonts->AddFontDefault();
+    // Основной шрифт с кириллицей. ImGui 1.92 растеризует его под нужный размер и DPI, поэтому он не мылится
+    std::string mainFontPath = std::string(ASSETS_SOURCE_DIR) + "/fonts/Roboto-Medium.ttf";
+    if (!io.Fonts->AddFontFromFileTTF(mainFontPath.c_str(), 15.0f)) {
+        io.Fonts->AddFontDefault();
+    }
     ImFontConfig config;
     config.MergeMode = true;
     config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced 

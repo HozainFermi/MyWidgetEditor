@@ -26,7 +26,7 @@ namespace wg {
 
         void DeleteWidget(const std::string& id);
         void DeleteWidget(int index);
-        void ClearAll() { widgets_.clear(); widgets_by_id_.clear(); };
+        void ClearAll() { widgets_.clear(); widgets_by_id_.clear(); connections_.clear(); };
         void BringToFront(const std::string& id) {
             
             auto it = std::find_if(widgets_.begin(), widgets_.end(),
