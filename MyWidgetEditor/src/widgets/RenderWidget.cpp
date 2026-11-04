@@ -44,7 +44,7 @@ namespace wg {
 								 static_cast<unsigned int>(widget_size.y));
 
 	
-		// Ðåíäåðèì ñöåíó â FBO
+		// Ð ÐµÐ½Ð´ÐµÑ€Ð¸Ð¼ ÑÑ†ÐµÐ½Ñƒ Ð² FBO
 		glBindFramebuffer(GL_FRAMEBUFFER, scene_.FBO);
 		glViewport(0, 0, (GLsizei)widget_size.x, (GLsizei)widget_size.y);
 
@@ -209,7 +209,7 @@ namespace wg {
 	void RenderWidget::FromJson(const nlohmann::json& json)
 	{
 		Widget::FromJson(json);
-		// value() âìåñòî operator[]: ó const json operator[] íà îòñóòñòâóþùèé êëþ÷ - UB
+		// value() Ð²Ð¼ÐµÑÑ‚Ð¾ operator[]: Ñƒ const json operator[] Ð½Ð° Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÐ»ÑŽÑ‡ - UB
 		auto camera_json = json.value("camera", nlohmann::json::object());
 		scene_.camera_->Position.x = camera_json.value("x", 0.0f);
 		scene_.camera_->Position.y = camera_json.value("y", 0.0f);

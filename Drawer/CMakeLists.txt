@@ -77,7 +77,8 @@ target_compile_definitions(Drawer PRIVATE
      ASSETS_SOURCE_DIR="${PARENT_DIR}/assets"
 )
 
-# 
+target_compile_options(Drawer PRIVATE ${PROJECT_UTF8_FLAG})
+
 target_link_libraries(Drawer PRIVATE 
      "${GLFW_DIR}/lib-vc2022/glfw3.lib" 
     opengl32

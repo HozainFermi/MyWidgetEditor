@@ -57,7 +57,7 @@ namespace wg {
 
     void WidgetManager::DeleteWidget(const std::string& id) {
 
-        // Удаляем все связи виджета, а не только первую
+        // РЈРґР°Р»СЏРµРј РІСЃРµ СЃРІСЏР·Рё РІРёРґР¶РµС‚Р°, Р° РЅРµ С‚РѕР»СЊРєРѕ РїРµСЂРІСѓСЋ
         connections_.erase(
             std::remove_if(connections_.begin(), connections_.end(), [&id](const Connection& p) {
                 return p.from.widget_id == id || p.to.widget_id == id;
@@ -172,17 +172,17 @@ namespace wg {
        }
        
         for (const auto& widget_json : json["widgets"]) {
-            // Пробуем создать виджет через фабрику
+            // РџСЂРѕР±СѓРµРј СЃРѕР·РґР°С‚СЊ РІРёРґР¶РµС‚ С‡РµСЂРµР· С„Р°Р±СЂРёРєСѓ
             std::unique_ptr<Widget> widget = WidgetFactory::CreateFromJson(widget_json);            
             if (widget) {                           
-                // Виджет уже создан и FromJson 
+                // Р’РёРґР¶РµС‚ СѓР¶Рµ СЃРѕР·РґР°РЅ Рё FromJson 
                 widget.get()->FromJson(widget_json);
                 widgets_by_id_[widget.get()->GetId()] = widget.get();
                 widgets_.push_back(std::move(widget));
 
             }
             else {
-                std::cout << "Фабрика не смогла создать (старый формат или не зарегистрирован)";
+                std::cout << "Р¤Р°Р±СЂРёРєР° РЅРµ СЃРјРѕРіР»Р° СЃРѕР·РґР°С‚СЊ (СЃС‚Р°СЂС‹Р№ С„РѕСЂРјР°С‚ РёР»Рё РЅРµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ)";
                 
             }
         }

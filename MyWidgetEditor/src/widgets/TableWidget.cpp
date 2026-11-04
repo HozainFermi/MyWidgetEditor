@@ -7,10 +7,10 @@ namespace wg {
     REGISTER_WIDGET(TableWidget);
 
     TableWidget::TableWidget() :
-        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // Больший размер по умолчанию
+        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // Р‘РѕР»СЊС€РёР№ СЂР°Р·РјРµСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable;
 
-        // Инициализируем тестовые колонки для превью
+        // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј С‚РµСЃС‚РѕРІС‹Рµ РєРѕР»РѕРЅРєРё РґР»СЏ РїСЂРµРІСЊСЋ
         columns_.push_back(TableColumnConfig{ "ID","id",50, true });
         columns_.push_back(TableColumnConfig{ "Name","name",150, true });
         columns_.push_back(TableColumnConfig{ "Value", "value", 100, false });
@@ -19,10 +19,10 @@ namespace wg {
     }
     //ImGuiTableFlags_SizingFixedFit
     TableWidget::TableWidget(const std::string& name, const ImVec2& pos) :
-        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // Больший размер по умолчанию
+        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // Р‘РѕР»СЊС€РёР№ СЂР°Р·РјРµСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg| ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable;
 
-        // Инициализируем тестовые колонки для превью
+        // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј С‚РµСЃС‚РѕРІС‹Рµ РєРѕР»РѕРЅРєРё РґР»СЏ РїСЂРµРІСЊСЋ
         columns_.push_back(TableColumnConfig{ "ID", "id", 50, true });
         columns_.push_back(TableColumnConfig{ "Name", "name", 150, true });
         columns_.push_back(TableColumnConfig{ "Value", "value", 100, false });
@@ -44,32 +44,32 @@ namespace wg {
         ImVec2 size = ImVec2(screen_max.x - screen_min.x -10,
             screen_max.y - screen_min.y-10);
         ImVec2 pos = ImVec2(screen_min.x+5, screen_min.y+5);
-        // Ограничиваем область таблицы
+        // РћРіСЂР°РЅРёС‡РёРІР°РµРј РѕР±Р»Р°СЃС‚СЊ С‚Р°Р±Р»РёС†С‹
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
 
-        // Используем окно без заголовка для ограничения области
+        // РСЃРїРѕР»СЊР·СѓРµРј РѕРєРЅРѕ Р±РµР· Р·Р°РіРѕР»РѕРІРєР° РґР»СЏ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ РѕР±Р»Р°СЃС‚Рё
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
        
 
         if (ImGui::BeginChild(("##table_child_" + GetId()).c_str(),
             size,
-            false, // No border (мы сами рисуем)
+            false, // No border (РјС‹ СЃР°РјРё СЂРёСЃСѓРµРј)
             ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_AlwaysUseWindowPadding)) {
 
-            // Получаем доступную область внутри окна
+            // РџРѕР»СѓС‡Р°РµРј РґРѕСЃС‚СѓРїРЅСѓСЋ РѕР±Р»Р°СЃС‚СЊ РІРЅСѓС‚СЂРё РѕРєРЅР°
             ImVec2 content_size = ImGui::GetContentRegionAvail();
            
-            // Создаём таблицу
+            // РЎРѕР·РґР°С‘Рј С‚Р°Р±Р»РёС†Сѓ
             if (ImGui::BeginTable(("##table_" + GetId()).c_str(),
                 (int)columns_.size(),
                 flags_,
                 content_size)) {
                
-                // Устанавливаем заголовки колонок
+                // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·Р°РіРѕР»РѕРІРєРё РєРѕР»РѕРЅРѕРє
                 for (const auto& col : columns_) {
                     ImGui::TableSetupColumn(col.header.c_str(),
                         col.sortable ? ImGuiTableColumnFlags_None :
@@ -77,18 +77,18 @@ namespace wg {
                         0.0f);                }
 
                 if (show_headers_) {
-                    ImGui::TableSetupScrollFreeze(0, 1); // Заголовок фиксирован при скролле
+                    ImGui::TableSetupScrollFreeze(0, 1); // Р—Р°РіРѕР»РѕРІРѕРє С„РёРєСЃРёСЂРѕРІР°РЅ РїСЂРё СЃРєСЂРѕР»Р»Рµ
                     ImGui::TableHeadersRow();
                 }
 
                 static char buf[32];                       
-                // Тестовые данные для превью в редакторе
+                // РўРµСЃС‚РѕРІС‹Рµ РґР°РЅРЅС‹Рµ РґР»СЏ РїСЂРµРІСЊСЋ РІ СЂРµРґР°РєС‚РѕСЂРµ
                 for (int row = 0; row < 5; row++) {
                     ImGui::TableNextRow();
 
                     for (int col = 0; col < (int)columns_.size(); col++) {
                         ImGui::TableSetColumnIndex(col);
-                        // Тестовые данные
+                        // РўРµСЃС‚РѕРІС‹Рµ РґР°РЅРЅС‹Рµ
                         if (col == 0) {
                             sprintf_s(buf, "ID_%d", row + 1);
                             ImGui::Selectable(buf, column_selected[col]);
@@ -115,7 +115,7 @@ namespace wg {
     }
 
     void TableWidget::RenderProperties() {
-        // Настройки таблицы
+        // РќР°СЃС‚СЂРѕР№РєРё С‚Р°Р±Р»РёС†С‹
         ImGui::Text("==Table Settings==");
         ImGui::Separator();
 
@@ -139,7 +139,7 @@ namespace wg {
 
         ImGui::Separator();
 
-        // Настройки колонок
+        // РќР°СЃС‚СЂРѕР№РєРё РєРѕР»РѕРЅРѕРє
         ImGui::Text("Columns:");
         for (size_t i = 0; i < columns_.size(); i++) {
             ImGui::PushID((int)i);
@@ -161,7 +161,7 @@ namespace wg {
             ImGui::SameLine();
             if (ImGui::Button("Remove")) {
                 RemoveColumn((int)i);
-                i--; // Уменьшаем индекс после удаления
+                i--; // РЈРјРµРЅСЊС€Р°РµРј РёРЅРґРµРєСЃ РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ
             }
 
             ImGui::PopID();
@@ -173,7 +173,7 @@ namespace wg {
 
         ImGui::Separator();
 
-        // Настройки источника данных
+        // РќР°СЃС‚СЂРѕР№РєРё РёСЃС‚РѕС‡РЅРёРєР° РґР°РЅРЅС‹С…
         ImGui::Text("Data Source:");
         const char* source_types[] = { "None", "CSV URL", "JSON URL", "CSV File", "JSON File", "Static Data" };
         int current_type = (int)data_source_type_;
@@ -189,7 +189,7 @@ namespace wg {
                 data_source_ = source_buf;
             }
 
-            // Настройки обновления
+            // РќР°СЃС‚СЂРѕР№РєРё РѕР±РЅРѕРІР»РµРЅРёСЏ
             const char* triggers[] = { "None", "Timer", "Button Click", "On Load" };
             int current_trigger = (int)update_trigger_;
             if (ImGui::Combo("Update Trigger", &current_trigger, triggers, IM_ARRAYSIZE(triggers))) {
@@ -229,32 +229,32 @@ namespace wg {
     nlohmann::json TableWidget::ToJson() const {
         auto json = Widget::ToJson();
 
-        // Колонки
+        // РљРѕР»РѕРЅРєРё
         nlohmann::json columns_json = nlohmann::json::array();
         for (const auto& col : columns_) {
             columns_json.push_back(col.ToJson());
         }
         json["columns"] = columns_json;
 
-        // Источник данных
+        // РСЃС‚РѕС‡РЅРёРє РґР°РЅРЅС‹С…
         json["data_source_type"] = (int)data_source_type_;
         json["data_source"] = data_source_;
         json["update_trigger"] = (int)update_trigger_;
         json["update_interval"] = update_interval_;
 
-        // Настройки таблицы
+        // РќР°СЃС‚СЂРѕР№РєРё С‚Р°Р±Р»РёС†С‹
         json["flags"] = flags_;
         json["show_headers"] = show_headers_;
         json["show_borders"] = show_borders_;
         json["alternate_row_colors"] = alternate_row_colors_;
         json["max_display_rows"] = max_display_rows_;
 
-        // Статические данные (если есть)
+        // РЎС‚Р°С‚РёС‡РµСЃРєРёРµ РґР°РЅРЅС‹Рµ (РµСЃР»Рё РµСЃС‚СЊ)
         if (!static_data_.empty()) {
             json["static_data"] = static_data_;
         }
 
-        // HTTP настройки
+        // HTTP РЅР°СЃС‚СЂРѕР№РєРё
         if (!api_key_.empty()) {
             json["api_key"] = api_key_;
         }
@@ -268,7 +268,7 @@ namespace wg {
     void TableWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);
 
-        // Колонки
+        // РљРѕР»РѕРЅРєРё
         if (json.contains("columns") && json["columns"].is_array()) {
             columns_.clear();
             for (const auto& col_json : json["columns"]) {
@@ -278,7 +278,7 @@ namespace wg {
             }
         }
 
-        // Источник данных
+        // РСЃС‚РѕС‡РЅРёРє РґР°РЅРЅС‹С…
         if (json.contains("data_source_type")) {
             data_source_type_ = (DataSourceType)json["data_source_type"].get<int>();
         }
@@ -292,7 +292,7 @@ namespace wg {
             update_interval_ = json["update_interval"].get<int>();
         }
 
-        // Настройки таблицы
+        // РќР°СЃС‚СЂРѕР№РєРё С‚Р°Р±Р»РёС†С‹
         if (json.contains("flags")) {
             flags_ = json["flags"].get<int>();
         }
@@ -309,7 +309,7 @@ namespace wg {
             max_display_rows_ = json["max_display_rows"].get<int>();
         }
 
-        // Статические данные
+        // РЎС‚Р°С‚РёС‡РµСЃРєРёРµ РґР°РЅРЅС‹Рµ
         if (json.contains("static_data") && json["static_data"].is_array()) {
             static_data_.clear();
             for (const auto& row_json : json["static_data"]) {
@@ -321,7 +321,7 @@ namespace wg {
             }
         }
 
-        // HTTP настройки
+        // HTTP РЅР°СЃС‚СЂРѕР№РєРё
         if (json.contains("api_key")) {
             api_key_ = json["api_key"].get<std::string>();
         }
@@ -331,7 +331,7 @@ namespace wg {
     }
 
     void TableWidget::GeneratePreviewData() {
-        // Генерируем тестовые данные для превью
+        // Р“РµРЅРµСЂРёСЂСѓРµРј С‚РµСЃС‚РѕРІС‹Рµ РґР°РЅРЅС‹Рµ РґР»СЏ РїСЂРµРІСЊСЋ
         static_data_.clear();
         for (int i = 0; i < 5; i++) {
             std::vector<std::string> row;

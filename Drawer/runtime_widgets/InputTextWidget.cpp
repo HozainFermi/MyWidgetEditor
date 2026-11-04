@@ -22,12 +22,12 @@ namespace rn {
 
     bool InputTextWidget::UpdateInteraction(int widget_id) {
 
-        // Вызываем базовую логику для остальных случаев
+        // Р’С‹Р·С‹РІР°РµРј Р±Р°Р·РѕРІСѓСЋ Р»РѕРіРёРєСѓ РґР»СЏ РѕСЃС‚Р°Р»СЊРЅС‹С… СЃР»СѓС‡Р°РµРІ
         return Widget::UpdateInteraction(widget_id);
     }
 
     void InputTextWidget::Render(ImDrawList* draw_list) {
-        // Вызываем базовую отрисовку (фон, рамка, имя)
+        // Р’С‹Р·С‹РІР°РµРј Р±Р°Р·РѕРІСѓСЋ РѕС‚СЂРёСЃРѕРІРєСѓ (С„РѕРЅ, СЂР°РјРєР°, РёРјСЏ)
         Widget::Render(draw_list);
 
     }
@@ -37,10 +37,10 @@ namespace rn {
         ImVec2 size = ImVec2(screen_max.x - screen_min.x,
             screen_max.y - screen_min.y);
 
-        ImVec2 text_input_size = ImVec2(size.x * 0.8f,  // 80% ширины виджета
-            size.y * 0.80f); // 80% высоты
+        ImVec2 text_input_size = ImVec2(size.x * 0.8f,  // 80% С€РёСЂРёРЅС‹ РІРёРґР¶РµС‚Р°
+            size.y * 0.80f); // 80% РІС‹СЃРѕС‚С‹
 
-        // Центрируем
+        // Р¦РµРЅС‚СЂРёСЂСѓРµРј
         ImVec2 input_pos = ImVec2(
             screen_min.x + (size.x - text_input_size.x) * 0.5f,
             screen_min.y + (size.y - text_input_size.y) * 1.5f
@@ -52,7 +52,7 @@ namespace rn {
             ImGuiWindowFlags_NoDecoration);
         //|ImGuiWindowFlags_NoScrollbar
 
-        // Центрируем текст внутри InputText
+        // Р¦РµРЅС‚СЂРёСЂСѓРµРј С‚РµРєСЃС‚ РІРЅСѓС‚СЂРё InputText
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 10));
 
         if (ImGui::InputTextMultiline("##input", &buffer_,

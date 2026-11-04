@@ -24,15 +24,15 @@ namespace wg {
     };
 
     enum class UpdateTrigger {
-        NONE,          // Только ручное
+        NONE,          // РўРѕР»СЊРєРѕ СЂСѓС‡РЅРѕРµ
         TIMER,
         BUTTON_CLICK,
         ON_LOAD
     };
 
     struct TableColumnConfig {
-        std::string header;      // Имя столбца в ImGui
-        std::string data_field;  // Поле в JSON/CSV
+        std::string header;      // РРјСЏ СЃС‚РѕР»Р±С†Р° РІ ImGui
+        std::string data_field;  // РџРѕР»Рµ РІ JSON/CSV
         float width = 100.0f;
         bool sortable = false;
 
@@ -55,30 +55,30 @@ namespace wg {
 
     class TableWidget : public Widget {
     private:
-        // === КОНФИГУРАЦИЯ (сохраняется в JSON) ===
+        // === РљРћРќР¤РР“РЈР РђР¦РРЇ (СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РІ JSON) ===
         std::vector<TableColumnConfig> columns_;
         DataSourceType data_source_type_ = DataSourceType::NONE;
-        std::string data_source_;  // URL или путь к файлу
+        std::string data_source_;  // URL РёР»Рё РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
         UpdateTrigger update_trigger_ = UpdateTrigger::NONE;
         int update_interval_ = 5;  // seconds (TIMER)
 
-        // Статические данные (если источник STATIC_DATA)
+        // РЎС‚Р°С‚РёС‡РµСЃРєРёРµ РґР°РЅРЅС‹Рµ (РµСЃР»Рё РёСЃС‚РѕС‡РЅРёРє STATIC_DATA)
         std::vector<std::vector<std::string>> static_data_;
 
-        // Настройки таблицы
+        // РќР°СЃС‚СЂРѕР№РєРё С‚Р°Р±Р»РёС†С‹
         ImGuiTableFlags flags_;
         bool show_headers_ = true;
         bool show_borders_ = true;
         bool alternate_row_colors_ = true;
-        int max_display_rows_ = 100;  // Ограничение для производительности
+        int max_display_rows_ = 100;  // РћРіСЂР°РЅРёС‡РµРЅРёРµ РґР»СЏ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё
         bool column_selected[3] = {};
 
-        // Стиль (сериализуется)
+        // РЎС‚РёР»СЊ (СЃРµСЂРёР°Р»РёР·СѓРµС‚СЃСЏ)
         ImU32 header_bg_color_ = IM_COL32(60, 60, 80, 255);
         ImU32 row_bg_color_ = IM_COL32(40, 40, 50, 200);
         ImU32 alternate_row_bg_color_ = IM_COL32(50, 50, 60, 200);
 
-        // HTTP настройки (если URL)
+        // HTTP РЅР°СЃС‚СЂРѕР№РєРё (РµСЃР»Рё URL)
         std::string api_key_;
         std::map<std::string, std::string> custom_headers_;
 
@@ -91,7 +91,7 @@ namespace wg {
        
         void RenderProperties();
 
-        // === КОНФИГУРАЦИОННЫЕ МЕТОДЫ ===
+        // === РљРћРќР¤РР“РЈР РђР¦РРћРќРќР«Р• РњР•РўРћР”Р« ===
         void AddColumn(const std::string& header, float width = 100.0f,
             const std::string& data_field = "");
         void RemoveColumn(int index);
@@ -105,25 +105,25 @@ namespace wg {
             custom_headers_[key] = value;
         }
 
-        // === ГЕТТЕРЫ (для UI редактора) ===
+        // === Р“Р•РўРўР•Р Р« (РґР»СЏ UI СЂРµРґР°РєС‚РѕСЂР°) ===
         const std::vector<TableColumnConfig>& GetColumns() const { return columns_; }
         DataSourceType GetDataSourceType() const { return data_source_type_; }
         const std::string& GetDataSource() const { return data_source_; }
         UpdateTrigger GetUpdateTrigger() const { return update_trigger_; }
         float GetUpdateInterval() const { return update_interval_; }
 
-         //== порты ==
+         //== РїРѕСЂС‚С‹ ==
         std::vector<PortDesc> GetInputPorts() const override;
         std::vector<PortDesc> GetOutputPorts() const override;
 
-        // === СЕРИАЛИЗАЦИЯ ===
+        // === РЎР•Р РРђР›РР—РђР¦РРЇ ===
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;
 
         
 
     private:
-        // Генерируем тестовые данные для превью в редакторе
+        // Р“РµРЅРµСЂРёСЂСѓРµРј С‚РµСЃС‚РѕРІС‹Рµ РґР°РЅРЅС‹Рµ РґР»СЏ РїСЂРµРІСЊСЋ РІ СЂРµРґР°РєС‚РѕСЂРµ
         void GeneratePreviewData();
         
     };

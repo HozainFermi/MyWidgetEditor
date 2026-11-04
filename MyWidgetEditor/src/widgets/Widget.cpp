@@ -11,7 +11,7 @@ namespace wg {
         : name_("Unnamed"), position_(0, 0), size_(100, 50) {
         //static int next_id = 0;
         id_ = "widget_" + std::to_string(next_id_++);
-        widget_class_ = "Widget";  // Базовый класс
+        widget_class_ = "Widget";  // Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ
     }
 
     Widget::Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size)
@@ -54,20 +54,20 @@ namespace wg {
 
         bool changed = false;
 
-        // Всегда обновляем состояние ховера
+        // Р’СЃРµРіРґР° РѕР±РЅРѕРІР»СЏРµРј СЃРѕСЃС‚РѕСЏРЅРёРµ С…РѕРІРµСЂР°
         is_hovered_ = screen_rect.Contains(mouse_pos);
         
-        // Проверяем ховер над ручками (только если выделен)
+        // РџСЂРѕРІРµСЂСЏРµРј С…РѕРІРµСЂ РЅР°Рґ СЂСѓС‡РєР°РјРё (С‚РѕР»СЊРєРѕ РµСЃР»Рё РІС‹РґРµР»РµРЅ)
         ResizeHandle hovered_handle = ResizeHandle::NONE;
         if (is_selected_) {
             hovered_handle = GetHoveredHandle(mouse_pos, screen_rect);
         }
 
-        // Обрабатываем клик (если не заняты другие элементы)
+        // РћР±СЂР°Р±Р°С‚С‹РІР°РµРј РєР»РёРє (РµСЃР»Рё РЅРµ Р·Р°РЅСЏС‚С‹ РґСЂСѓРіРёРµ СЌР»РµРјРµРЅС‚С‹)
         //&& !ImGui::IsAnyItemActive()
         if (ImGui::IsMouseClicked(0) )  {
             if (hovered_handle != ResizeHandle::NONE) {
-                // Начинаем ресайз
+                // РќР°С‡РёРЅР°РµРј СЂРµСЃР°Р№Р·
                 is_resizing_ = true;
                 active_handle_ = hovered_handle;
                 resize_start_size_ = size_;
@@ -75,7 +75,7 @@ namespace wg {
                 changed = true;
             }
             else if (is_hovered_) {
-                // Начинаем перетаскивание
+                // РќР°С‡РёРЅР°РµРј РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµ
                 is_dragging_ = true;
                 drag_offset_ = ImVec2(
                     mouse_pos.x - screen_rect.Min.x,
@@ -91,7 +91,7 @@ namespace wg {
                 SetSelected(true);
             }
             else if (is_selected_ && !stay_selected_) {
-                // Клик вне виджета - снимаем выделение
+                // РљР»РёРє РІРЅРµ РІРёРґР¶РµС‚Р° - СЃРЅРёРјР°РµРј РІС‹РґРµР»РµРЅРёРµ
                 SetSelected(false);
                 stay_selected_ = false;
                 changed = true;
@@ -101,7 +101,7 @@ namespace wg {
             }*/
         }
 
-        // Обрабатываем ПРОДОЛЖЕНИЕ операций        
+        // РћР±СЂР°Р±Р°С‚С‹РІР°РµРј РџР РћР”РћР›Р–Р•РќРР• РѕРїРµСЂР°С†РёР№        
         if (is_dragging_ && ImGui::IsMouseDragging(0) && IsWidgetInCanvas(canvas_p0, canvas_size,screen_rect)) {
             position_ = ImVec2(
                 mouse_pos.x - canvas_p0.x - drag_offset_.x,
@@ -116,7 +116,7 @@ namespace wg {
             }
         }
 
-        // Завершаем операции при отпускании мыши
+        // Р—Р°РІРµСЂС€Р°РµРј РѕРїРµСЂР°С†РёРё РїСЂРё РѕС‚РїСѓСЃРєР°РЅРёРё РјС‹С€Рё
         if (ImGui::IsMouseReleased(0)) {
             is_dragging_ = false;
             is_resizing_ = false;
@@ -130,23 +130,23 @@ namespace wg {
     void Widget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
         ImRect rect = GetScreenRect(canvas_p0);
 
-        // Фон
+        // Р¤РѕРЅ
         draw_list->AddRectFilled(rect.Min, rect.Max, bg_color_);
 
-        // Общие элементы (рамка, ручки)
+        // РћР±С‰РёРµ СЌР»РµРјРµРЅС‚С‹ (СЂР°РјРєР°, СЂСѓС‡РєРё)
         DrawCommonElements(draw_list, rect);
 
-        // Имя виджета в углу
+        // РРјСЏ РІРёРґР¶РµС‚Р° РІ СѓРіР»Сѓ
         ImVec2 text_pos = ImVec2(rect.Min.x + 5, rect.Min.y + 5);
         draw_list->AddText(text_pos, text_color_, name_.c_str());
     }
 
     void Widget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
-        // Базовый виджет не имеет содержимого
-        // Переопределяется в потомках
+        // Р‘Р°Р·РѕРІС‹Р№ РІРёРґР¶РµС‚ РЅРµ РёРјРµРµС‚ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ
+        // РџРµСЂРµРѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РІ РїРѕС‚РѕРјРєР°С…
     }
 
-    //Общие элементы (рамка, ручки)
+    //РћР±С‰РёРµ СЌР»РµРјРµРЅС‚С‹ (СЂР°РјРєР°, СЂСѓС‡РєРё)
     void Widget::DrawCommonElements(ImDrawList* draw_list, const ImRect& rect) {
         if (IsSelected()) {
             draw_list->AddRect(rect.Min, rect.Max, selected_border_color_, 0.0f, 0, 2.0f);
@@ -156,7 +156,7 @@ namespace wg {
         }
         
 
-        // Рисуем ручки ресайза
+        // Р РёСЃСѓРµРј СЂСѓС‡РєРё СЂРµСЃР°Р№Р·Р°
         const float handle_size = 4.0f;
         ImVec2 handles[8] = {
             rect.Min,                                                 // TOP_LEFT
@@ -209,11 +209,11 @@ namespace wg {
                 handle_pos.x + handle_size, handle_pos.y + handle_size);
 
             if (handle_rect.Contains(mouse_pos)) {
-                return static_cast<ResizeHandle>(i + 1);  // Возвращаем ручку
+                return static_cast<ResizeHandle>(i + 1);  // Р’РѕР·РІСЂР°С‰Р°РµРј СЂСѓС‡РєСѓ
             }
         }
 
-        return ResizeHandle::NONE;  // Важно: всегда возвращаем значение!
+        return ResizeHandle::NONE;  // Р’Р°Р¶РЅРѕ: РІСЃРµРіРґР° РІРѕР·РІСЂР°С‰Р°РµРј Р·РЅР°С‡РµРЅРёРµ!
     }
 
     bool Widget::ProcessResizing(const ImVec2& canvas_p0, const ImVec2& mouse_pos, bool proportional) {
@@ -221,7 +221,7 @@ namespace wg {
         ImVec2 delta = ImGui::GetMouseDragDelta(0);
         ImVec2 new_size = resize_start_size_;
 
-        // Пропорциональное масштабирование при зажатом Shift
+        // РџСЂРѕРїРѕСЂС†РёРѕРЅР°Р»СЊРЅРѕРµ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ РїСЂРё Р·Р°Р¶Р°С‚РѕРј Shift
         
         switch (active_handle_) {
         case ResizeHandle(1):
@@ -258,7 +258,7 @@ namespace wg {
             break;
         }
 
-        // Минимальный размер
+        // РњРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
         new_size.x = ImMax(new_size.x, 10.0f);
         new_size.y = ImMax(new_size.y, 10.0f);
         ImRect widget {position_.x,position_.y,position_.x+size_.x,position_.y+size_.y};

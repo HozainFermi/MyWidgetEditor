@@ -15,10 +15,10 @@ namespace wg {
         int selected_widget_index_ = -1;
 
     public:
-        // === Соединения ===
+        // === РЎРѕРµРґРёРЅРµРЅРёСЏ ===
         std::vector<Connection> connections_;
 
-        // Добавляет связь, если такой ещё нет. Возвращает false для дубликата
+        // Р”РѕР±Р°РІР»СЏРµС‚ СЃРІСЏР·СЊ, РµСЃР»Рё С‚Р°РєРѕР№ РµС‰С‘ РЅРµС‚. Р’РѕР·РІСЂР°С‰Р°РµС‚ false РґР»СЏ РґСѓР±Р»РёРєР°С‚Р°
         bool AddConnection(const Connection& connection) {
             for (const auto& existing : connections_) {
                 if (SameConnection(existing, connection)) {
@@ -29,7 +29,7 @@ namespace wg {
             return true;
         }
 
-        // Добавляет виджет в менеджер
+        // Р”РѕР±Р°РІР»СЏРµС‚ РІРёРґР¶РµС‚ РІ РјРµРЅРµРґР¶РµСЂ
         void AddWidget(std::unique_ptr<Widget> widget) {            
             widgets_by_id_[widget.get()->GetId()] = widget.get();
             widgets_.push_back(std::move(widget));
@@ -53,18 +53,18 @@ namespace wg {
             }
         }
 
-        // === Селекция ===
+        // === РЎРµР»РµРєС†РёСЏ ===
         void SelectWidget(const std::string& id);
         void SelectWidget(int index);
         void DeselectAll();
         Widget* GetSelectedWidget();
 
-        // === Обновление и отрисовка ===
+        // === РћР±РЅРѕРІР»РµРЅРёРµ Рё РѕС‚СЂРёСЃРѕРІРєР° ===
         void UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size);
         void RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0);
         void RenderContentAll(const ImVec2& canvas_p0);
 
-        // === Доступ к виджетам ===
+        // === Р”РѕСЃС‚СѓРї Рє РІРёРґР¶РµС‚Р°Рј ===
         size_t GetCount() const { return widgets_.size(); };
         Widget* GetWidget(int index) const { return widgets_[index].get(); };
         Widget* GetWidget(const std::string& id) {
@@ -85,7 +85,7 @@ namespace wg {
             return result;
         };
 
-        // === Сериализация ===
+        // === РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ ===
         nlohmann::json ToJson(const wg::RuntimeWindowProperties& mw_props) const;
         void FromJson(const nlohmann::json& json, wg::RuntimeWindowProperties& mw_props);
         void SaveToFile(const std::string& filename, const wg::RuntimeWindowProperties& w_props) const;

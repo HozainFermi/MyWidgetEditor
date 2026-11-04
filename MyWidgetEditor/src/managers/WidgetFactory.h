@@ -11,9 +11,9 @@ namespace wg {
 
     class WidgetFactory {
     private:
-        // Два типа creator'ов:
-        // CreatorFromJson - создаёт из JSON (знает о FromJson)
-        // CreatorWithName - создаёт с именем и позицией
+        // Р”РІР° С‚РёРїР° creator'РѕРІ:
+        // CreatorFromJson - СЃРѕР·РґР°С‘С‚ РёР· JSON (Р·РЅР°РµС‚ Рѕ FromJson)
+        // CreatorWithName - СЃРѕР·РґР°С‘С‚ СЃ РёРјРµРЅРµРј Рё РїРѕР·РёС†РёРµР№
         using CreatorFromJson = std::function<std::unique_ptr<Widget>(const nlohmann::json&)>;
         using CreatorWithName = std::function<std::unique_ptr<Widget>(const std::string&, const ImVec2&)>;
 
@@ -28,15 +28,15 @@ namespace wg {
         }
 
     public:
-        // Регистрация класса виджета
+        // Р РµРіРёСЃС‚СЂР°С†РёСЏ РєР»Р°СЃСЃР° РІРёРґР¶РµС‚Р°
         template<typename T>
         static bool RegisterWidget(const std::string& type_name) {
-            // Регистрируем создание из JSON
+            // Р РµРіРёСЃС‚СЂРёСЂСѓРµРј СЃРѕР·РґР°РЅРёРµ РёР· JSON
             GetJsonCreators()[type_name] = [](const nlohmann::json& json) -> std::unique_ptr<Widget> {                                       
                 return std::make_unique<T>();
                 };
 
-            // Регистрируем создание с именем и позицией
+            // Р РµРіРёСЃС‚СЂРёСЂСѓРµРј СЃРѕР·РґР°РЅРёРµ СЃ РёРјРµРЅРµРј Рё РїРѕР·РёС†РёРµР№
             GetNameCreators()[type_name] = [](const std::string& name, const ImVec2& pos) -> std::unique_ptr<Widget> {                
                 return std::make_unique<T>(name, pos);
                 };
@@ -44,7 +44,7 @@ namespace wg {
             return true;
         }
 
-        // Создание из JSON
+        // РЎРѕР·РґР°РЅРёРµ РёР· JSON
         static std::unique_ptr<Widget> CreateFromJson(const nlohmann::json& json) {
             std::string type = json.value("widget_class", "");           
             auto& creators = GetJsonCreators();           
@@ -52,12 +52,12 @@ namespace wg {
           
             if (it != creators.end()) {
                 
-                return it->second(json);  // Вызываем creator
+                return it->second(json);  // Р’С‹Р·С‹РІР°РµРј creator
             }
             return nullptr;
         }
 
-        // Создание с именем и позицией
+        // РЎРѕР·РґР°РЅРёРµ СЃ РёРјРµРЅРµРј Рё РїРѕР·РёС†РёРµР№
         static std::unique_ptr<Widget> CreateWithName(const std::string& type_name,
             const std::string& name,
             const ImVec2& pos) {
@@ -70,7 +70,7 @@ namespace wg {
             return nullptr;
         }
 
-        // Получить список типов
+        // РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє С‚РёРїРѕРІ
         static std::vector<std::string> GetRegisteredTypes() {
             std::vector<std::string> types;
             for (const auto& pair : GetJsonCreators()) {

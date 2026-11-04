@@ -21,11 +21,11 @@ namespace wg {
     }
 
     void TextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
-        // Вызываем базовую отрисовку (фон, рамка, имя)
+        // Р’С‹Р·С‹РІР°РµРј Р±Р°Р·РѕРІСѓСЋ РѕС‚СЂРёСЃРѕРІРєСѓ (С„РѕРЅ, СЂР°РјРєР°, РёРјСЏ)
         Widget::Render(draw_list, canvas_p0);
         
 
-        // Отрисовываем текст
+        // РћС‚СЂРёСЃРѕРІС‹РІР°РµРј С‚РµРєСЃС‚
         ImVec2 screen_max = GetScreenMax(canvas_p0);
         ImVec2 screen_min = GetScreenMin(canvas_p0);
         //screen_max.x*0.5f-text_.length()*0.1f*0.5f, screen_max.y*0.5f
@@ -44,7 +44,7 @@ namespace wg {
             return;
         }
 
-        // Размер считаем по тексту без тегов, иначе центрирование уезжает
+        // Р Р°Р·РјРµСЂ СЃС‡РёС‚Р°РµРј РїРѕ С‚РµРєСЃС‚Сѓ Р±РµР· С‚РµРіРѕРІ, РёРЅР°С‡Рµ С†РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ СѓРµР·Р¶Р°РµС‚
         std::string plain_text;
         for (const auto& segment : parse_result_) { plain_text += segment.content; }
         ImVec2 text_size = font->CalcTextSizeA(font_size, FLT_MAX, wrap_width,
@@ -94,7 +94,7 @@ namespace wg {
             float char_width = font->CalcTextSizeA(font_size, FLT_MAX, 0.0f, text_ptr, next_ptr).x;
             if (bold) { char_width += 1.0f; }
 
-            // Перенос считаем от начала строки, а не от начала сегмента
+            // РџРµСЂРµРЅРѕСЃ СЃС‡РёС‚Р°РµРј РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё, Р° РЅРµ РѕС‚ РЅР°С‡Р°Р»Р° СЃРµРіРјРµРЅС‚Р°
             if (wrap_width > 0.0f && pen.x > line_start_x && (pen.x + char_width) > (line_start_x + wrap_width)) {
                 pen.x = line_start_x;
                 pen.y += font_size;
@@ -117,11 +117,11 @@ namespace wg {
             int vtx_start = draw_list->VtxBuffer.Size;
             draw_list->AddText(font, font_size, draw_pos, col, text_ptr, next_ptr);
             if (bold) {
-                // Псевдо-жирный: рисуем символ второй раз со сдвигом на пиксель
+                // РџСЃРµРІРґРѕ-Р¶РёСЂРЅС‹Р№: СЂРёСЃСѓРµРј СЃРёРјРІРѕР» РІС‚РѕСЂРѕР№ СЂР°Р· СЃРѕ СЃРґРІРёРіРѕРј РЅР° РїРёРєСЃРµР»СЊ
                 draw_list->AddText(font, font_size, ImVec2(draw_pos.x + 1.0f, draw_pos.y), col, text_ptr, next_ptr);
             }
             if (italic) {
-                // Псевдо-курсив: наклоняем вершины символа относительно базовой линии
+                // РџСЃРµРІРґРѕ-РєСѓСЂСЃРёРІ: РЅР°РєР»РѕРЅСЏРµРј РІРµСЂС€РёРЅС‹ СЃРёРјРІРѕР»Р° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ Р±Р°Р·РѕРІРѕР№ Р»РёРЅРёРё
                 float baseline_y = draw_pos.y + font_size;
                 for (int v = vtx_start; v < draw_list->VtxBuffer.Size; ++v) {
                     ImDrawVert& vert = draw_list->VtxBuffer[v];
@@ -140,8 +140,8 @@ namespace wg {
 
 
     void TextWidget::RenderContent(ImVec2& screen_min, ImVec2& screen_max) {
-        // Для текстового виджета не нужно ImGui содержимое
-        // Всё рисуется через DrawList
+        // Р”Р»СЏ С‚РµРєСЃС‚РѕРІРѕРіРѕ РІРёРґР¶РµС‚Р° РЅРµ РЅСѓР¶РЅРѕ ImGui СЃРѕРґРµСЂР¶РёРјРѕРµ
+        // Р’СЃС‘ СЂРёСЃСѓРµС‚СЃСЏ С‡РµСЂРµР· DrawList
 
     }
     

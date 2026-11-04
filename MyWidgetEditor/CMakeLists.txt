@@ -131,6 +131,8 @@ target_include_directories(MyWidgetEditor PRIVATE
     ${BB_DIR}
 )
 
+target_compile_options(MyWidgetEditor PRIVATE ${PROJECT_UTF8_FLAG})
+
 target_link_libraries(MyWidgetEditor PRIVATE 
     "${GLFW_DIR}/lib-vc2022/glfw3.lib"     
     opengl32

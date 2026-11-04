@@ -23,12 +23,12 @@ private:
     
     std::vector<Process> processes_;
 
-    // связи
+    // СЃРІСЏР·Рё
     std::vector<PortVisual> port_visuals_;
     bool is_dragging_connection_ = false;
     PortRef drag_from_port_;
    
-    // Состояние редактора
+    // РЎРѕСЃС‚РѕСЏРЅРёРµ СЂРµРґР°РєС‚РѕСЂР°
     ImVec2 canvas_p0_;
     ImVec2 canvas_size_;
     bool show_grid_ = true;
@@ -136,7 +136,7 @@ public:
             filtered_files_ = all_files_;
         }
         else {
-            // Регистронезависимый поиск
+            // Р РµРіРёСЃС‚СЂРѕРЅРµР·Р°РІРёСЃРёРјС‹Р№ РїРѕРёСЃРє
             std::string query_lower = search_query_;
             std::transform(query_lower.begin(), query_lower.end(),
                 query_lower.begin(), ::tolower);
@@ -166,7 +166,7 @@ public:
         return filtered_files_;
     }
 
-    // Callback для ImGui InputText
+    // Callback РґР»СЏ ImGui InputText
     static int SearchCallback(ImGuiInputTextCallbackData* data) {
         auto editor = Editor::Get();
 
@@ -192,20 +192,20 @@ private:
     void RenderCanvas();
     void RenderWindowProperties();
     
-    // Обработка событий канваса
+    // РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РєР°РЅРІР°СЃР°
     void HandleCanvasInteraction();
 
-    // Вспомогательные методы
+    // Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹
     ImVec2 GetMousePosRelativeToCanvas() const;
     void DrawGrid(ImDrawList* draw_list) const;
     void RenderConnections(ImDrawList* draw_list);
     void RenderPortsAndHandleConnections(ImDrawList* draw_list);
 
-    // Сохранение/загрузка конфигурации с учётом connections_
+    // РЎРѕС…СЂР°РЅРµРЅРёРµ/Р·Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЃ СѓС‡С‘С‚РѕРј connections_
     void SaveConfigWithConnections(const std::string& filename);
 
     void CheckFileMenuHotKeys();
 
-    // Создание виджетов
+    // РЎРѕР·РґР°РЅРёРµ РІРёРґР¶РµС‚РѕРІ
     void CreateWidgetFromTemplate(const std::string& type, const ImVec2& position);
 };

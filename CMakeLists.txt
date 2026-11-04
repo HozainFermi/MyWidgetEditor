@@ -46,6 +46,11 @@ set(ASSIMP_NO_EXPORT           ON  CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ASSIMP_TOOLS  OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_SAMPLES       OFF CACHE BOOL "" FORCE)
 
+# Все исходники проекта в UTF-8. Сторонние библиотеки этот флаг не получают
+if(MSVC)
+    set(PROJECT_UTF8_FLAG /utf-8)
+endif()
+
 # Подключаем подпроекты
 add_subdirectory(${ASSIMP_DIR} assimp_build)
 add_subdirectory(MyWidgetEditor)

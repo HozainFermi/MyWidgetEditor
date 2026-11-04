@@ -11,8 +11,8 @@ namespace rn {
 
     class RuntimeWidgetFactory {
     private:
-        // Два типа creator ов:
-        // CreatorFromJson - создаёт из JSON (знает о FromJson)
+        // Р”РІР° С‚РёРїР° creator РѕРІ:
+        // CreatorFromJson - СЃРѕР·РґР°С‘С‚ РёР· JSON (Р·РЅР°РµС‚ Рѕ FromJson)
         
         using CreatorFromJson = std::function<std::unique_ptr<Widget>(const nlohmann::json&)>;       
 
@@ -24,10 +24,10 @@ namespace rn {
 
     public:
 
-        // Регистрация класса виджета
+        // Р РµРіРёСЃС‚СЂР°С†РёСЏ РєР»Р°СЃСЃР° РІРёРґР¶РµС‚Р°
         template<typename T>
         static bool RegisterWidget(const std::string& type_name) {
-            // Регистрируем создание из JSON
+            // Р РµРіРёСЃС‚СЂРёСЂСѓРµРј СЃРѕР·РґР°РЅРёРµ РёР· JSON
             GetJsonCreators()[type_name] = [](const nlohmann::json& json) -> std::unique_ptr<Widget> {
                 return std::make_unique<T>();
                 };
@@ -35,7 +35,7 @@ namespace rn {
             return true;
         }
 
-        // Создание из JSON
+        // РЎРѕР·РґР°РЅРёРµ РёР· JSON
         static std::unique_ptr<Widget> CreateFromJson(const nlohmann::json& json) {
             std::string type = json.value("widget_class", "");
             std::cout << type;
@@ -43,13 +43,13 @@ namespace rn {
             auto& creators = GetJsonCreators();
             auto it = creators.find(type);
             if (it != creators.end()) {
-                return it->second(json);  // Вызываем creator
+                return it->second(json);  // Р’С‹Р·С‹РІР°РµРј creator
             }
 
             return nullptr;
         }
 
-        // Получить список типов
+        // РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє С‚РёРїРѕРІ
         static std::vector<std::string> GetRegisteredTypes() {
             std::vector<std::string> types;
             for (const auto& pair : GetJsonCreators()) {

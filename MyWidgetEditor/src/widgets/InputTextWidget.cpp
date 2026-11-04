@@ -22,12 +22,12 @@ namespace wg {
 
     bool InputTextWidget::UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id) {
         
-        // Вызываем базовую логику для остальных случаев
+        // Р’С‹Р·С‹РІР°РµРј Р±Р°Р·РѕРІСѓСЋ Р»РѕРіРёРєСѓ РґР»СЏ РѕСЃС‚Р°Р»СЊРЅС‹С… СЃР»СѓС‡Р°РµРІ
         return Widget::UpdateInteraction(canvas_p0, canvas_size, widget_id);
     }
 
     void InputTextWidget::Render(ImDrawList* draw_list, const ImVec2& canvas_p0) {
-        // Вызываем базовую отрисовку (фон, рамка, имя)
+        // Р’С‹Р·С‹РІР°РµРј Р±Р°Р·РѕРІСѓСЋ РѕС‚СЂРёСЃРѕРІРєСѓ (С„РѕРЅ, СЂР°РјРєР°, РёРјСЏ)
         Widget::Render(draw_list, canvas_p0);
         
     }
@@ -37,10 +37,10 @@ namespace wg {
         ImVec2 size = ImVec2(screen_max.x - screen_min.x,
             screen_max.y - screen_min.y);
         
-        ImVec2 text_input_size = ImVec2(size.x * 0.8f,  // 80% ширины виджета
-            size.y * 0.80f); // 80% высоты
+        ImVec2 text_input_size = ImVec2(size.x * 0.8f,  // 80% С€РёСЂРёРЅС‹ РІРёРґР¶РµС‚Р°
+            size.y * 0.80f); // 80% РІС‹СЃРѕС‚С‹
 
-        // Центрируем
+        // Р¦РµРЅС‚СЂРёСЂСѓРµРј
         ImVec2 input_pos = ImVec2(
             screen_min.x + (size.x - text_input_size.x) * 0.5f,
             screen_min.y + (size.y - text_input_size.y) * 1.5f
@@ -52,7 +52,7 @@ namespace wg {
             ImGuiWindowFlags_NoDecoration );
         //|ImGuiWindowFlags_NoScrollbar
         
-        // Центрируем текст внутри InputText
+        // Р¦РµРЅС‚СЂРёСЂСѓРµРј С‚РµРєСЃС‚ РІРЅСѓС‚СЂРё InputText
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 10));       
 
         if (ImGui::InputTextMultiline("##input", &buffer_,
@@ -67,14 +67,14 @@ namespace wg {
     void InputTextWidget::DrawHeader(ImDrawList* draw_list, const ImVec2& screen_min) {
         ImVec2 header_max = ImVec2(screen_min.x + size_.x-2, screen_min.y + 20);
         ImVec2 header_min = ImVec2(screen_min.x + 2, screen_min.y + 2);
-        // Фон заголовка
+        // Р¤РѕРЅ Р·Р°РіРѕР»РѕРІРєР°
         draw_list->AddRectFilled(header_min, header_max, IM_COL32(60, 60, 100, 255));
 
-        // Текст заголовка
+        // РўРµРєСЃС‚ Р·Р°РіРѕР»РѕРІРєР°
         draw_list->AddText(ImVec2(screen_min.x + 5, screen_min.y + 2),
             text_color_, label_.c_str());
 
-        // Индикатор перетаскивания
+        // РРЅРґРёРєР°С‚РѕСЂ РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёСЏ
         if (is_hovered_) {
             draw_list->AddText(ImVec2(header_max.x - 45, screen_min.y + 2),
                 IM_COL32(200, 200, 200, 255), "? drag");
@@ -82,7 +82,7 @@ namespace wg {
     }
 
     bool InputTextWidget::ShouldBlockDrag() const {
-        // Не перетаскиваем если InputText активен или ховерен
+        // РќРµ РїРµСЂРµС‚Р°СЃРєРёРІР°РµРј РµСЃР»Рё InputText Р°РєС‚РёРІРµРЅ РёР»Рё С…РѕРІРµСЂРµРЅ
         return ImGui::IsItemActive() || ImGui::IsItemHovered();
     }
 

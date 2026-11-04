@@ -72,9 +72,9 @@ namespace Helpers {
 
         std::string line;
         while (std::getline(file, line)) {
-            // Проверяем, что строка не пустая и не содержит только пробелы
+            // РџСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ СЃС‚СЂРѕРєР° РЅРµ РїСѓСЃС‚Р°СЏ Рё РЅРµ СЃРѕРґРµСЂР¶РёС‚ С‚РѕР»СЊРєРѕ РїСЂРѕР±РµР»С‹
             if (line.empty() || std::all_of(line.begin(), line.end(), ::isspace)) {
-                continue; // Пропускаем пустые строки
+                continue; // РџСЂРѕРїСѓСЃРєР°РµРј РїСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё
             }
 
             std::istringstream iss(line);
@@ -82,7 +82,7 @@ namespace Helpers {
 
             while (std::getline(iss, token, ',')) {
                 try {
-                    // Удаляем пробелы вокруг числа
+                    // РЈРґР°Р»СЏРµРј РїСЂРѕР±РµР»С‹ РІРѕРєСЂСѓРі С‡РёСЃР»Р°
                     token.erase(std::remove_if(token.begin(), token.end(), ::isspace), token.end());
 
                     if (!token.empty()) {
@@ -93,7 +93,7 @@ namespace Helpers {
                 catch (const std::exception& e) {
                     std::cerr << "Warning: Cannot parse float from token: " << token
                         << " in line: " << line << std::endl;
-                    // Можно выбрасывать исключение или игнорировать
+                    // РњРѕР¶РЅРѕ РІС‹Р±СЂР°СЃС‹РІР°С‚СЊ РёСЃРєР»СЋС‡РµРЅРёРµ РёР»Рё РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ
                 }
             }
         }

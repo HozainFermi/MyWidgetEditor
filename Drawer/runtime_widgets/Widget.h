@@ -9,15 +9,15 @@
 #include <RuntimeWindowProperties.h>
 
 namespace rn {
-    // Примитивный тип данных между виджетами (JSON как универсальный контейнер)
-    // Строка в таблице
+    // РџСЂРёРјРёС‚РёРІРЅС‹Р№ С‚РёРї РґР°РЅРЅС‹С… РјРµР¶РґСѓ РІРёРґР¶РµС‚Р°РјРё (JSON РєР°Рє СѓРЅРёРІРµСЂСЃР°Р»СЊРЅС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ)
+    // РЎС‚СЂРѕРєР° РІ С‚Р°Р±Р»РёС†Рµ
     using WidgetValue = nlohmann::json;
 
 
     struct PortDesc {
-        std::string name;   // внутреннее имя порта
-        std::string label;  // отображаемое имя
-        std::string type;   // произвольный строковый тип ("event","table","number"...)
+        std::string name;   // РІРЅСѓС‚СЂРµРЅРЅРµРµ РёРјСЏ РїРѕСЂС‚Р°
+        std::string label;  // РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕРµ РёРјСЏ
+        std::string type;   // РїСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ СЃС‚СЂРѕРєРѕРІС‹Р№ С‚РёРї ("event","table","number"...)
         bool is_input = true;
     };
 
@@ -43,29 +43,29 @@ namespace rn {
         WidgetType type_;
         std::string widget_class_ = "None";
 
-        ImVec2 position_;     // Левый верхний угол относительно канваса (локальные координаты в канвасе)
-        ImVec2 size_;          // Ширина и высота
+        ImVec2 position_;     // Р›РµРІС‹Р№ РІРµСЂС…РЅРёР№ СѓРіРѕР» РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєР°РЅРІР°СЃР° (Р»РѕРєР°Р»СЊРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РєР°РЅРІР°СЃРµ)
+        ImVec2 size_;          // РЁРёСЂРёРЅР° Рё РІС‹СЃРѕС‚Р°
 
-        //состояние
+        //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅСЃРѕСЃС‚РѕСЏРЅРёРµ
         bool is_dragging_ = false;
         bool is_resizing_ = false;
         bool is_hovered_ = false;
         bool is_selected_ = false;
         bool stay_selected_ = false;
 
-        //стили
+        //пїЅпїЅпїЅпїЅСЃС‚РёР»Рё
         ImU32 bg_color_ = IM_COL32(40, 40, 80, 255);
         ImU32 border_color_ = IM_COL32(100, 100, 100, 255);
         ImU32 selected_border_color_ = IM_COL32(199, 197, 135, 255);
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
         float border_thickness_ = 2.0f;        
 
-        // для ресайза
+        //пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅРґР»СЏ СЂРµСЃР°Р№Р·Р°
         ImVec2 drag_offset_;
         ImVec2 resize_start_size_;
         ImVec2 resize_start_pos_;
 
-        // минимальные размеры
+        //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅРјРёРЅРёРјР°Р»СЊРЅС‹Рµ СЂР°Р·РјРµСЂС‹
         float min_width_ = 30.0f;
         float min_height_ = 20.0f;
 
@@ -76,30 +76,30 @@ namespace rn {
 
         RuntimeWindowProperties* window_props;
 
-        // Обработка взаимодействия
+        // РћР±СЂР°Р±РѕС‚РєР° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ
         virtual bool UpdateInteraction(int widget_id);
-        // Отрисовка
+        // РћС‚СЂРёСЃРѕРІРєР°
         virtual void Render(ImDrawList* draw_list);
         virtual void RenderContent(ImVec2& screen_min, ImVec2& screen_max);
 
 
-        // === События ===
+        // === РЎРѕР±С‹С‚РёСЏ ===
         virtual void OnSelected() {}
         virtual void OnDeselected() {}
         virtual void OnValueChanged() {}
         virtual void OnClick() {}
 
-        // == Порты и пайплайн (по умолчанию отсутствуют) ==
-        //В коллбеке находится ссылка на OnInput связанного виджета
+        // == РџРѕСЂС‚С‹ Рё РїР°Р№РїР»Р°Р№РЅ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚) ==
+        //Р’ РєРѕР»Р»Р±РµРєРµ РЅР°С…РѕРґРёС‚СЃСЏ СЃСЃС‹Р»РєР° РЅР° OnInput СЃРІСЏР·Р°РЅРЅРѕРіРѕ РІРёРґР¶РµС‚Р°
         using EmitCallback = std::function<void(const std::string& widget_id, const std::string& port, const std::vector<WidgetValue>& value) > ;
-        // Для каждого выходного порта - список callback'ов (один порт может вести в несколько виджетов)
+        // Р”Р»СЏ РєР°Р¶РґРѕРіРѕ РІС‹С…РѕРґРЅРѕРіРѕ РїРѕСЂС‚Р° - СЃРїРёСЃРѕРє callback'РѕРІ (РѕРґРёРЅ РїРѕСЂС‚ РјРѕР¶РµС‚ РІРµСЃС‚Рё РІ РЅРµСЃРєРѕР»СЊРєРѕ РІРёРґР¶РµС‚РѕРІ)
         std::unordered_map<std::string, std::vector<EmitCallback>> from_port_callbacks_;
         virtual std::vector<PortDesc> GetInputPorts() const { return {}; }
         virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
         virtual void OnInput(const std::string& from_widget_id, const std::string& from_port, const std::vector<WidgetValue>& value) {}
 
        
-        // Установить callback для конкретного порта
+        // РЈСЃС‚Р°РЅРѕРІРёС‚СЊ callback РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїРѕСЂС‚Р°
         void AddPortCallback(const std::string& port, EmitCallback cb) {
             from_port_callbacks_[port].push_back(std::move(cb));
         }
@@ -108,7 +108,7 @@ namespace rn {
             from_port_callbacks_.erase(port);
         }
 
-        // Отправляет данные во все виджеты, подключённые к порту
+        // РћС‚РїСЂР°РІР»СЏРµС‚ РґР°РЅРЅС‹Рµ РІРѕ РІСЃРµ РІРёРґР¶РµС‚С‹, РїРѕРґРєР»СЋС‡С‘РЅРЅС‹Рµ Рє РїРѕСЂС‚Сѓ
         void Emit(const std::string& from_port, const std::vector<WidgetValue>& value) {
             auto it = from_port_callbacks_.find(from_port);
             if (it == from_port_callbacks_.end()) {
@@ -122,10 +122,10 @@ namespace rn {
         }
 
 
-        // === Сериализация ===    
+        // === РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ ===    
         virtual void FromJson(const nlohmann::json& json);
 
-        // === Геттеры/Сеттеры ===
+        // === Р“РµС‚С‚РµСЂС‹/РЎРµС‚С‚РµСЂС‹ ===
         const std::string& GetId() const { return id_; }
         const std::string& GetName() const { return name_; }
         WidgetType GetType() const { return type_; }
@@ -148,7 +148,7 @@ namespace rn {
         bool IsStaySelected() const { return stay_selected_; }
         void SetStaySelected(bool stay_selected) { stay_selected_ = stay_selected; }
 
-        // === Вспомогательные методы ===
+        // === Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹ ===
         std::string TypeToString(WidgetType type) {
             switch (type) {
             case WidgetType::TEXT: return "TEXT";
@@ -169,12 +169,12 @@ namespace rn {
         
 
     protected:
-        // Внутренние методы для обработки
+        // Р’РЅСѓС‚СЂРµРЅРЅРёРµ РјРµС‚РѕРґС‹ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё
         bool ProcessDragging(const ImVec2& mouse_pos);
         bool ProcessResizing(const ImVec2& mouse_pos, bool proportional);
         void DrawCommonElements(ImDrawList* draw_list, const ImRect& screen_rect);
 
-        //  
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         //ImRect GetScreenRect(const ImVec2& canvas_p0) { return ImRect(canvas_p0.x + position_.x, canvas_p0.y + position_.y, canvas_p0.x + position_.x + size_.x, canvas_p0.y + position_.y + size_.y); };
 
     private:

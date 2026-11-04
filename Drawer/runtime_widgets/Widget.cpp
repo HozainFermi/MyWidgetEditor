@@ -10,7 +10,7 @@ namespace rn {
         : name_("Unnamed"), position_(0, 0), size_(100, 50) {
         //static int next_id = 0;
         id_ = "widget_" + std::to_string(next_id_++);
-        widget_class_ = "Widget";  // Базовый класс
+        widget_class_ = "Widget";  // Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ
     }
 
     Widget::Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size)

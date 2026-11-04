@@ -23,7 +23,7 @@ namespace rn {
         };
         std::vector<Connection> connections_;
 
-        // Старые конфиги могли содержать дубли - они вызвали бы OnInput дважды
+        // РЎС‚Р°СЂС‹Рµ РєРѕРЅС„РёРіРё РјРѕРіР»Рё СЃРѕРґРµСЂР¶Р°С‚СЊ РґСѓР±Р»Рё - РѕРЅРё РІС‹Р·РІР°Р»Рё Р±С‹ OnInput РґРІР°Р¶РґС‹
         void AddConnectionUnique(const Connection& c) {
             for (const auto& e : connections_) {
                 if (e.from.port == c.from.port && e.from.widget_id == c.from.widget_id &&
@@ -51,7 +51,7 @@ namespace rn {
         void operator=(const RuntimeWidgetManager&&) = delete;
 
 
-        // === Управление виджетами ===
+        // === РЈРїСЂР°РІР»РµРЅРёРµ РІРёРґР¶РµС‚Р°РјРё ===
         //template<typename T, typename... Args>
         //T* CreateWidget(Args&&... args) {
         //    auto widget = std::make_unique<T>(std::forward<Args>(args)...);
@@ -61,7 +61,7 @@ namespace rn {
         //    return ptr;
         //}
 
-        // Добавляет виджет в менеджер
+        // Р”РѕР±Р°РІР»СЏРµС‚ РІРёРґР¶РµС‚ РІ РјРµРЅРµРґР¶РµСЂ
         void AddWidget(std::unique_ptr<Widget> widget) {
             widgets_.push_back(std::move(widget));
         }
@@ -84,18 +84,18 @@ namespace rn {
             }
         }
 
-        // === Селекция ===
+        // === РЎРµР»РµРєС†РёСЏ ===
         void SelectWidget(const std::string& id);
         void SelectWidget(int index);
         void DeselectAll();
         Widget* GetSelectedWidget() const;
 
-        // === Обновление и отрисовка ===
+        // === РћР±РЅРѕРІР»РµРЅРёРµ Рё РѕС‚СЂРёСЃРѕРІРєР° ===
         void UpdateAll();
         void RenderAll(ImDrawList* draw_list);
         void RenderContentAll();
 
-        // === Доступ к виджетам ===
+        // === Р”РѕСЃС‚СѓРї Рє РІРёРґР¶РµС‚Р°Рј ===
         size_t GetCount() const { return widgets_.size(); };
         Widget* GetWidget(int index) const { return widgets_[index].get(); };
         Widget* GetWidget(const std::string& id) {
@@ -116,7 +116,7 @@ namespace rn {
             return result;
         };
 
-        // === Сериализация ===       
+        // === РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ ===       
         void FromJson(const nlohmann::json& json);
         void WindowPropsFromJson(const std::string& filename);
         void LoadFromFile(const std::string& filename);

@@ -30,13 +30,13 @@ namespace wg {
         CUSTOM
     };
 
-    // Примитивный тип данных между виджетами (JSON как универсальный контейнер)
+    // РџСЂРёРјРёС‚РёРІРЅС‹Р№ С‚РёРї РґР°РЅРЅС‹С… РјРµР¶РґСѓ РІРёРґР¶РµС‚Р°РјРё (JSON РєР°Рє СѓРЅРёРІРµСЂСЃР°Р»СЊРЅС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ)
     using WidgetValue = nlohmann::json;
 
     struct PortDesc {
-        std::string name;   // внутреннее имя порта
-        std::string label;  // отображаемое имя
-        std::string type;   // произвольный строковый тип ("event","table","number"...)
+        std::string name;   // РІРЅСѓС‚СЂРµРЅРЅРµРµ РёРјСЏ РїРѕСЂС‚Р°
+        std::string label;  // РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕРµ РёРјСЏ
+        std::string type;   // РїСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ СЃС‚СЂРѕРєРѕРІС‹Р№ С‚РёРї ("event","table","number"...)
         bool is_input = true;
     };
 
@@ -47,10 +47,10 @@ namespace wg {
         WidgetType type_;
         std::string widget_class_="None";
 
-        ImVec2 position_;      // Левый верхний угол относительно канваса (локальные координаты в канвасе)
-        ImVec2 size_;          // Ширина и высота
+        ImVec2 position_;      // Р›РµРІС‹Р№ РІРµСЂС…РЅРёР№ СѓРіРѕР» РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєР°РЅРІР°СЃР° (Р»РѕРєР°Р»СЊРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РєР°РЅРІР°СЃРµ)
+        ImVec2 size_;          // РЁРёСЂРёРЅР° Рё РІС‹СЃРѕС‚Р°
 
-        // Состояние
+        // РЎРѕСЃС‚РѕСЏРЅРёРµ
         bool is_dragging_ = false;
         bool is_resizing_ = false;
         bool is_hovered_ = false;
@@ -58,19 +58,19 @@ namespace wg {
         bool stay_selected_ = false;
         ResizeHandle active_handle_ = ResizeHandle::NONE;
 
-        // Стиль
+        // РЎС‚РёР»СЊ
         ImU32 bg_color_ = IM_COL32(40, 40, 80, 255);
         ImU32 border_color_ = IM_COL32(100, 100, 100, 255);
         ImU32 selected_border_color_ = IM_COL32(199, 197, 135, 255);
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
         float border_thickness_ = 2.0f;
 
-        // Для ресайза
+        // Р”Р»СЏ СЂРµСЃР°Р№Р·Р°
         ImVec2 drag_offset_;
         ImVec2 resize_start_size_;
         ImVec2 resize_start_pos_;
 
-        // Минимальные размеры
+        // РњРёРЅРёРјР°Р»СЊРЅС‹Рµ СЂР°Р·РјРµСЂС‹
         float min_width_ = 30.0f;
         float min_height_ = 20.0f;
 
@@ -79,22 +79,22 @@ namespace wg {
         Widget(const std::string& name, WidgetType type, const ImVec2& pos, const ImVec2& size);
         virtual ~Widget() = default;
 
-        // Обработка взаимодействия (вместо HandleWidgetInteraction)
+        // РћР±СЂР°Р±РѕС‚РєР° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ (РІРјРµСЃС‚Рѕ HandleWidgetInteraction)
         virtual bool UpdateInteraction(const ImVec2& canvas_p0, const ImVec2& canvas_size, int widget_id);
-        // Отрисовка (вместо DrawWidget)
+        // РћС‚СЂРёСЃРѕРІРєР° (РІРјРµСЃС‚Рѕ DrawWidget)
         virtual void Render(ImDrawList* draw_list, const ImVec2& canvas_p0);
-        // Отрисовка содержимого (ImGui элементы)
+        // РћС‚СЂРёСЃРѕРІРєР° СЃРѕРґРµСЂР¶РёРјРѕРіРѕ (ImGui СЌР»РµРјРµРЅС‚С‹)
         virtual void RenderContent(ImVec2& screen_min, ImVec2& screen_max);
         virtual void RenderProperties() { ImGui::Text("Custom properties"); };
 
-        // === События ===
+        // === РЎРѕР±С‹С‚РёСЏ ===
         virtual void OnSelected() {}
         virtual void OnDeselected() {}
         virtual void OnValueChanged() {}
         virtual void OnClick() {}
 
-        // === Порты и пайплайн данных/событий ===
-        // По умолчанию виджет не имеет портов и игнорирует входы
+        // === РџРѕСЂС‚С‹ Рё РїР°Р№РїР»Р°Р№РЅ РґР°РЅРЅС‹С…/СЃРѕР±С‹С‚РёР№ ===
+        // РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РІРёРґР¶РµС‚ РЅРµ РёРјРµРµС‚ РїРѕСЂС‚РѕРІ Рё РёРіРЅРѕСЂРёСЂСѓРµС‚ РІС…РѕРґС‹
         virtual std::vector<PortDesc> GetInputPorts() const { return {}; }
         virtual std::vector<PortDesc> GetOutputPorts() const { return {}; }
 
@@ -108,11 +108,11 @@ namespace wg {
             }
         }
 
-        // === Сериализация ===
+        // === РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ ===
         virtual nlohmann::json ToJson() const;
         virtual void FromJson(const nlohmann::json& json);
 
-        // === Геттеры/Сеттеры ===
+        // === Р“РµС‚С‚РµСЂС‹/РЎРµС‚С‚РµСЂС‹ ===
         const std::string& GetId() const { return id_; }
         const std::string& GetName() const { return name_; }
         WidgetType GetType() const { return type_; }
@@ -136,7 +136,7 @@ namespace wg {
         void SetStaySelected(bool stay_selected) { stay_selected_ = stay_selected; }
         bool IsWidgetInCanvas(const ImVec2& canvas_p0, const ImVec2& canvas_size, ImRect& screen_rect);
 
-        // === Вспомогательные методы ===
+        // === Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹ ===
         bool ContainsPoint(const ImVec2& point, const ImVec2& canvas_p0) const;
         ResizeHandle GetHoveredHandle(const ImVec2& mouse_pos, const ImRect& screen_rect) const;
 
@@ -159,12 +159,12 @@ namespace wg {
         }
 
     protected:
-        // Внутренние методы для обработки
+        // Р’РЅСѓС‚СЂРµРЅРЅРёРµ РјРµС‚РѕРґС‹ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё
         bool ProcessDragging(const ImVec2& canvas_p0, const ImVec2& mouse_pos);
         bool ProcessResizing(const ImVec2& canvas_p0, const ImVec2& mouse_pos, bool proportional);
         void DrawCommonElements(ImDrawList* draw_list, const ImRect& screen_rect);
 
-        // Конвертация координат
+        // РљРѕРЅРІРµСЂС‚Р°С†РёСЏ РєРѕРѕСЂРґРёРЅР°С‚
         ImRect GetScreenRect(const ImVec2& canvas_p0) { return ImRect(canvas_p0.x+position_.x,canvas_p0.y+position_.y,canvas_p0.x+ position_.x+size_.x, canvas_p0.y + position_.y + size_.y); };
 
     private:

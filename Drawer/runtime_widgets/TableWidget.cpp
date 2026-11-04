@@ -6,10 +6,10 @@ namespace rn {
     REGISTER_WIDGET(TableWidget);
 
     TableWidget::TableWidget() :
-        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  //    
+        Widget("Unnamed", WidgetType::TABLE, ImVec2(20, 20), ImVec2(400, 300)) {  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
-        //     
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id",50.0f, true }, std::vector < std::string>{}));
         //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
         //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
@@ -18,10 +18,10 @@ namespace rn {
     }
 
     TableWidget::TableWidget(const std::string& name, const ImVec2& pos) :
-        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  //    
+        Widget(name, WidgetType::TABLE, pos, ImVec2(400, 300)) {  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         flags_ = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
-        //     
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
        //columns_.push_back(std::pair(TableColumnConfig{ "ID", "id", 50.0f,true }, std::vector < std::string>{}) );
        //columns_.push_back(std::pair(TableColumnConfig{ "Name", "name", 150.0f,true }, std::vector < std::string>{}));
        //columns_.push_back(std::pair(TableColumnConfig{ "Value", "value",100.0f, false }, std::vector < std::string>{}) );
@@ -48,11 +48,11 @@ namespace rn {
             Emit("data", rows_);
         }
 
-        // Ограничиваем область таблицы
+        // РћРіСЂР°РЅРёС‡РёРІР°РµРј РѕР±Р»Р°СЃС‚СЊ С‚Р°Р±Р»РёС†С‹
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
 
-        // Используем окно без заголовка для ограничения области
+        // РСЃРїРѕР»СЊР·СѓРµРј РѕРєРЅРѕ Р±РµР· Р·Р°РіРѕР»РѕРІРєР° РґР»СЏ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ РѕР±Р»Р°СЃС‚Рё
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 40, 200));
         if (update_trigger_!=UpdateTrigger::NONE) {
@@ -68,7 +68,7 @@ namespace rn {
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_AlwaysUseWindowPadding)) {
 
-            // Получаем доступную область внутри окна
+            // РџРѕР»СѓС‡Р°РµРј РґРѕСЃС‚СѓРїРЅСѓСЋ РѕР±Р»Р°СЃС‚СЊ РІРЅСѓС‚СЂРё РѕРєРЅР°
             ImVec2 content_size = ImGui::GetContentRegionAvail();
 
             std::lock_guard<std::mutex> lock(data_mutex_);
@@ -77,7 +77,7 @@ namespace rn {
                 flags_,
                 content_size)) {
 
-                // Устанавливаем заголовки колонок
+                // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·Р°РіРѕР»РѕРІРєРё РєРѕР»РѕРЅРѕРє
                 for (const auto& col : columns_) {
                     ImGui::TableSetupColumn(col.first.header.c_str(),
                         col.first.sortable ? ImGuiTableColumnFlags_None :
@@ -86,12 +86,12 @@ namespace rn {
                 }
 
                 if (show_headers_) {
-                    ImGui::TableSetupScrollFreeze(0, 1); // Заголовок фиксирован при скролле
+                    ImGui::TableSetupScrollFreeze(0, 1); // Р—Р°РіРѕР»РѕРІРѕРє С„РёРєСЃРёСЂРѕРІР°РЅ РїСЂРё СЃРєСЂРѕР»Р»Рµ
                     ImGui::TableHeadersRow();
                 }
 
                 static char buf[256];               
-                // Определяем реальное количество строк для отображения
+                // РћРїСЂРµРґРµР»СЏРµРј СЂРµР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
                 int rows_to_display = 0;
                 if (!columns_.empty() && !columns_[0].second.empty()) {
                     rows_to_display = std::min((int)columns_[0].second.size(), max_display_rows_);
@@ -206,7 +206,7 @@ namespace rn {
                         }
                         is_loading_ = false;
                     });
-                    // Отправляем данные дальше
+                    // РћС‚РїСЂР°РІР»СЏРµРј РґР°РЅРЅС‹Рµ РґР°Р»СЊС€Рµ
                     //Emit("data", rows_);
                 }
                 last_update_ = std::chrono::steady_clock::now();
@@ -302,7 +302,7 @@ namespace rn {
     void TableWidget::FromJson(const nlohmann::json& json) {
         Widget::FromJson(json);
 
-        // 
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (json.contains("columns") && json["columns"].is_array()) {
             columns_.clear();
             for (const auto& col_json : json["columns"]) {
@@ -312,7 +312,7 @@ namespace rn {
             }
         }
 
-        //  
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         if (json.contains("data_source_type")) {
             data_source_type_ = (DataSourceType)json["data_source_type"].get<int>();
         }
@@ -327,7 +327,7 @@ namespace rn {
             update_interval_millisec_= std::chrono::milliseconds{ update_interval_ * 1000 };
         }
 
-        //  
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (json.contains("flags")) {
             flags_ = json["flags"].get<int>();
         }
@@ -344,7 +344,7 @@ namespace rn {
             max_display_rows_ = json["max_display_rows"].get<int>();
         }
 
-        //  
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         if (json.contains("static_data") && json["static_data"].is_array()) {
             static_data_.clear();
             for (const auto& row_json : json["static_data"]) {
@@ -356,7 +356,7 @@ namespace rn {
             }
         }
 
-        // HTTP 
+        // HTTP пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (json.contains("api_key")) {
             api_key_ = json["api_key"].get<std::string>();
         }
@@ -370,7 +370,7 @@ namespace rn {
     //==Helper functions==
 
     void TableWidget::GenerateData() {
-        //     
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         static_data_.clear();
         for (int i = 0; i < 5; i++) {
             std::vector<std::string> row;

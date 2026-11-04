@@ -6,7 +6,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <shellapi.h> // для ShellExecute как альтернативы
+#include <shellapi.h> // РґР»СЏ ShellExecute РєР°Рє Р°Р»СЊС‚РµСЂРЅР°С‚РёРІС‹
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 #else
@@ -45,9 +45,9 @@ public:
     }
 
     /**
-     * @brief Запускает процесс полностью независимо от родительского
-     * @param command Полная командная строка (исполняемый файл + аргументы)
-     * @return true если процесс успешно запущен
+     * @brief Р—Р°РїСѓСЃРєР°РµС‚ РїСЂРѕС†РµСЃСЃ РїРѕР»РЅРѕСЃС‚СЊСЋ РЅРµР·Р°РІРёСЃРёРјРѕ РѕС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ
+     * @param command РџРѕР»РЅР°СЏ РєРѕРјР°РЅРґРЅР°СЏ СЃС‚СЂРѕРєР° (РёСЃРїРѕР»РЅСЏРµРјС‹Р№ С„Р°Р№Р» + Р°СЂРіСѓРјРµРЅС‚С‹)
+     * @return true РµСЃР»Рё РїСЂРѕС†РµСЃСЃ СѓСЃРїРµС€РЅРѕ Р·Р°РїСѓС‰РµРЅ
      */
 
 #ifdef _WIN32
@@ -60,10 +60,10 @@ public:
     }
 #endif
     /**
-     * @brief Запускает исполняемый файл с аргументами
-     * @param executablePath Путь к исполняемому файлу
-     * @param arguments Аргументы командной строки
-     * @return true если процесс успешно запущен
+     * @brief Р—Р°РїСѓСЃРєР°РµС‚ РёСЃРїРѕР»РЅСЏРµРјС‹Р№ С„Р°Р№Р» СЃ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
+     * @param executablePath РџСѓС‚СЊ Рє РёСЃРїРѕР»РЅСЏРµРјРѕРјСѓ С„Р°Р№Р»Сѓ
+     * @param arguments РђСЂРіСѓРјРµРЅС‚С‹ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
+     * @return true РµСЃР»Рё РїСЂРѕС†РµСЃСЃ СѓСЃРїРµС€РЅРѕ Р·Р°РїСѓС‰РµРЅ
      */
 #ifdef _WIN32
     static HANDLE launch(const std::string& executablePath, const std::string& arguments) {
@@ -84,30 +84,30 @@ private:
    static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
         HWND p = FindWindowEx(hwnd, NULL, "SHELLDLL_DefView", NULL);
         if (p != NULL) {
-            // Находим следующее окно после того, где лежат иконки
+            // РќР°С…РѕРґРёРј СЃР»РµРґСѓСЋС‰РµРµ РѕРєРЅРѕ РїРѕСЃР»Рµ С‚РѕРіРѕ, РіРґРµ Р»РµР¶Р°С‚ РёРєРѕРЅРєРё
             *(HWND*)lParam = FindWindowEx(NULL, hwnd, "WorkerW", NULL);
         }
         return TRUE;
     }
 
-    //Использование CreateProcess с правильными параметрами
+    //РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ CreateProcess СЃ РїСЂР°РІРёР»СЊРЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё
     static HANDLE launchWindows(const std::string& command) {
 
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         PROCESS_INFORMATION pi = { 0 };
 
-        // Создаем копию строки, так как CreateProcess требует изменяемую строку
+        // РЎРѕР·РґР°РµРј РєРѕРїРёСЋ СЃС‚СЂРѕРєРё, С‚Р°Рє РєР°Рє CreateProcess С‚СЂРµР±СѓРµС‚ РёР·РјРµРЅСЏРµРјСѓСЋ СЃС‚СЂРѕРєСѓ
         char* cmd = _strdup(command.c_str());
 
         bool success = CreateProcessA(
-            NULL,           // lpApplicationName - NULL, тогда используется lpCommandLine
-            cmd,            // lpCommandLine - командная строка
-            NULL,           // Атрибуты процесса
-            NULL,           // Атрибуты потока
-            FALSE,          // Наследование дескрипторов
-            CREATE_NEW_CONSOLE | DETACHED_PROCESS, // Флаги
-            NULL,           // Окружение
-            NULL,           // Текущий каталог
+            NULL,           // lpApplicationName - NULL, С‚РѕРіРґР° РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ lpCommandLine
+            cmd,            // lpCommandLine - РєРѕРјР°РЅРґРЅР°СЏ СЃС‚СЂРѕРєР°
+            NULL,           // РђС‚СЂРёР±СѓС‚С‹ РїСЂРѕС†РµСЃСЃР°
+            NULL,           // РђС‚СЂРёР±СѓС‚С‹ РїРѕС‚РѕРєР°
+            FALSE,          // РќР°СЃР»РµРґРѕРІР°РЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ
+            CREATE_NEW_CONSOLE | DETACHED_PROCESS, // Р¤Р»Р°РіРё
+            NULL,           // РћРєСЂСѓР¶РµРЅРёРµ
+            NULL,           // РўРµРєСѓС‰РёР№ РєР°С‚Р°Р»РѕРі
             &si,            // STARTUPINFO
             &pi             // PROCESS_INFORMATION
         );
@@ -123,7 +123,7 @@ private:
             DWORD error = GetLastError();
             std::cerr << "CreateProcess failed. Error " << error << ": ";
 
-            // Расшифровка ошибки
+            // Р Р°СЃС€РёС„СЂРѕРІРєР° РѕС€РёР±РєРё
             switch (error) {
             case 2: std::cerr << "ERROR_FILE_NOT_FOUND"; break;
             case 3: std::cerr << "ERROR_PATH_NOT_FOUND"; break;
@@ -139,7 +139,7 @@ private:
         }
     }
 
-    //Альтернативный способ через ShellExecute 
+    //РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Р№ СЃРїРѕСЃРѕР± С‡РµСЂРµР· ShellExecute 
     static HANDLE launchWindowsShellExA(const std::string& executablePath, const std::string& arguments) {
                 
         HANDLE handle{0};
@@ -168,7 +168,7 @@ private:
     static HANDLE LaunchWithExeWorkingDir(std::string exeQuotedOrNot, std::string argQuotedOrNot) {
         const std::string exe = StripOuterQuotes(exeQuotedOrNot);
                 
-        // рабочая директория = папка exe
+        // СЂР°Р±РѕС‡Р°СЏ РґРёСЂРµРєС‚РѕСЂРёСЏ = РїР°РїРєР° exe
         std::string workDir;
         const auto pos = exe.find_last_of("\\");
         if (pos != std::string::npos) {
@@ -204,22 +204,22 @@ private:
             return nullptr;
         }
         CloseHandle(pi.hThread);
-        return pi.hProcess; // закрой CloseHandle когда не нужен / после TerminateProcess
+        return pi.hProcess; // Р·Р°РєСЂРѕР№ CloseHandle РєРѕРіРґР° РЅРµ РЅСѓР¶РµРЅ / РїРѕСЃР»Рµ TerminateProcess
     }
 
     static HANDLE launchWindowsShellEx(const std::string& executablePath, const std::string& arguments) {
-        // 1. Извлекаем путь к папке (рабочую директорию)
+        // 1. РР·РІР»РµРєР°РµРј РїСѓС‚СЊ Рє РїР°РїРєРµ (СЂР°Р±РѕС‡СѓСЋ РґРёСЂРµРєС‚РѕСЂРёСЋ)
         std::string directory = executablePath.substr(0, executablePath.find_last_of("\\/"));
 
-        // 2. Оборачиваем аргументы в кавычки на случай пробелов в путях
+        // 2. РћР±РѕСЂР°С‡РёРІР°РµРј Р°СЂРіСѓРјРµРЅС‚С‹ РІ РєР°РІС‹С‡РєРё РЅР° СЃР»СѓС‡Р°Р№ РїСЂРѕР±РµР»РѕРІ РІ РїСѓС‚СЏС…
         std::string quotedArgs = "\"" + arguments + "\"";
 
-        SHELLEXECUTEINFOA sei = { sizeof(sei) }; // Явно используем ANSI версию (A)
+        SHELLEXECUTEINFOA sei = { sizeof(sei) }; // РЇРІРЅРѕ РёСЃРїРѕР»СЊР·СѓРµРј ANSI РІРµСЂСЃРёСЋ (A)
         sei.fMask = SEE_MASK_NOCLOSEPROCESS;
         sei.lpVerb = "open";
         sei.lpFile = executablePath.c_str();
         sei.lpParameters = quotedArgs.c_str();
-        sei.lpDirectory = directory.c_str(); // Устанавливаем рабочую папку
+        sei.lpDirectory = directory.c_str(); // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЂР°Р±РѕС‡СѓСЋ РїР°РїРєСѓ
         sei.nShow = SW_SHOWNORMAL;
 
         if (!ShellExecuteExA(&sei)) {
@@ -228,24 +228,24 @@ private:
             return NULL;
         }
 
-        // Если hProcess все еще NULL, значит приложение открылось через DDE 
-        // (например, в существующей вкладке другого процесса)
+        // Р•СЃР»Рё hProcess РІСЃРµ РµС‰Рµ NULL, Р·РЅР°С‡РёС‚ РїСЂРёР»РѕР¶РµРЅРёРµ РѕС‚РєСЂС‹Р»РѕСЃСЊ С‡РµСЂРµР· DDE 
+        // (РЅР°РїСЂРёРјРµСЂ, РІ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµР№ РІРєР»Р°РґРєРµ РґСЂСѓРіРѕРіРѕ РїСЂРѕС†РµСЃСЃР°)
         return sei.hProcess;
     }
 
 
-    // Раздельная передача exe и аргументов
+    // Р Р°Р·РґРµР»СЊРЅР°СЏ РїРµСЂРµРґР°С‡Р° exe Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     static HANDLE launchWindowsExeArgs(const std::string& executablePath, const std::string& arguments) {
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         PROCESS_INFORMATION pi = { 0 };
 
-        // Формируем полную командную строку
+        // Р¤РѕСЂРјРёСЂСѓРµРј РїРѕР»РЅСѓСЋ РєРѕРјР°РЅРґРЅСѓСЋ СЃС‚СЂРѕРєСѓ
         std::string fullCmd = executablePath +" "+ arguments;
         std::cout << std::endl <<fullCmd;
         char* cmd = _strdup(fullCmd.c_str());
 
         bool success = CreateProcessA(
-            NULL,           // lpApplicationName - используем командную строку
+            NULL,           // lpApplicationName - РёСЃРїРѕР»СЊР·СѓРµРј РєРѕРјР°РЅРґРЅСѓСЋ СЃС‚СЂРѕРєСѓ
             cmd,            // lpCommandLine
             NULL,
             NULL,
@@ -307,15 +307,15 @@ private:
             _exit(EXIT_FAILURE);
         }
         
-        close(pipefd[1]); // Закрываем запись
+        close(pipefd[1]); // Р—Р°РєСЂС‹РІР°РµРј Р·Р°РїРёСЃСЊ
 
         pid_t actualPid;
         if (read(pipefd[0], &actualPid, sizeof(actualPid)) <= 0) {
-            actualPid = -1; // Ошибка чтения
+            actualPid = -1; // РћС€РёР±РєР° С‡С‚РµРЅРёСЏ
         }
         close(pipefd[0]);
 
-        // Обязательно ждем первого потомка 
+        // РћР±СЏР·Р°С‚РµР»СЊРЅРѕ Р¶РґРµРј РїРµСЂРІРѕРіРѕ РїРѕС‚РѕРјРєР° 
         waitpid(pid1, NULL, 0);
 
         return actualPid; 

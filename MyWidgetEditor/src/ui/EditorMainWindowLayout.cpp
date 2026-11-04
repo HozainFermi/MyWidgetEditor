@@ -33,7 +33,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     std::filesystem::path absExePath = std::filesystem::absolute(relDrawer);
     std::filesystem::path absConfigPath = std::filesystem::absolute(relfilePath);
 
-    // Проверка существования файлов
+    // РџСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»РѕРІ
     if (!std::filesystem::exists(absExePath)) {
         std::cerr << "Error: Executable not found: " << absExePath << "\n";
         return;
@@ -49,7 +49,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
 
     std::cout << "Executing: " << exePath << " " << configPath << std::endl;
 
-    //Раздельная передача
+    //Р Р°Р·РґРµР»СЊРЅР°СЏ РїРµСЂРµРґР°С‡Р°
 #ifdef _WIN32   
     HANDLE proc = IndependentLauncher::launch(exePath, configPath);
     if (proc== nullptr) {///!!!
@@ -74,10 +74,10 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
 
 void Editor::SaveConfigWithConnections(const std::string& filename)
 {
-    // Базовый json с окном и виджетами
+    // Р‘Р°Р·РѕРІС‹Р№ json СЃ РѕРєРЅРѕРј Рё РІРёРґР¶РµС‚Р°РјРё
     nlohmann::json json = widget_manager_.ToJson(window_props_);
 
-    // Сериализуем connections_
+    // РЎРµСЂРёР°Р»РёР·СѓРµРј connections_
     nlohmann::json conn = nlohmann::json::array();
     for (const auto& c : widget_manager_.connections_) {
         conn.push_back({
@@ -97,7 +97,7 @@ void Editor::SaveConfigWithConnections(const std::string& filename)
 
 void Editor::CheckFileMenuHotKeys() {
     ImGuiIO& io = ImGui::GetIO();
-    // Не перехватываем Ctrl+буква, пока пользователь печатает в поле ввода
+    // РќРµ РїРµСЂРµС…РІР°С‚С‹РІР°РµРј Ctrl+Р±СѓРєРІР°, РїРѕРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РїРµС‡Р°С‚Р°РµС‚ РІ РїРѕР»Рµ РІРІРѕРґР°
     if (!io.KeyCtrl || io.WantTextInput) {
         return;
     }
@@ -113,7 +113,7 @@ void Editor::CheckFileMenuHotKeys() {
     }
 }
 
-// Реализация методов класса Editor
+// Р РµР°Р»РёР·Р°С†РёСЏ РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° Editor
 void Editor::RenderMenuBar() {
 
     CheckFileMenuHotKeys();
@@ -135,7 +135,7 @@ void Editor::RenderMenuBar() {
                 browsermode = FileBrowserMode::Load;                
             }
             if (ImGui::MenuItem("Exit")) {
-                // Логика выхода
+                // Р›РѕРіРёРєР° РІС‹С…РѕРґР°
             }
             ImGui::EndMenu();
         }
@@ -196,7 +196,7 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
         if (ImGui::Selectable(templates[i].c_str(), selected_template_ == i)) {
             selected_template_ = i;
         }
-        // Drag & Drop источник
+        // Drag & Drop РёСЃС‚РѕС‡РЅРёРє
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover)) {
             ImGui::SetDragDropPayload("WIDGET_TEMPLATE", templates[i].c_str(), strlen(templates[i].c_str()) + 1);
             ImGui::Text("Add %s", templates[i].c_str());
@@ -326,7 +326,7 @@ void Editor::RenderRightPanel() {
 
     if (ImGui::Button("Compile shader")) {
         std::unique_ptr shaders = std::make_unique<Helpers::Shader>(window_props_.vertex_GLSLshader_file, window_props_.frag_GLSLshader_file);
-        // Присваивание unique_ptr само удалит старый шейдер (release() его терял)
+        // РџСЂРёСЃРІР°РёРІР°РЅРёРµ unique_ptr СЃР°РјРѕ СѓРґР°Р»РёС‚ СЃС‚Р°СЂС‹Р№ С€РµР№РґРµСЂ (release() РµРіРѕ С‚РµСЂСЏР»)
         background_scene_.models_[0].shader = std::move(shaders);
     }
     //if (ImGui::InputText("Vert Shader", VERTbuf, IM_ARRAYSIZE(VERTbuf))) {
@@ -339,30 +339,30 @@ void Editor::RenderRightPanel() {
         ImGui::Text("Properties: %s", selected->GetName().c_str());
         ImGui::Separator();
 
-        // Позиция
+        // РџРѕР·РёС†РёСЏ
         ImVec2 pos = selected->GetPosition();
         if (ImGui::DragFloat2("Position", &pos.x, 1.0f)) {
             selected->SetPosition(pos);
         }
 
-        // Размер
+        // Р Р°Р·РјРµСЂ
         ImVec2 size = selected->GetSize();
         if (ImGui::DragFloat2("Size", &size.x, 1.0f, 10.0f, 1000.0f)) {
             selected->SetSize(size);
         }
 
-        // Имя
+        // РРјСЏ
         static char name_buffer[256];
         strcpy_s(name_buffer, selected->GetName().c_str());
         if (ImGui::InputText("Name", name_buffer, sizeof(name_buffer))) {
             selected->SetName(name_buffer);
         }
 
-        // Тип виджета (только для чтения)
+        // РўРёРї РІРёРґР¶РµС‚Р° (С‚РѕР»СЊРєРѕ РґР»СЏ С‡С‚РµРЅРёСЏ)
         ImGui::Text("Type: %s", selected->TypeToString(selected->GetType()).c_str());
         ImGui::Separator();
 
-        // Кнопки действий
+        // РљРЅРѕРїРєРё РґРµР№СЃС‚РІРёР№
         if (ImGui::Button("Delete", ImVec2(-1, 0))) {
             widget_manager_.DeleteWidget(selected->GetId());
             selected = nullptr;
@@ -371,11 +371,11 @@ void Editor::RenderRightPanel() {
         }
 
         if (ImGui::Button("Duplicate", ImVec2(-1, 0))) {
-            // Логика дублирования
+            // Р›РѕРіРёРєР° РґСѓР±Р»РёСЂРѕРІР°РЅРёСЏ
         }
 
         if (ImGui::Button("Bring to Front", ImVec2(-1, 0))) {
-            // Логика поднятия наверх
+            // Р›РѕРіРёРєР° РїРѕРґРЅСЏС‚РёСЏ РЅР°РІРµСЂС…
             widget_manager_.BringToFront(selected->GetId());
         }
         ImGui::Separator();
@@ -403,7 +403,7 @@ ImVec2 Editor::GetMousePosRelativeToCanvas() const {
         mouse_pos.y - canvas_p0_.y
     );
 
-    // Проверяем, находится ли relative_pos внутри размеров канваса
+    // РџСЂРѕРІРµСЂСЏРµРј, РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё relative_pos РІРЅСѓС‚СЂРё СЂР°Р·РјРµСЂРѕРІ РєР°РЅРІР°СЃР°
     if (relative_pos.x < 0 || relative_pos.x > canvas_size_.x ||
         relative_pos.y < 0 || relative_pos.y > canvas_size_.y) {
         return ImVec2(0, 0);
@@ -415,16 +415,16 @@ void Editor::CreateWidgetFromTemplate(const std::string& widget_class, const ImV
     static int widget_counter = 1; 
     std::string name = widget_class + std::to_string(widget_counter++);
    
-    // Создаем через фабрику
+    // РЎРѕР·РґР°РµРј С‡РµСЂРµР· С„Р°Р±СЂРёРєСѓ
     std::unique_ptr<wg::Widget> widget = wg::WidgetFactory::CreateWithName(widget_class, name, position);
 
     if (widget) {
-        // Добавляем в менеджер        
+        // Р”РѕР±Р°РІР»СЏРµРј РІ РјРµРЅРµРґР¶РµСЂ        
         widget_manager_.AddWidget(std::move(widget));
 
     }
     else {
-        // Обработка ошибки: виджет не зарегистрирован
+        // РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё: РІРёРґР¶РµС‚ РЅРµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ
         std::cerr << "Widget class not registered: " << widget_class << std::endl;
     }   
 }
@@ -435,7 +435,7 @@ void Editor::DrawGrid(ImDrawList* draw_list) const {
     ImU32 grid_color = IM_COL32(100, 100, 100, 50);
     ImU32 major_grid_color = IM_COL32(150, 150, 150, 80);
 
-    // Вертикальные линии
+    // Р’РµСЂС‚РёРєР°Р»СЊРЅС‹Рµ Р»РёРЅРёРё
     for (float x = canvas_p0_.x; x < canvas_p0_.x + canvas_size_.x; x += grid_size_) {
         bool is_major = fmod(x - canvas_p0_.x, grid_size_ * 5.0f) < 1.0f;
         draw_list->AddLine(
@@ -446,7 +446,7 @@ void Editor::DrawGrid(ImDrawList* draw_list) const {
         );
     }
 
-    // Горизонтальные линии
+    // Р“РѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Рµ Р»РёРЅРёРё
     for (float y = canvas_p0_.y; y < canvas_p0_.y + canvas_size_.y; y += grid_size_) {
         bool is_major = fmod(y - canvas_p0_.y, grid_size_ * 5.0f) < 1.0f;
         draw_list->AddLine(
@@ -458,7 +458,7 @@ void Editor::DrawGrid(ImDrawList* draw_list) const {
     }
 }
 
-// Реализация основного метода Render
+// Р РµР°Р»РёР·Р°С†РёСЏ РѕСЃРЅРѕРІРЅРѕРіРѕ РјРµС‚РѕРґР° Render
 void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates) {
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -471,10 +471,10 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 
         RenderMenuBar();
 
-        // Главный сплиттер
+        // Р“Р»Р°РІРЅС‹Р№ СЃРїР»РёС‚С‚РµСЂ
         ImGui::BeginChild("MainSplitter", ImVec2(0, 0));
         {
-            // Левая панель (20%)
+            // Р›РµРІР°СЏ РїР°РЅРµР»СЊ (20%)
             ImGui::BeginChild("LeftPanel", ImVec2(ImGui::GetContentRegionAvail().x * 0.2f, 0),
                 ImGuiChildFlags_ResizeX | ImGuiChildFlags_Borders);
                         
@@ -485,9 +485,9 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 
            
 
-            // Центральная панель (60%)
-            // Ширина канваса сохраняется в imgui.ini. Если окно стало меньше, без ограничения
-            // правая панель уезжает за край, поэтому оставляем ей минимум места
+            // Р¦РµРЅС‚СЂР°Р»СЊРЅР°СЏ РїР°РЅРµР»СЊ (60%)
+            // РЁРёСЂРёРЅР° РєР°РЅРІР°СЃР° СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РІ imgui.ini. Р•СЃР»Рё РѕРєРЅРѕ СЃС‚Р°Р»Рѕ РјРµРЅСЊС€Рµ, Р±РµР· РѕРіСЂР°РЅРёС‡РµРЅРёСЏ
+            // РїСЂР°РІР°СЏ РїР°РЅРµР»СЊ СѓРµР·Р¶Р°РµС‚ Р·Р° РєСЂР°Р№, РїРѕСЌС‚РѕРјСѓ РѕСЃС‚Р°РІР»СЏРµРј РµР№ РјРёРЅРёРјСѓРј РјРµСЃС‚Р°
             const float right_panel_min_width = 250.0f;
             const float canvas_max_width = ImMax(200.0f, ImGui::GetContentRegionAvail().x - right_panel_min_width);
             ImGui::SetNextWindowSizeConstraints(ImVec2(200.0f, 0.0f), ImVec2(canvas_max_width, FLT_MAX));
@@ -498,7 +498,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 
             ImGui::SameLine();
             
-            // Правая панель (20%)
+            // РџСЂР°РІР°СЏ РїР°РЅРµР»СЊ (20%)
             ImGui::BeginChild("RightPanel", ImVec2(0, 0), ImGuiChildFlags_Borders);
             wg::Widget* selected = widget_manager_.GetSelectedWidget();
             RenderRightPanel();
@@ -512,7 +512,7 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 }
 
 
-// Реализация RenderCanvas 
+// Р РµР°Р»РёР·Р°С†РёСЏ RenderCanvas 
 void Editor::RenderCanvas() {
     
     if(!loaded_config.empty()){
@@ -528,7 +528,7 @@ void Editor::RenderCanvas() {
     ImGui::Spacing();
     ImVec2 curmouse= GetMousePosRelativeToCanvas();
 
-    // Информация о канвасе
+    // РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РєР°РЅРІР°СЃРµ
     ImGui::Text("Canvas: %.0fx%.0f", canvas_size_.x, canvas_size_.y);
     window_props_.width = canvas_size_.x;
     window_props_.height = canvas_size_.y;
@@ -537,7 +537,7 @@ void Editor::RenderCanvas() {
        curmouse.x,
        curmouse.y);
     
-    // Создаём невидимую кнопку-канвас
+    // РЎРѕР·РґР°С‘Рј РЅРµРІРёРґРёРјСѓСЋ РєРЅРѕРїРєСѓ-РєР°РЅРІР°СЃ
     ImVec2 canvas_avail = ImGui::GetContentRegionAvail();
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, window_props_.rounding);
     ImGui::InvisibleButton("CanvasButton", canvas_avail,
@@ -545,16 +545,16 @@ void Editor::RenderCanvas() {
         ImGuiButtonFlags_MouseButtonRight);
     ImGui::PopStyleVar();
 
-    // Получаем координаты канваса
+    // РџРѕР»СѓС‡Р°РµРј РєРѕРѕСЂРґРёРЅР°С‚С‹ РєР°РЅРІР°СЃР°
     canvas_p0_ = ImGui::GetItemRectMin();
     ImVec2 canvas_p1 = ImGui::GetItemRectMax();
     canvas_size_ = ImVec2(canvas_p1.x - canvas_p0_.x, canvas_p1.y - canvas_p0_.y);
     
-    // DrawList для отрисовки
+    // DrawList РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     //IM_COL32(40, 40, 40, 255)
-    // Фон канваса
+    // Р¤РѕРЅ РєР°РЅРІР°СЃР°
     ImVec4 to_im32
     { 
         window_props_.bg_color_float[0] * 255,
@@ -571,11 +571,11 @@ void Editor::RenderCanvas() {
         background_scene_.SCR_HEIGHT = canvas_size_.y;
 
         background_scene_.ResizeFramebuffer(background_scene_.SCR_WIDTH, background_scene_.SCR_HEIGHT);
-        // Сохраняем текущий Viewport, чтобы не сбить ImGui
+        // РЎРѕС…СЂР°РЅСЏРµРј С‚РµРєСѓС‰РёР№ Viewport, С‡С‚РѕР±С‹ РЅРµ СЃР±РёС‚СЊ ImGui
         GLint last_viewport[4];
         glGetIntegerv(GL_VIEWPORT, last_viewport);
 
-        // Рендерим сцену в FBO
+        // Р РµРЅРґРµСЂРёРј СЃС†РµРЅСѓ РІ FBO
         glBindFramebuffer(GL_FRAMEBUFFER, background_scene_.FBO);
         glViewport(0, 0, (GLsizei)canvas_size_.x, (GLsizei)canvas_size_.y);
 
@@ -600,7 +600,7 @@ void Editor::RenderCanvas() {
         background_scene_.Draw();        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // Восстанавливаем Viewport обратно для ImGui
+        // Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј Viewport РѕР±СЂР°С‚РЅРѕ РґР»СЏ ImGui
         glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 
         ImVec2 pos = ImVec2(canvas_p0_.x + 0, canvas_p0_.y + 0);
@@ -618,13 +618,13 @@ void Editor::RenderCanvas() {
     }
     //========================================================================================================
 
-    // Сетка
+    // РЎРµС‚РєР°
     DrawGrid(draw_list);
   
-    // Рамка канваса
+    // Р Р°РјРєР° РєР°РЅРІР°СЃР°
     draw_list->AddRect(canvas_p0_, canvas_p1, IM_COL32(100, 100, 100, 255), window_props_.rounding, 0, 2.0f);
 
-    // Обработка Drag & Drop
+    // РћР±СЂР°Р±РѕС‚РєР° Drag & Drop
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("WIDGET_TEMPLATE")) {
             const char* widget_class = (const char*)payload->Data;
@@ -633,12 +633,12 @@ void Editor::RenderCanvas() {
         }
         ImGui::EndDragDropTarget();
     }
-    // === Обновляем и рисуем все виджеты ===
+    // === РћР±РЅРѕРІР»СЏРµРј Рё СЂРёСЃСѓРµРј РІСЃРµ РІРёРґР¶РµС‚С‹ ===
     widget_manager_.UpdateAll(canvas_p0_, canvas_size_);
     widget_manager_.RenderAll(draw_list, canvas_p0_);
     widget_manager_.RenderContentAll(canvas_p0_);
 
-    // Порты и соединения поверх виджетов
+    // РџРѕСЂС‚С‹ Рё СЃРѕРµРґРёРЅРµРЅРёСЏ РїРѕРІРµСЂС… РІРёРґР¶РµС‚РѕРІ
     RenderPortsAndHandleConnections(draw_list);
     RenderConnections(draw_list);
     
@@ -657,7 +657,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
     const float spacing = 15.0f;
     const float hit_radius = 6.0f;
 
-    // Сначала собираем все порты и рисуем кружки
+    // РЎРЅР°С‡Р°Р»Р° СЃРѕР±РёСЂР°РµРј РІСЃРµ РїРѕСЂС‚С‹ Рё СЂРёСЃСѓРµРј РєСЂСѓР¶РєРё
     for (auto* w : widgets) {
         if (!w) continue;
         ImRect rect(
@@ -667,7 +667,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
         auto inputs = w->GetInputPorts();
         auto outputs = w->GetOutputPorts();
         
-        // Входы слева
+        // Р’С…РѕРґС‹ СЃР»РµРІР°
         for (int i = 0; i < (int)inputs.size(); ++i) {
             ImVec2 p(
                 rect.Min.x-3.0f,
@@ -676,14 +676,14 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             port_visuals_.push_back(vis);
             draw_list->AddCircleFilled(p, radius, IM_COL32(180, 220, 180, 255));
 
-            // Создаем невидимую кнопку поверх порта
+            // РЎРѕР·РґР°РµРј РЅРµРІРёРґРёРјСѓСЋ РєРЅРѕРїРєСѓ РїРѕРІРµСЂС… РїРѕСЂС‚Р°
             ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
-            ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
+            ImGui::PushID(&vis);  // РЈРЅРёРєР°Р»СЊРЅС‹Р№ ID РґР»СЏ РєР°Р¶РґРѕР№ РєРЅРѕРїРєРё
             if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
                
             }
 
-            // Тултип при наведении
+            // РўСѓР»С‚РёРї РїСЂРё РЅР°РІРµРґРµРЅРёРё
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", vis.ref.port.c_str());
             }
@@ -691,7 +691,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
 
         }
 
-        // Выходы справа
+        // Р’С‹С…РѕРґС‹ СЃРїСЂР°РІР°
         for (int i = 0; i < (int)outputs.size(); ++i) {
             ImVec2 p(
                 rect.Max.x+3.0f,
@@ -699,14 +699,14 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             PortVisual vis{ {outputs[i].name, w->GetId()}, p, false };
             port_visuals_.push_back(vis);
             draw_list->AddCircleFilled(p, radius, IM_COL32(220, 180, 180, 255));
-            // Создаем невидимую кнопку поверх порта
+            // РЎРѕР·РґР°РµРј РЅРµРІРёРґРёРјСѓСЋ РєРЅРѕРїРєСѓ РїРѕРІРµСЂС… РїРѕСЂС‚Р°
             ImGui::SetCursorScreenPos(ImVec2(vis.pos.x - hit_radius, vis.pos.y - hit_radius));
-            ImGui::PushID(&vis);  // Уникальный ID для каждой кнопки
+            ImGui::PushID(&vis);  // РЈРЅРёРєР°Р»СЊРЅС‹Р№ ID РґР»СЏ РєР°Р¶РґРѕР№ РєРЅРѕРїРєРё
             if (ImGui::InvisibleButton("##port", ImVec2(hit_radius * 2, hit_radius * 2))) {
                
             }
 
-            // Тултип при наведении
+            // РўСѓР»С‚РёРї РїСЂРё РЅР°РІРµРґРµРЅРёРё
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", vis.ref.port.c_str());
             }
@@ -714,9 +714,9 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
         }
     }
 
-    // Обработка drag для создания соединений             
+    // РћР±СЂР°Р±РѕС‚РєР° drag РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёР№             
         if (ImGui::IsMouseClicked(0)) {
-        // Начало drag'а по порту
+        // РќР°С‡Р°Р»Рѕ drag'Р° РїРѕ РїРѕСЂС‚Сѓ
         for (auto& vis : port_visuals_) {
             float dx = mouse_pos.x - vis.pos.x;
             float dy = mouse_pos.y - vis.pos.y;
@@ -731,7 +731,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
     
 
     if (is_dragging_connection_) {
-        // Временная линия от исходного порта до мыши
+        // Р’СЂРµРјРµРЅРЅР°СЏ Р»РёРЅРёСЏ РѕС‚ РёСЃС…РѕРґРЅРѕРіРѕ РїРѕСЂС‚Р° РґРѕ РјС‹С€Рё
         ImVec2 from_pos{};
         for (auto& vis : port_visuals_) {
             if (vis.ref.widget_id == drag_from_port_.widget_id &&
@@ -747,13 +747,13 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
             IM_COL32(200, 200, 100, 255), 2.0f);
 
         if (ImGui::IsMouseReleased(0)) {
-            // Попробуем найти порт под мышью для завершения соединения
+            // РџРѕРїСЂРѕР±СѓРµРј РЅР°Р№С‚Рё РїРѕСЂС‚ РїРѕРґ РјС‹С€СЊСЋ РґР»СЏ Р·Р°РІРµСЂС€РµРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ
             for (auto& vis : port_visuals_) {
                 float dx2 = mouse_pos.x - vis.pos.x;
                 float dy2 = mouse_pos.y - vis.pos.y;
                 if (dx2 * dx2 + dy2 * dy2 <= hit_radius * hit_radius) {
-                    // Соединяем только выход со входом разных виджетов.
-                    // Если тянули от входа к выходу - разворачиваем связь.
+                    // РЎРѕРµРґРёРЅСЏРµРј С‚РѕР»СЊРєРѕ РІС‹С…РѕРґ СЃРѕ РІС…РѕРґРѕРј СЂР°Р·РЅС‹С… РІРёРґР¶РµС‚РѕРІ.
+                    // Р•СЃР»Рё С‚СЏРЅСѓР»Рё РѕС‚ РІС…РѕРґР° Рє РІС‹С…РѕРґСѓ - СЂР°Р·РІРѕСЂР°С‡РёРІР°РµРј СЃРІСЏР·СЊ.
                     const PortVisual* from_vis = nullptr;
                     for (const auto& candidate : port_visuals_) {
                         if (SamePort(candidate.ref, drag_from_port_)) {
@@ -778,7 +778,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
 
 void Editor::RenderConnections(ImDrawList* draw_list)
 {
-    // Актуальные позиции портов из port_visuals_ (map вместо линейного поиска)
+    // РђРєС‚СѓР°Р»СЊРЅС‹Рµ РїРѕР·РёС†РёРё РїРѕСЂС‚РѕРІ РёР· port_visuals_ (map РІРјРµСЃС‚Рѕ Р»РёРЅРµР№РЅРѕРіРѕ РїРѕРёСЃРєР°)
     std::unordered_map<std::string, ImVec2> port_positions;
     port_positions.reserve(port_visuals_.size());
     for (const auto& v : port_visuals_) {
@@ -804,7 +804,7 @@ void Editor::RenderConnections(ImDrawList* draw_list)
         draw_list->AddBezierCubic(p1, c1, c2, p2,
             IM_COL32(150, 150, 255, 255), 2.0f);
 
-        // Приближённая точка середины линии
+        // РџСЂРёР±Р»РёР¶С‘РЅРЅР°СЏ С‚РѕС‡РєР° СЃРµСЂРµРґРёРЅС‹ Р»РёРЅРёРё
         ImVec2 mid((p1.x + p2.x) * 0.5f, (p1.y + p2.y) * 0.5f);
         float dxm = mouse_pos.x - mid.x;
         float dym = mouse_pos.y - mid.y;

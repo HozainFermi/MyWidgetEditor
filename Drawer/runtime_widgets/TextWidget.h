@@ -27,7 +27,7 @@ namespace rn {
         void Render(ImDrawList* draw_list) override;
         void RenderContent(ImVec2& screen_min, ImVec2& screen_max) override;
 
-        // Специфичные методы
+        // РЎРїРµС†РёС„РёС‡РЅС‹Рµ РјРµС‚РѕРґС‹
         void SetText(const std::string& text) { text_ = text; }
         const std::string& GetText() const { return text_; }
        
