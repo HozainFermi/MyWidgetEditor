@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <imgui.h>
+#include <core/EventBus.h>
 #include <core/Ports.h>
 #include <core/Widget.h>
 #include <core/WidgetContext.h>
@@ -38,6 +39,7 @@ namespace rn {
 
         std::vector<std::unique_ptr<core::Widget>> widgets_;
         std::vector<core::Connection> connections_;
+        core::EventBus bus_;
         core::WidgetContext context_;
     };
 }

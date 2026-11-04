@@ -8,6 +8,7 @@ namespace rn {
         context_.is_editor = false;
         context_.live_data = true;
         context_.window = &window_props_;
+        context_.bus = &bus_;
     }
 
     bool RuntimeWidgetManager::WindowPropsFromJson(const std::string& filename) {
@@ -36,7 +37,7 @@ namespace rn {
             widget->SetContext(&context_);
             widgets.push_back(widget.get());
         }
-        core::ConnectPorts(widgets, connections_);
+        bus_.SetRoutes(widgets, connections_);
         return true;
     }
 
@@ -44,6 +45,8 @@ namespace rn {
         for (auto& widget : widgets_) {
             widget->Update();
         }
+        // Доставляем всё, что виджеты отправили (в том числе из фоновых потоков)
+        bus_.Dispatch();
     }
 
     void RuntimeWidgetManager::RenderAll(ImDrawList* draw_list, const ImVec2& origin) {

@@ -28,7 +28,4 @@ namespace core {
         const std::vector<const Widget*>& widgets,
         const std::vector<Connection>& connections);
     bool SaveConfig(const std::string& path, const nlohmann::json& json, std::string* error = nullptr);
-
-    // Подключает Emit выходов ко входам по списку связей (старые подключения сбрасываются)
-    void ConnectPorts(const std::vector<Widget*>& widgets, const std::vector<Connection>& connections);
 }

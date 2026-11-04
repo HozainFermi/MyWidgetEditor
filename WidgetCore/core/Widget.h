@@ -57,11 +57,8 @@ namespace core {
         // Данные пришли на входной порт to_port от виджета from_widget_id
         virtual void OnInput(const std::string& to_port, const std::string& from_widget_id, const std::vector<WidgetValue>& value) {}
 
-        using EmitCallback = std::function<void(const std::string& from_widget_id, const std::vector<WidgetValue>& value)>;
-        // Один выходной порт может вести в несколько виджетов
-        void AddPortCallback(const std::string& port, EmitCallback callback);
-        void ClearPortCallbacks() { port_callbacks_.clear(); }
-        // Отправляет данные во все виджеты, подключённые к выходному порту
+        // Отправляет данные с выходного порта во все подключённые виджеты (через шину событий).
+        // Можно вызывать из любого потока; OnInput у получателей сработает на главном потоке
         void Emit(const std::string& port, const std::vector<WidgetValue>& value);
 
         // === Сериализация ===
@@ -113,6 +110,5 @@ namespace core {
         static int next_id_;
 
         const WidgetContext* context_;
-        std::unordered_map<std::string, std::vector<EmitCallback>> port_callbacks_;
     };
 }

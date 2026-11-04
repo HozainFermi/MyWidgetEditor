@@ -1,7 +1,6 @@
 #include "Config.h"
 #include <fstream>
 #include <iostream>
-#include <unordered_map>
 #include "WidgetFactory.h"
 
 namespace core {
@@ -112,31 +111,5 @@ namespace core {
         }
         file << json.dump(4);
         return true;
-    }
-
-    void ConnectPorts(const std::vector<Widget*>& widgets, const std::vector<Connection>& connections) {
-        std::unordered_map<std::string, Widget*> by_id;
-        for (Widget* widget : widgets) {
-            widget->ClearPortCallbacks();
-            by_id[widget->GetId()] = widget;
-        }
-
-        for (const auto& connection : connections) {
-            auto from = by_id.find(connection.from.widget_id);
-            auto to = by_id.find(connection.to.widget_id);
-            if (from == by_id.end() || to == by_id.end()) {
-                continue;
-            }
-            Widget* target = to->second;
-            std::string to_port = connection.to.port;
-            from->second->AddPortCallback(connection.from.port,
-                [target, to_port](const std::string& from_widget_id, const std::vector<WidgetValue>& value) {
-                    target->OnInput(to_port, from_widget_id, value);
-                });
-        }
-
-        for (Widget* widget : widgets) {
-            widget->OnPortsConnected();
-        }
     }
 }

@@ -31,6 +31,7 @@ namespace wg {
     WidgetManager::WidgetManager() {
         context_.is_editor = true;
         context_.live_data = false;  // по умолчанию в редакторе превью
+        context_.bus = &bus_;
     }
 
     // ================= Виджеты =================
@@ -122,7 +123,7 @@ namespace wg {
         if (!ports_dirty_) {
             return;
         }
-        core::ConnectPorts(GetAllWidgets(), connections_);
+        bus_.SetRoutes(GetAllWidgets(), connections_);
         ports_dirty_ = false;
     }
 
@@ -176,6 +177,8 @@ namespace wg {
         for (auto& item : items_) {
             item.widget->Update();
         }
+        // Доставляем всё, что виджеты отправили (в том числе из фоновых потоков)
+        bus_.Dispatch();
 
         // Клик обрабатываем, только если он внутри канваса и не по всплывающему окну поверх него.
         // Иначе выбор виджета в левой панели сразу сбрасывался бы этим же кликом.
@@ -251,11 +254,11 @@ namespace wg {
         ImVec2 pos = widget.GetPosition();
         ImVec2 size = widget.GetSize();
 
-        size.x = std::min(size.x, canvas_size.x);
-        size.y = std::min(size.y, canvas_size.y);
+        size.x = (std::min)(size.x, canvas_size.x);
+        size.y = (std::min)(size.y, canvas_size.y);
         ImVec2 clamped(
-            std::clamp(pos.x, 0.0f, std::max(0.0f, canvas_size.x - size.x)),
-            std::clamp(pos.y, 0.0f, std::max(0.0f, canvas_size.y - size.y)));
+            std::clamp(pos.x, 0.0f, (std::max)(0.0f, canvas_size.x - size.x)),
+            std::clamp(pos.y, 0.0f, (std::max)(0.0f, canvas_size.y - size.y)));
 
         bool changed = clamped.x != pos.x || clamped.y != pos.y || size.x != widget.GetSize().x || size.y != widget.GetSize().y;
         widget.SetPosition(clamped);

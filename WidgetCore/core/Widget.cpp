@@ -1,5 +1,6 @@
 #include "Widget.h"
 #include <algorithm>
+#include "EventBus.h"
 
 namespace core {
 
@@ -50,19 +51,9 @@ namespace core {
         OnContextChanged();
     }
 
-    void Widget::AddPortCallback(const std::string& port, EmitCallback callback) {
-        port_callbacks_[port].push_back(std::move(callback));
-    }
-
     void Widget::Emit(const std::string& port, const std::vector<WidgetValue>& value) {
-        auto it = port_callbacks_.find(port);
-        if (it == port_callbacks_.end()) {
-            return;
-        }
-        for (auto& callback : it->second) {
-            if (callback) {
-                callback(id_, value);
-            }
+        if (context_->bus) {
+            context_->bus->Post(WidgetMessage{ id_, port, value });
         }
     }
 

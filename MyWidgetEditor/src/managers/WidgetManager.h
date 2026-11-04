@@ -4,6 +4,7 @@
 #include <vector>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <core/EventBus.h>
 #include <core/Ports.h>
 #include <core/Widget.h>
 #include <core/WidgetContext.h>
@@ -84,6 +85,7 @@ namespace wg {
 
         std::vector<CanvasItem> items_;
         std::vector<core::Connection> connections_;
+        core::EventBus bus_;
         core::WidgetContext context_;
         bool keep_selection_ = false;
         bool ports_dirty_ = true;
