@@ -93,6 +93,24 @@ namespace core {
         void SetName(const std::string& name) { name_ = name; }
         void SetWidgetClass(const std::string& widget_class) { widget_class_ = widget_class; }
 
+        // === Видимость и прозрачность при наведении (действуют в Drawer) ===
+        // Невидимый виджет не рисуется, но работает: например, таблица, которая только кормит график
+        bool IsVisible() const { return visible_; }
+        void SetVisible(bool visible) { visible_ = visible; }
+        // Под курсором виджет плавно становится прозрачнее (до fade_min_alpha), без курсора возвращается
+        bool GetFadeOnHover() const { return fade_on_hover_; }
+        void SetFadeOnHover(bool fade) { fade_on_hover_ = fade; }
+        float GetFadeMinAlpha() const { return fade_min_alpha_; }
+        void SetFadeMinAlpha(float alpha) { fade_min_alpha_ = alpha; }
+        float GetFadeSpeed() const { return fade_speed_; }
+        void SetFadeSpeed(float speed) { fade_speed_ = speed; }
+        // Вызывать каждый кадр: hovered - курсор над виджетом, dt - секунды с прошлого кадра
+        void UpdateHoverFade(bool hovered, float dt);
+        // Текущая непрозрачность 0..1 (1 - обычный вид)
+        float GetOpacity() const { return opacity_; }
+        // Прозрачность сейчас меняется - нужна плавная анимация
+        bool IsFading() const;
+
     protected:
         std::string id_;
         std::string name_ = "Unnamed";
@@ -106,6 +124,12 @@ namespace core {
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
         float min_width_ = 30.0f;
         float min_height_ = 20.0f;
+
+        bool visible_ = true;
+        bool fade_on_hover_ = false;
+        float fade_min_alpha_ = 0.15f;
+        float fade_speed_ = 1.0f;   // на сколько меняется непрозрачность за секунду
+        float opacity_ = 1.0f;      // не сохраняется
 
     private:
         // Новые id не должны совпадать с загруженными из конфига

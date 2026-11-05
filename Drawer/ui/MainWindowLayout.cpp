@@ -80,7 +80,10 @@ namespace rn {
                     );
                 }
 
-                manager->UpdateAll();
+                // Курсор берём у GLFW, а не у ImGui: в режиме обоев окно не получает событий мыши
+                double cursor_x = 0.0, cursor_y = 0.0;
+                glfwGetCursorPos(window, &cursor_x, &cursor_y);
+                manager->UpdateAll(main_screen_min, ImVec2((float)cursor_x, (float)cursor_y), ImGui::GetIO().DeltaTime);
                 manager->RenderAll(drawlist, main_screen_min);
                 manager->RenderContentAll(main_screen_min);
             }

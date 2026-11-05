@@ -352,6 +352,15 @@ namespace wg {
             DrawFrame(draw_list, item, rect);
             draw_list->AddText(ImVec2(rect.Min.x + 5, rect.Min.y + 5), kNameColor, item.widget->GetName().c_str());
             item.widget->Render(draw_list, rect.Min, rect.Max);
+
+            // Плашка поверх содержимого: в запущенном виджете этот виджет не рисуется
+            if (!item.widget->IsVisible()) {
+                const char* badge = "hidden";
+                const ImVec2 size = ImGui::CalcTextSize(badge);
+                const ImVec2 badge_min(rect.Max.x - size.x - 12, rect.Min.y + 4);
+                draw_list->AddRectFilled(badge_min, ImVec2(rect.Max.x - 4, badge_min.y + size.y + 4), IM_COL32(0, 0, 0, 180), 3.0f);
+                draw_list->AddText(ImVec2(badge_min.x + 4, badge_min.y + 2), IM_COL32(255, 200, 90, 255), badge);
+            }
         }
     }
 

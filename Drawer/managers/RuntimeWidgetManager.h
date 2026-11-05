@@ -28,7 +28,8 @@ namespace rn {
         // Виджеты и связи: нужен готовый GL-контекст
         bool LoadFromFile(const std::string& filename);
 
-        void UpdateAll();
+        // mouse - курсор в координатах окна (для прозрачности при наведении), dt - секунды с прошлого кадра
+        void UpdateAll(const ImVec2& origin, const ImVec2& mouse, float dt);
         void RenderAll(ImDrawList* draw_list, const ImVec2& origin);
         void RenderContentAll(const ImVec2& origin);
 

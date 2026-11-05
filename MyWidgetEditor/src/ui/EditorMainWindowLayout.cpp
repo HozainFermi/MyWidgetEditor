@@ -352,6 +352,33 @@ void Editor::RenderRightPanel() {
 
         // Тип виджета (только для чтения)
         ImGui::Text("Type: %s", core::WidgetTypeToString(selected->GetType()));
+
+        // Общие настройки для запущенного виджета (Drawer)
+        bool visible = selected->IsVisible();
+        if (ImGui::Checkbox("Visible in widget", &visible)) {
+            selected->SetVisible(visible);
+        }
+        ImGui::SameLine();
+        HelpMarker("Hidden widgets are not drawn in the running widget but keep working\n(e.g. a table that only feeds data to a plot).");
+
+        bool fade = selected->GetFadeOnHover();
+        if (ImGui::Checkbox("Fade on hover", &fade)) {
+            selected->SetFadeOnHover(fade);
+        }
+        ImGui::SameLine();
+        HelpMarker("In the running widget: while the mouse is over the widget it gradually becomes transparent,\nwhen the mouse leaves it comes back.");
+        if (fade) {
+            float min_opacity = selected->GetFadeMinAlpha() * 100.0f;
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
+            if (ImGui::SliderFloat("Min opacity", &min_opacity, 0.0f, 100.0f, "%.0f%%")) {
+                selected->SetFadeMinAlpha(min_opacity / 100.0f);
+            }
+            float fade_time = 1.0f / selected->GetFadeSpeed();
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
+            if (ImGui::SliderFloat("Fade time", &fade_time, 0.1f, 5.0f, "%.1f s")) {
+                selected->SetFadeSpeed(1.0f / fade_time);
+            }
+        }
         ImGui::Separator();
 
         // Кнопки действий

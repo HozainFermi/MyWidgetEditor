@@ -46,12 +46,22 @@ namespace rn {
         float fps = 1.0f;
         for (const auto& widget : widgets_) {
             fps = std::max(fps, widget->GetDesiredFps());
+            if (widget->IsFading()) {
+                fps = std::max(fps, 30.0f);  // плавное исчезновение/появление
+            }
+            else if (widget->GetFadeOnHover()) {
+                fps = std::max(fps, 10.0f);  // проверяем курсор: в режиме обоев событий мыши нет
+            }
         }
         return fps;
     }
 
-    void RuntimeWidgetManager::UpdateAll() {
+    void RuntimeWidgetManager::UpdateAll(const ImVec2& origin, const ImVec2& mouse, float dt) {
         for (auto& widget : widgets_) {
+            const ImVec2 min = widget->GetScreenMin(origin);
+            const ImVec2 max = widget->GetScreenMax(origin);
+            const bool hovered = mouse.x >= min.x && mouse.x < max.x && mouse.y >= min.y && mouse.y < max.y;
+            widget->UpdateHoverFade(hovered && widget->IsVisible(), dt);
             widget->Update();
         }
         // Доставляем всё, что виджеты отправили (в том числе из фоновых потоков)
@@ -60,13 +70,31 @@ namespace rn {
 
     void RuntimeWidgetManager::RenderAll(ImDrawList* draw_list, const ImVec2& origin) {
         for (auto& widget : widgets_) {
+            if (!widget->IsVisible()) continue;
+
+            const int first_vertex = draw_list->VtxBuffer.Size;
             widget->Render(draw_list, widget->GetScreenMin(origin), widget->GetScreenMax(origin));
+
+            // Прозрачность при наведении: домножаем альфу всех вершин, которые нарисовал виджет
+            const float opacity = widget->GetOpacity();
+            if (opacity < 1.0f) {
+                for (int i = first_vertex; i < draw_list->VtxBuffer.Size; ++i) {
+                    ImU32& col = draw_list->VtxBuffer[i].col;
+                    const ImU32 alpha = (ImU32)(((col >> IM_COL32_A_SHIFT) & 0xFF) * opacity);
+                    col = (col & ~IM_COL32_A_MASK) | (alpha << IM_COL32_A_SHIFT);
+                }
+            }
         }
     }
 
     void RuntimeWidgetManager::RenderContentAll(const ImVec2& origin) {
         for (auto& widget : widgets_) {
+            if (!widget->IsVisible()) continue;
+
+            // ImGui-элементы (таблицы, графики, поля) берут прозрачность из стиля
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * widget->GetOpacity());
             widget->RenderContent(widget->GetScreenMin(origin), widget->GetScreenMax(origin));
+            ImGui::PopStyleVar();
         }
     }
 }

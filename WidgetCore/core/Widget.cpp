@@ -46,6 +46,21 @@ namespace core {
         }
     }
 
+    void Widget::UpdateHoverFade(bool hovered, float dt) {
+        const float target = (fade_on_hover_ && hovered) ? fade_min_alpha_ : 1.0f;
+        const float step = fade_speed_ * dt;
+        if (opacity_ > target) {
+            opacity_ = std::max(target, opacity_ - step);
+        }
+        else {
+            opacity_ = std::min(target, opacity_ + step);
+        }
+    }
+
+    bool Widget::IsFading() const {
+        return opacity_ < 1.0f;
+    }
+
     void Widget::SetContext(const WidgetContext* context) {
         context_ = context ? context : &kDefaultContext;
         OnContextChanged();
@@ -67,7 +82,11 @@ namespace core {
             {"size", {size_.x, size_.y}},
             {"bg_color", bg_color_},
             {"min_width", min_width_},
-            {"min_height", min_height_}
+            {"min_height", min_height_},
+            {"visibility", visible_},
+            {"fade_on_hover", fade_on_hover_},
+            {"fade_min_alpha", fade_min_alpha_},
+            {"fade_speed", fade_speed_}
         };
     }
 
@@ -90,5 +109,9 @@ namespace core {
         if (json.contains("bg_color")) bg_color_ = json["bg_color"];
         if (json.contains("min_width")) min_width_ = json["min_width"];
         if (json.contains("min_height")) min_height_ = json["min_height"];
+        visible_ = json.value("visibility", visible_);
+        fade_on_hover_ = json.value("fade_on_hover", fade_on_hover_);
+        fade_min_alpha_ = std::clamp(json.value("fade_min_alpha", fade_min_alpha_), 0.0f, 1.0f);
+        fade_speed_ = std::max(0.05f, json.value("fade_speed", fade_speed_));
     }
 }
