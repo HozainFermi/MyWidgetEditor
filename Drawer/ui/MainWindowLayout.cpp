@@ -1,4 +1,5 @@
 #include "MainWindowLayout.h"
+#include "LayoutScale.h"
 
 
 
@@ -33,8 +34,11 @@ namespace rn {
 
                 drawlist->AddRectFilled(main_screen_min, main_screen_max, manager->window_props_.bg_color, manager->window_props_.rounding);
 
-                background_scene_.SCR_WIDTH = window_size.x;
-                background_scene_.SCR_HEIGHT = window_size.y;
+                // Фон рендерим в реальных пикселях окна (при масштабе раскладки они не совпадают с единицами ImGui)
+                const ImVec2 fb_scale = ImGui::GetIO().DisplayFramebufferScale;
+                const ImVec2 pixel_size(window_size.x * fb_scale.x, window_size.y * fb_scale.y);
+                background_scene_.SCR_WIDTH = (unsigned int)pixel_size.x;
+                background_scene_.SCR_HEIGHT = (unsigned int)pixel_size.y;
 
                 if (window_props_.frag_GLSLshader_file != "" && window_props_.vertex_GLSLshader_file != "" && !background_scene_.models_.empty()) {
 
@@ -45,7 +49,7 @@ namespace rn {
 
                     // Рендерим сцену в FBO
                     glBindFramebuffer(GL_FRAMEBUFFER, background_scene_.FBO);
-                    glViewport(0, 0, (GLsizei)window_size.x, (GLsizei)window_size.y);
+                    glViewport(0, 0, (GLsizei)pixel_size.x, (GLsizei)pixel_size.y);
 
                     glClearColor(manager->window_props_.bg_color_float[0],
                         manager->window_props_.bg_color_float[1],
@@ -59,7 +63,7 @@ namespace rn {
 
                     background_scene_.models_[0].model_mat = model;
                     background_scene_.models_[0].shader->setFloat("iTime", (float)glfwGetTime());
-                    background_scene_.models_[0].shader->setVec2("iResolution", window_size.x, window_size.y);
+                    background_scene_.models_[0].shader->setVec2("iResolution", pixel_size.x, pixel_size.y);
                     background_scene_.models_[0].shader->setMat4("ortho_model", model);
                     background_scene_.models_[0].shader->setMat4("ortho_view", view);
                     background_scene_.models_[0].shader->setMat4("ortho_projection", proj);
@@ -83,9 +87,11 @@ namespace rn {
                 // Курсор берём у GLFW, а не у ImGui: в режиме обоев окно не получает событий мыши
                 double cursor_x = 0.0, cursor_y = 0.0;
                 glfwGetCursorPos(window, &cursor_x, &cursor_y);
-                manager->UpdateAll(main_screen_min, ImVec2((float)cursor_x, (float)cursor_y), ImGui::GetIO().DeltaTime);
-                manager->RenderAll(drawlist, main_screen_min);
-                manager->RenderContentAll(main_screen_min);
+                // Fit: раскладка по центру окна
+                const ImVec2 origin(main_screen_min.x + g_layout_scale.offset.x, main_screen_min.y + g_layout_scale.offset.y);
+                manager->UpdateAll(origin, g_layout_scale.ToLayout(cursor_x, cursor_y), ImGui::GetIO().DeltaTime);
+                manager->RenderAll(drawlist, origin);
+                manager->RenderContentAll(origin);
             }
             ImGui::EndChild();
             ImGui::PopStyleVar();

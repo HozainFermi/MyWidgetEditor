@@ -41,6 +41,7 @@ namespace core {
     nlohmann::json WindowPropertiesToJson(const WindowProperties& props) {
         nlohmann::json window;
         window["mode"] = (int)props.mode;
+        window["layout_scaling"] = (int)props.layout_scaling;
         window["bg_color"] = nlohmann::json::array({
             props.bg_color_float[0], props.bg_color_float[1],
             props.bg_color_float[2], props.bg_color_float[3] });
@@ -85,6 +86,7 @@ namespace core {
         props.height = window.value("height", 300);
         props.rounding = window.value("rounding", 0.0f);
         props.fps_limit = window.value("fps_limit", 60);
+        props.layout_scaling = (LayoutScaling)std::clamp(window.value("layout_scaling", 0), 0, 2);
 
         // В старых конфигах режима нет - определяем по флагам
         if (window.contains("mode")) {

@@ -493,6 +493,18 @@ void Editor::RenderRightPanel() {
                "Without user input it redraws only as often as its widgets need:\n"
                "static widgets ~1-2 FPS, animations ~30. A shader background always uses the limit.");
 
+    static const char* kScaling[] = { "Off", "Fit", "Stretch" };
+    int scaling = (int)window_props_.layout_scaling;
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
+    if (ImGui::Combo("Layout scaling", &scaling, kScaling, IM_ARRAYSIZE(kScaling))) {
+        window_props_.layout_scaling = (core::LayoutScaling)scaling;
+    }
+    ImGui::SameLine();
+    HelpMarker("How this canvas layout fits a window of another size (e.g. full screen):\n"
+               "Off - widgets keep their pixel positions and sizes.\n"
+               "Fit - everything scales evenly until it fits, centered (keeps proportions).\n"
+               "Stretch - fills the whole window, proportions change.");
+
     if (ImGui::Button(ICON(ICON_FOLDER), ImVec2(30,22)) ) {
         shaderNames.clear();
         shaders_paths.clear();

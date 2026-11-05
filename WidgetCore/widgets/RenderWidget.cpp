@@ -34,14 +34,18 @@ namespace core {
     void RenderWidget::RenderContent(const ImVec2& screen_min, const ImVec2& screen_max)
     {
         ImVec2 widget_size = GetSize();
+        // Сцену рендерим в реальных пикселях: при масштабе раскладки их больше, чем единиц ImGui
+        const ImVec2 fb_scale = ImGui::GetIO().DisplayFramebufferScale;
+        const unsigned int pixel_w = (unsigned int)(widget_size.x * fb_scale.x);
+        const unsigned int pixel_h = (unsigned int)(widget_size.y * fb_scale.y);
         scene_.SaveCurrentState();
 
-        scene_.SCR_WIDTH = (unsigned int)widget_size.x;
-        scene_.SCR_HEIGHT = (unsigned int)widget_size.y;
-        scene_.ResizeFramebuffer((unsigned int)widget_size.x, (unsigned int)widget_size.y);
+        scene_.SCR_WIDTH = pixel_w;
+        scene_.SCR_HEIGHT = pixel_h;
+        scene_.ResizeFramebuffer(pixel_w, pixel_h);
 
         glBindFramebuffer(GL_FRAMEBUFFER, scene_.FBO);
-        glViewport(0, 0, (GLsizei)widget_size.x, (GLsizei)widget_size.y);
+        glViewport(0, 0, (GLsizei)pixel_w, (GLsizei)pixel_h);
 
         // Под шейдерным фоном - прозрачный фон, иначе цвет фона окна
         const WindowProperties* window = Context().window;

@@ -12,8 +12,16 @@ namespace core {
         Hud = 2         // поверх всего, на весь экран, клики проходят насквозь, фон прозрачный
     };
 
+    // Как раскладка с холста редактора (width x height) ложится на окно другого размера
+    enum class LayoutScaling {
+        Off = 0,     // без масштаба: виджеты на тех же пикселях
+        Fit = 1,     // равномерно, пока влезает, по центру (пропорции сохраняются)
+        Stretch = 2  // на всё окно, пропорции искажаются
+    };
+
     // Свойства окна виджета (рантайм-окна Drawer). Редактор их настраивает, Drawer применяет
     struct WindowProperties {
+        LayoutScaling layout_scaling = LayoutScaling::Off;
         WindowMode mode = WindowMode::Normal;
 
         ImU32 bg_color = IM_COL32(40, 40, 40, 255);

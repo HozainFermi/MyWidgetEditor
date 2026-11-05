@@ -37,6 +37,7 @@
 #include <widgets/RegisterAllWidgets.h>
 #include <core/FrameLimiter.h>
 #include <core/Fonts.h>
+#include "ui/LayoutScale.h"
 
 
 
@@ -147,6 +148,7 @@ int main(int argc, char** argv)
   
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
+    rn::InstallScaledCursorCallback(window);  // мышь в единицах раскладки
 #ifdef __EMSCRIPTEN__
     ImGui_ImplGlfw_InstallEmscriptenCallbacks(window, "#canvas");
 #endif
@@ -197,6 +199,8 @@ int main(int argc, char** argv)
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
+        // Раскладка с холста редактора растягивается на окно (настройка "Layout scaling")
+        rn::g_layout_scale.Apply(window, manager->window_props_);
         ImGui::NewFrame();
        
        //отрисовка главного окна            
