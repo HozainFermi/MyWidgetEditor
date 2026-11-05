@@ -56,8 +56,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
         std::cerr << "Failed to launch process\n";
     }
     else {
-        Process created (proc,filename);        
-        processes_.push_back(std::move(created));
+        processes_.Add(Process(proc, filename));
     }
 #else
     pid_t pid = IndependentLauncher::launch(exePath, configPath);
@@ -65,7 +64,7 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
         std::cerr << "Failed to launch process\n";
     }
     else {
-        processes_.push_back(Process(pid,filename));
+        processes_.Add(Process(pid, filename));
     }
 #endif
 
@@ -139,24 +138,35 @@ void Editor::RenderMenuBar() {
             ImGui::EndMenu();
         }
         ImGui::Spacing();
-        if (ImGui::BeginMenu("Processes")) {
-                if (ImGui::MenuItem("Refresh Desktop Wallpaper", NULL)) {
-                    IndependentLauncher::RefreshDesktopWallpaperLayer();
-                }
-                if (ImGui::MenuItem("Kill All",NULL)) {
-                    processes_.clear();
-                }
+        processes_.RemoveExited();  // виджеты, которые закрылись сами
+        char processes_label[32];
+        snprintf(processes_label, sizeof(processes_label), "Processes (%zu)###processes", processes_.size());  // ### - ID меню не меняется вместе с числом
+        if (ImGui::BeginMenu(processes_label)) {
+            if (ImGui::MenuItem("Refresh Desktop Wallpaper", NULL)) {
+                IndependentLauncher::RefreshDesktopWallpaperLayer();
+            }
+            if (ImGui::MenuItem("Kill All", NULL, false, !processes_.empty())) {
+                processes_.KillAll();
+                IndependentLauncher::RefreshDesktopWallpaperLayer();  // убрать след виджета с обоев
+            }
+            ImGui::Separator();
+            if (processes_.empty()) {
+                ImGui::TextDisabled("No running widgets");
+            }
             for (size_t i = 0; i < processes_.size(); ++i) {
-                char proc_num[32];
-                snprintf(proc_num, sizeof(proc_num), "Process %zu: %s", i, processes_[i].GetName().c_str());
-
-                if (ImGui::BeginMenu(proc_num)) {
-                    if (ImGui::MenuItem("Kill Process")) {                       
-                        processes_.erase(processes_.begin() + i);
-                    }                    
-                    ImGui::EndMenu(); 
+                char label[160];
+                snprintf(label, sizeof(label), "%s (pid %u)##%zu", processes_[i].GetName().c_str(), processes_[i].GetPid(), i);
+                if (ImGui::BeginMenu(label)) {
+                    if (ImGui::MenuItem("Kill Process")) {
+                        processes_.Kill(i);
+                        IndependentLauncher::RefreshDesktopWallpaperLayer();
+                        ImGui::EndMenu();
+                        break;
+                    }
+                    ImGui::EndMenu();
                 }
             }
+            ImGui::TextDisabled("Widgets keep running after the editor closes");
             ImGui::EndMenu();
         }
 

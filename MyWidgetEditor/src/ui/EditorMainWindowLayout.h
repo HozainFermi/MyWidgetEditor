@@ -7,7 +7,7 @@
 #include "Connections.h"
 #include "Mesh.h"
 #include "Scene.hpp"
-#include <Process.h>
+#include <ProcessList.h>
 
 enum class FileBrowserMode {
     Load,
@@ -21,7 +21,8 @@ class Editor {
 private:
     wg::WidgetManager widget_manager_;
     
-    std::vector<Process> processes_;
+    // Запущенные виджеты; список хранится в файле и переживает закрытие редактора
+    ProcessList processes_;
 
     // связи
     std::vector<PortVisual> port_visuals_;
@@ -56,6 +57,8 @@ public:
     {
         // Виджеты видят цвет фона и шейдер окна (например, RenderWidget для цвета очистки)
         widget_manager_.SetWindowProperties(&window_props_);
+        // Подхватываем виджеты, запущенные в прошлые сеансы редактора
+        processes_.Load();
 
         std::vector<Helpers::Vertex> vertices_{
 

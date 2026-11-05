@@ -184,18 +184,14 @@ private:
 
         PROCESS_INFORMATION pi{};
         
-        const BOOL ok = CreateProcessA(
-            nullptr,
-            cmdBuf.data(),
-            nullptr, 
-            nullptr,
-            FALSE,
-            CREATE_NO_WINDOW,//CREATE_NEW_CONSOLE
-            nullptr,
-            workDir.c_str(),
-            &si,
-            &pi
-        );
+        // CREATE_BREAKAWAY_FROM_JOB: если редактор сам запущен внутри job object (так делают некоторые
+        // IDE и терминалы), виджет не умрёт вместе с ним. Если job запрещает breakaway - запускаем как обычно
+        BOOL ok = CreateProcessA(nullptr, cmdBuf.data(), nullptr, nullptr, FALSE,
+            CREATE_NO_WINDOW | CREATE_BREAKAWAY_FROM_JOB, nullptr, workDir.c_str(), &si, &pi);
+        if (!ok && GetLastError() == ERROR_ACCESS_DENIED) {
+            ok = CreateProcessA(nullptr, cmdBuf.data(), nullptr, nullptr, FALSE,
+                CREATE_NO_WINDOW, nullptr, workDir.c_str(), &si, &pi);
+        }
                 
         if (!ok) {
             DWORD e = GetLastError();
