@@ -38,6 +38,7 @@
 #include <core/WidgetFactory.h>
 #include <widgets/RegisterAllWidgets.h>
 #include <core/FrameLimiter.h>
+#include <core/Fonts.h>
 
 
 
@@ -124,15 +125,8 @@ int main(int argc, char** argv)
     // Setup Dear ImGui style
     ApplyObsLikeImGuiStyle(main_scale);
       
-    // Terminus: пиксельный шрифт с кириллицей. Без оверсэмплинга и с привязкой к пикселям, чтобы не мылился
-    std::string mainFontPath = std::string(ASSETS_SOURCE_DIR) + "/fonts/TerminusTTF.ttf";
-    ImFontConfig mainFontConfig;
-    mainFontConfig.OversampleH = 1;
-    mainFontConfig.OversampleV = 1;
-    mainFontConfig.PixelSnapH = true;
-    if (!io.Fonts->AddFontFromFileTTF(mainFontPath.c_str(), 16.0f, &mainFontConfig)) {
-        io.Fonts->AddFontDefault();
-    }
+    // ProggyClean + кириллица из Terminus; иконки ниже подмешиваются в этот же шрифт
+    core::AddMainFont();
     ImFontConfig config;
     config.MergeMode = true;
     config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced 

@@ -36,6 +36,7 @@
 #include <stb_image.h>
 #include <widgets/RegisterAllWidgets.h>
 #include <core/FrameLimiter.h>
+#include <core/Fonts.h>
 
 
 
@@ -151,15 +152,8 @@ int main(int argc, char** argv)
 #endif
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Terminus: пиксельный шрифт с кириллицей (во встроенном ProggyClean её нет)
-    std::string font_path = std::string(ASSETS_SOURCE_DIR) + "/fonts/TerminusTTF.ttf";
-    ImFontConfig font_config;
-    font_config.OversampleH = 1;
-    font_config.OversampleV = 1;
-    font_config.PixelSnapH = true;
-    if (!io.Fonts->AddFontFromFileTTF(font_path.c_str(), 16.0f, &font_config)) {
-        io.Fonts->AddFontDefault();
-    }
+    // ProggyClean + кириллица из Terminus (во встроенном ProggyClean её нет)
+    core::AddMainFont();
 
    static bool open = true;
     
