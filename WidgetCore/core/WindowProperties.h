@@ -54,6 +54,10 @@ namespace core {
         bool IsClickThroughOverlay() const { return always_on_top && full_screen && mouse_passthrougth; }
     };
 
+    // "assets/shaders/x.frag" -> полный путь в папке ассетов проекта; остальные пути не меняются.
+    // Так конфиги (например, демо) работают не только на том диске, где их сделали
+    std::string ResolveAssetPath(const std::string& path);
+
     nlohmann::json WindowPropertiesToJson(const WindowProperties& props);
     void WindowPropertiesFromJson(const nlohmann::json& json, WindowProperties& props);
 }

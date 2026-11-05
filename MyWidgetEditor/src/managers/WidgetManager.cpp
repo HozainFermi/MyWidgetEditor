@@ -32,6 +32,7 @@ namespace wg {
         context_.is_editor = true;
         context_.live_data = false;  // по умолчанию в редакторе превью
         context_.bus = &bus_;
+        context_.shader_uniforms = &shader_uniforms_;
     }
 
     // ================= Виджеты =================

@@ -72,6 +72,8 @@ namespace wg {
         bool IsLiveData() const { return context_.live_data; }
         // Последние данные на проводах - для инспектора
         const core::EventBus& GetBus() const { return bus_; }
+        // uniform-ы фонового шейдера от узлов ShaderParams
+        const std::map<std::string, float>& GetShaderUniforms() const { return shader_uniforms_; }
         void SetLiveData(bool live);
         void SetWindowProperties(const core::WindowProperties* window) { context_.window = window; }
 
@@ -91,6 +93,7 @@ namespace wg {
         std::vector<CanvasItem> items_;
         std::vector<core::Connection> connections_;
         core::EventBus bus_;
+        std::map<std::string, float> shader_uniforms_;
         core::WidgetContext context_;
         bool keep_selection_ = false;
         bool ports_dirty_ = true;

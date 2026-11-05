@@ -846,6 +846,9 @@ void Editor::RenderCanvas() {
 
 
             background_scene_.models_[0].shader->setFloat("iTime", (float)glfwGetTime());
+            for (const auto& [name, value] : widget_manager_.GetShaderUniforms()) {
+                background_scene_.models_[0].shader->setFloat("u_" + name, value);  // данные от узлов ShaderParams
+            }
             background_scene_.models_[0].shader->setVec2("iResolution", canvas_size_.x, canvas_size_.y);
             background_scene_.models_[0].shader->setMat4("ortho_model", model);
             background_scene_.models_[0].shader->setMat4("ortho_view", view);

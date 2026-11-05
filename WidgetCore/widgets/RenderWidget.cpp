@@ -271,9 +271,9 @@ namespace core {
 
         for (const auto& model : json.value("models", nlohmann::json::array())) {
             scene_.AddModel(
-                model.value("model_path", ""),
-                model.value("vert_shader_path", ""),
-                model.value("fragment_shader_path", ""),
+                ResolveAssetPath(model.value("model_path", "")),
+                ResolveAssetPath(model.value("vert_shader_path", "")),
+                ResolveAssetPath(model.value("fragment_shader_path", "")),
                 "");
         }
     }

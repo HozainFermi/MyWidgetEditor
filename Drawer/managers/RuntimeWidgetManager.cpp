@@ -10,6 +10,7 @@ namespace rn {
         context_.live_data = true;
         context_.window = &window_props_;
         context_.bus = &bus_;
+        context_.shader_uniforms = &shader_uniforms_;
     }
 
     bool RuntimeWidgetManager::WindowPropsFromJson(const std::string& filename) {

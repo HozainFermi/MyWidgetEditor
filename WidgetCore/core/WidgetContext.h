@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+#include <string>
 
 namespace core {
 
@@ -15,5 +17,8 @@ namespace core {
         const WindowProperties* window = nullptr;
         // Куда Emit отправляет сообщения. Без шины Emit ничего не делает
         EventBus* bus = nullptr;
+        // uniform-ы фонового шейдера окна: имя без "u_" -> значение. Пишут узлы ShaderParams,
+        // окно каждый кадр передаёт их в шейдер как uniform float u_<имя>. Может быть nullptr
+        std::map<std::string, float>* shader_uniforms = nullptr;
     };
 }

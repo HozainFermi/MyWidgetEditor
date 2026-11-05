@@ -34,6 +34,8 @@ namespace rn {
         void RenderContentAll(const ImVec2& origin);
 
         size_t GetCount() const { return widgets_.size(); }
+        // uniform-ы фонового шейдера от узлов ShaderParams
+        const std::map<std::string, float>& GetShaderUniforms() const { return shader_uniforms_; }
         // Наибольший FPS, который нужен виджетам без действий пользователя
         float GetDesiredFps() const;
 
@@ -43,6 +45,7 @@ namespace rn {
         std::vector<std::unique_ptr<core::Widget>> widgets_;
         std::vector<core::Connection> connections_;
         core::EventBus bus_;
+        std::map<std::string, float> shader_uniforms_;
         core::WidgetContext context_;
     };
 }

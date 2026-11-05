@@ -63,6 +63,10 @@ namespace rn {
 
                     background_scene_.models_[0].model_mat = model;
                     background_scene_.models_[0].shader->setFloat("iTime", (float)glfwGetTime());
+                    // Данные от узлов ShaderParams: uniform float u_<имя>
+                    for (const auto& [name, value] : manager->GetShaderUniforms()) {
+                        background_scene_.models_[0].shader->setFloat("u_" + name, value);
+                    }
                     background_scene_.models_[0].shader->setVec2("iResolution", pixel_size.x, pixel_size.y);
                     background_scene_.models_[0].shader->setMat4("ortho_model", model);
                     background_scene_.models_[0].shader->setMat4("ortho_view", view);
