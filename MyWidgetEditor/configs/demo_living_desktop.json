@@ -1,0 +1,320 @@
+{
+  "window": {
+    "mode": 0,
+    "bg_color": [
+      0.02,
+      0.03,
+      0.07,
+      1.0
+    ],
+    "frag_shader": "assets/shaders/DataAurora/data_aurora.frag",
+    "width": 1100,
+    "height": 620,
+    "layout_scaling": 1,
+    "fps_limit": 60,
+    "decorated": true,
+    "resizeble": true,
+    "moveble": true,
+    "full_screen": false,
+    "always_on_top": false,
+    "always_on_bottom": false,
+    "mouse_passthrougth": false,
+    "window_rounding": false,
+    "wallpaper_mode": false,
+    "rounding": 0.0
+  },
+  "widgets": [
+    {
+      "widget_class": "TextWidget",
+      "id": "widget_0",
+      "name": "Title",
+      "position": [
+        380,
+        20
+      ],
+      "size": [
+        340,
+        70
+      ],
+      "text": "[wave]Живой рабочий стол[/wave]",
+      "font_scale": 1.8,
+      "center_alignment": true,
+      "bg_color": 0,
+      "graph_position": [
+        30,
+        480
+      ]
+    },
+    {
+      "widget_class": "WeatherWidget",
+      "id": "widget_1",
+      "name": "Weather",
+      "position": [
+        20,
+        60
+      ],
+      "size": [
+        330,
+        240
+      ],
+      "city": "Москва",
+      "location_name": "Москва",
+      "latitude": 55.7558,
+      "longitude": 37.6173,
+      "forecast_days": 3,
+      "fade_on_hover": true,
+      "fade_min_alpha": 0.15,
+      "graph_position": [
+        30,
+        30
+      ]
+    },
+    {
+      "widget_class": "ActivityTrackerWidget",
+      "id": "widget_2",
+      "name": "Activity",
+      "position": [
+        750,
+        60
+      ],
+      "size": [
+        330,
+        250
+      ],
+      "top_count": 5,
+      "fade_on_hover": true,
+      "fade_min_alpha": 0.15,
+      "graph_position": [
+        30,
+        280
+      ]
+    },
+    {
+      "widget_class": "RenderWidget",
+      "id": "widget_3",
+      "name": "Model",
+      "position": [
+        380,
+        110
+      ],
+      "size": [
+        340,
+        400
+      ],
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "z": 6,
+        "zoom": 45
+      },
+      "models": [
+        {
+          "model_path": "assets/models/backpack/backpack.obj",
+          "vert_shader_path": "assets/shaders/backpack/1.model_loading.vert",
+          "fragment_shader_path": "assets/shaders/backpack/1.model_loading.frag"
+        }
+      ],
+      "rotation_speed": 30,
+      "scale": 0.65,
+      "bg_color": 0,
+      "graph_position": [
+        560,
+        170
+      ]
+    },
+    {
+      "widget_class": "NotificationWidget",
+      "id": "widget_4",
+      "name": "Notifications",
+      "position": [
+        750,
+        330
+      ],
+      "size": [
+        330,
+        215
+      ],
+      "bg_color": 0,
+      "graph_position": [
+        560,
+        330
+      ],
+      "rules": [
+        {
+          "enabled": true,
+          "name": "Холодно",
+          "op": 1,
+          "column": "temperature",
+          "message": "Холодно - одевайся теплее",
+          "duration_sec": 10
+        },
+        {
+          "enabled": true,
+          "name": "Перерыв",
+          "op": 3,
+          "column": "minutes",
+          "number": 120,
+          "message": "Больше двух часов в одной программе. Пора сделать перерыв",
+          "duration_sec": 10
+        }
+      ]
+    },
+    {
+      "widget_class": "TextWidget",
+      "id": "widget_5",
+      "name": "Hint",
+      "position": [
+        20,
+        560
+      ],
+      "size": [
+        1060,
+        40
+      ],
+      "bg_color": 0,
+      "text": "Погода -> цвет неба   Активность -> яркость   Температура -> вращение модели   Ctrl+Alt+Shift+Q - закрыть",
+      "font_scale": 1.0,
+      "center_alignment": true,
+      "graph_position": [
+        300,
+        480
+      ]
+    },
+    {
+      "widget_class": "MapNode",
+      "id": "widget_10",
+      "name": "Temp -> sky",
+      "columns": [
+        {
+          "output": "temperature",
+          "source": "temperature",
+          "op": 0,
+          "operand": ""
+        }
+      ],
+      "graph_position": [
+        300,
+        20
+      ]
+    },
+    {
+      "widget_class": "MapNode",
+      "id": "widget_11",
+      "name": "Temp -> spin",
+      "columns": [
+        {
+          "output": "rotation_speed",
+          "source": "temperature",
+          "op": 3,
+          "operand": "12"
+        }
+      ],
+      "graph_position": [
+        300,
+        120
+      ]
+    },
+    {
+      "widget_class": "FilterNode",
+      "id": "widget_12",
+      "name": "Cold?",
+      "filter": {
+        "match_all": true,
+        "conditions": [
+          {
+            "column": "temperature",
+            "op": 4,
+            "value": "5"
+          }
+        ]
+      },
+      "graph_position": [
+        300,
+        220
+      ]
+    },
+    {
+      "widget_class": "MapNode",
+      "id": "widget_13",
+      "name": "Activity -> energy",
+      "columns": [
+        {
+          "output": "energy",
+          "source": "minutes",
+          "op": 4,
+          "operand": "120"
+        }
+      ],
+      "graph_position": [
+        300,
+        330
+      ]
+    },
+    {
+      "widget_class": "ShaderParamsNode",
+      "id": "widget_14",
+      "name": "Sky shader",
+      "smoothing_sec": 3.0,
+      "graph_position": [
+        560,
+        30
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from_widget": "widget_1",
+      "from_port": "weather",
+      "to_widget": "widget_10",
+      "to_port": "in"
+    },
+    {
+      "from_widget": "widget_10",
+      "from_port": "out",
+      "to_widget": "widget_14",
+      "to_port": "params"
+    },
+    {
+      "from_widget": "widget_1",
+      "from_port": "weather",
+      "to_widget": "widget_11",
+      "to_port": "in"
+    },
+    {
+      "from_widget": "widget_11",
+      "from_port": "out",
+      "to_widget": "widget_3",
+      "to_port": "params"
+    },
+    {
+      "from_widget": "widget_1",
+      "from_port": "weather",
+      "to_widget": "widget_12",
+      "to_port": "in"
+    },
+    {
+      "from_widget": "widget_12",
+      "from_port": "yes",
+      "to_widget": "widget_4",
+      "to_port": "data"
+    },
+    {
+      "from_widget": "widget_2",
+      "from_port": "usage",
+      "to_widget": "widget_13",
+      "to_port": "in"
+    },
+    {
+      "from_widget": "widget_13",
+      "from_port": "out",
+      "to_widget": "widget_14",
+      "to_port": "params"
+    },
+    {
+      "from_widget": "widget_2",
+      "from_port": "usage",
+      "to_widget": "widget_4",
+      "to_port": "data"
+    }
+  ]
+}

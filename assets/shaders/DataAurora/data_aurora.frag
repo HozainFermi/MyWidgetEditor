@@ -66,7 +66,7 @@ void main() {
     vec3 band_b = mix(cold_b, hot_b, warm);
 
     // Несколько волнистых полос, искажённых шумом
-    float intensity = 0.55 + energy * 0.9;
+    float intensity = 0.9 + energy * 0.9;  // красиво и без данных, ярче с активностью
     for (int i = 0; i < 4; ++i) {
         float fi = float(i);
         float wave = fbm(vec2(p.x * 1.3 + t * (1.0 + fi * 0.35) + fi * 7.0, t * 0.5 + fi));
