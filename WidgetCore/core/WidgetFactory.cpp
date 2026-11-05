@@ -7,6 +7,21 @@ namespace core {
         return creators;
     }
 
+    std::map<std::string, WidgetCategory>& WidgetFactory::Categories() {
+        static std::map<std::string, WidgetCategory> categories;
+        return categories;
+    }
+
+    std::vector<std::string> WidgetFactory::GetRegisteredTypes(WidgetCategory category) {
+        std::vector<std::string> types;
+        for (const auto& [name, cat] : Categories()) {
+            if (cat == category) {
+                types.push_back(name);
+            }
+        }
+        return types;
+    }
+
     std::unique_ptr<Widget> WidgetFactory::Create(const std::string& class_name) {
         auto it = Creators().find(class_name);
         if (it == Creators().end()) {

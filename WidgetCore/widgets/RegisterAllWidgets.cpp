@@ -1,5 +1,7 @@
 #include "RegisterAllWidgets.h"
 #include "core/WidgetFactory.h"
+#include "nodes/FilterNode.h"
+#include "nodes/MapNode.h"
 #include "ActivityTrackerWidget.h"
 #include "InputTextWidget.h"
 #include "NotificationWidget.h"
@@ -20,5 +22,9 @@ namespace core {
         WidgetFactory::Register<TableWidget>("TableWidget");
         WidgetFactory::Register<TextWidget>("TextWidget");
         WidgetFactory::Register<WeatherWidget>("WeatherWidget");
+
+        // Узлы логики - только на вкладке Logic
+        WidgetFactory::Register<FilterNode>("FilterNode", WidgetCategory::Logic);
+        WidgetFactory::Register<MapNode>("MapNode", WidgetCategory::Logic);
     }
 }

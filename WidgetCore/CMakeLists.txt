@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB CORE_FILES CONFIGURE_DEPENDS
     "core/*.cpp" "core/*.h"
     "widgets/*.cpp" "widgets/*.h"
+    "nodes/*.cpp" "nodes/*.h"
 )
 
 file(GLOB GLHELPERS_FILES CONFIGURE_DEPENDS

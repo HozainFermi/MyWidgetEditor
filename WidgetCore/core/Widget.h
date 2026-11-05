@@ -48,6 +48,8 @@ namespace core {
         virtual void RenderProperties() {}
         // Контекст изменился (например, в редакторе переключили превью/живые данные)
         virtual void OnContextChanged() {}
+        // Узел логики (Filter, Map...): нет на раскладке окна и в Drawer, живёт только на вкладке Logic
+        virtual bool IsLogicNode() const { return false; }
         // Сколько кадров в секунду нужно виджету без действий пользователя. Окно рисуется с частотой
         // самого требовательного виджета (но не выше лимита окна). Анимациям нужно ~30, статике хватит 1-2
         virtual float GetDesiredFps() const { return 2.0f; }
@@ -93,6 +95,11 @@ namespace core {
         void SetName(const std::string& name) { name_ = name; }
         void SetWidgetClass(const std::string& widget_class) { widget_class_ = widget_class; }
 
+        // === Положение блока на вкладке Logic (на окно не влияет) ===
+        bool HasGraphPosition() const { return has_graph_position_; }
+        ImVec2 GetGraphPosition() const { return graph_position_; }
+        void SetGraphPosition(const ImVec2& pos) { graph_position_ = pos; has_graph_position_ = true; }
+
         // === Видимость и прозрачность при наведении (действуют в Drawer) ===
         // Невидимый виджет не рисуется, но работает: например, таблица, которая только кормит график
         bool IsVisible() const { return visible_; }
@@ -124,6 +131,9 @@ namespace core {
         ImU32 text_color_ = IM_COL32(255, 255, 255, 255);
         float min_width_ = 30.0f;
         float min_height_ = 20.0f;
+
+        ImVec2 graph_position_{ 0.0f, 0.0f };
+        bool has_graph_position_ = false;
 
         bool visible_ = true;
         bool fade_on_hover_ = false;

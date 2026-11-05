@@ -73,7 +73,7 @@ namespace core {
     }
 
     nlohmann::json Widget::ToJson() const {
-        return {
+        nlohmann::json json = {
             {"id", id_},
             {"name", name_},
             {"widget_class", widget_class_},
@@ -88,6 +88,10 @@ namespace core {
             {"fade_min_alpha", fade_min_alpha_},
             {"fade_speed", fade_speed_}
         };
+        if (has_graph_position_) {
+            json["graph_position"] = { graph_position_.x, graph_position_.y };
+        }
+        return json;
     }
 
     void Widget::FromJson(const nlohmann::json& json) {
@@ -109,6 +113,9 @@ namespace core {
         if (json.contains("bg_color")) bg_color_ = json["bg_color"];
         if (json.contains("min_width")) min_width_ = json["min_width"];
         if (json.contains("min_height")) min_height_ = json["min_height"];
+        if (json.contains("graph_position") && json["graph_position"].is_array()) {
+            SetGraphPosition(ImVec2(json["graph_position"][0], json["graph_position"][1]));
+        }
         visible_ = json.value("visibility", visible_);
         fade_on_hover_ = json.value("fade_on_hover", fade_on_hover_);
         fade_min_alpha_ = std::clamp(json.value("fade_min_alpha", fade_min_alpha_), 0.0f, 1.0f);
