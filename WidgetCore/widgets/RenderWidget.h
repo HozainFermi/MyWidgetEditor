@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <map>
 #include <string>
 #include <vector>
 #include <Scene.hpp>
@@ -25,12 +26,23 @@ namespace core {
         nlohmann::json ToJson() const override;
         void FromJson(const nlohmann::json& json) override;
 
-        // Вход для данных сцены (на будущее)
+        // Вход "params": первая строка данных управляет сценой.
+        //   rotation_speed (град/с), scale, camera_x/y/z, camera_zoom - параметры сцены;
+        //   любое числовое поле <name> уходит в шейдеры моделей как uniform float u_<name>
         std::vector<PortDesc> GetInputPorts() const override {
-            return { PortDesc{ "scene", "Scene", "render_scene", true } };
+            return { PortDesc{ "params", "Params", "json", true } };
         }
+        void OnInput(const std::string& to_port, const std::string& from_widget_id, const std::vector<WidgetValue>& value) override;
 
     private:
+        // Параметры сцены (сохраняются; вход "params" их меняет)
+        float rotation_speed_ = 30.0f;  // градусов в секунду
+        float scale_ = 1.0f;
+        float angle_ = 0.0f;            // текущий угол, не сохраняется
+        double last_time_ = -1.0;
+        // Числа со входа -> uniform u_<имя> в шейдерах моделей
+        std::map<std::string, float> shader_params_;
+
         void ExplorerButton(std::string& current_path, std::vector<std::filesystem::path>& paths, const std::filesystem::path& folder, PathType type);
 
         Styles::Scene scene_;

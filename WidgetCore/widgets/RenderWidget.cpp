@@ -56,10 +56,23 @@ namespace core {
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (!scene_.models_.empty()) {
-            scene_.models_[0].model_mat = glm::rotate(scene_.models_[0].model_mat,
-                glm::radians(sin(static_cast<float>(glfwGetTime()))),
-                glm::vec3(0.0f, 1.0f, 0.0f));
+        // Вращение по времени, а не по кадрам: скорость не зависит от FPS
+        const double now = glfwGetTime();
+        if (last_time_ >= 0.0) {
+            angle_ = fmodf(angle_ + rotation_speed_ * (float)(now - last_time_), 360.0f);
+        }
+        last_time_ = now;
+
+        const glm::mat4 transform = glm::scale(
+            glm::rotate(glm::mat4(1.0f), glm::radians(angle_), glm::vec3(0.0f, 1.0f, 0.0f)),
+            glm::vec3(scale_));
+        for (auto& model : scene_.models_) {
+            model.model_mat = transform;
+            if (model.shader) {
+                for (const auto& [name, value] : shader_params_) {
+                    model.shader->setFloat("u_" + name, value);  // шейдер без такого uniform просто проигнорирует
+                }
+            }
         }
 
         scene_.Draw();
@@ -137,6 +150,52 @@ namespace core {
             ImGui::DragFloat("Y:", &camera.Position.y, 0.01f);
             ImGui::DragFloat("Z:", &camera.Position.z, 0.01f);
         }
+
+        ImGui::Separator();
+        ImGui::Text("Animation");
+        ImGui::DragFloat("Rotation speed (deg/s)", &rotation_speed_, 1.0f, -720.0f, 720.0f);
+        ImGui::DragFloat("Scale", &scale_, 0.01f, 0.01f, 100.0f);
+
+        ImGui::Separator();
+        ImGui::TextDisabled("Input \"params\": rotation_speed, scale, camera_x/y/z, camera_zoom.");
+        ImGui::TextDisabled("Any other number goes to shaders as uniform float u_<name>.");
+        if (!shader_params_.empty()) {
+            ImGui::Text("Shader uniforms from input:");
+            for (const auto& [name, value] : shader_params_) {
+                ImGui::BulletText("u_%s = %.3f", name.c_str(), value);
+            }
+        }
+    }
+
+    void RenderWidget::OnInput(const std::string& to_port, const std::string&, const std::vector<WidgetValue>& value)
+    {
+        if (to_port != "params" || value.empty() || !value[0].is_object()) {
+            return;
+        }
+        // Числа могут прийти и строками (например, из таблицы со статическими данными)
+        auto to_float = [](const nlohmann::json& v, float& out) {
+            if (v.is_number()) { out = v.get<float>(); return true; }
+            if (v.is_string()) {
+                try { size_t used = 0; out = std::stof(v.get<std::string>(), &used); return used > 0; }
+                catch (...) {}
+            }
+            return false;
+        };
+
+        shader_params_.clear();
+        for (auto it = value[0].begin(); it != value[0].end(); ++it) {
+            float number = 0.0f;
+            if (!to_float(it.value(), number)) continue;
+
+            const std::string& key = it.key();
+            if (key == "rotation_speed") rotation_speed_ = number;
+            else if (key == "scale") scale_ = (std::max)(0.001f, number);
+            else if (key == "camera_x") scene_.camera_->Position.x = number;
+            else if (key == "camera_y") scene_.camera_->Position.y = number;
+            else if (key == "camera_z") scene_.camera_->Position.z = number;
+            else if (key == "camera_zoom") scene_.camera_->Zoom = number;
+            else shader_params_[key] = number;
+        }
     }
 
     void RenderWidget::ExplorerButton(std::string& current_path, std::vector<std::filesystem::path>& paths, const std::filesystem::path& folder, PathType type)
@@ -188,12 +247,16 @@ namespace core {
             {"yaw", scene_.camera_->Yaw},
             {"pitch", scene_.camera_->Pitch}
         };
+        json["rotation_speed"] = rotation_speed_;
+        json["scale"] = scale_;
         return json;
     }
 
     void RenderWidget::FromJson(const nlohmann::json& json)
     {
         Widget::FromJson(json);
+        rotation_speed_ = json.value("rotation_speed", rotation_speed_);
+        scale_ = (std::max)(0.001f, json.value("scale", scale_));
 
         auto camera_json = json.value("camera", nlohmann::json::object());
         scene_.camera_->Position.x = camera_json.value("x", 0.0f);
