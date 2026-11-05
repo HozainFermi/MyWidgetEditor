@@ -10,8 +10,9 @@ void Editor::RenderFileBrowser(FileBrowserMode& mode) {
             // Строка поиска
             static char search_buffer[256] = "";
 
-            // Синхронизируем buffer с search_query_
+            // При каждом открытии: свежий список файлов и синхронизация строки поиска
             if (ImGui::IsWindowAppearing()) {
+                ScanConfigFiles();
                 strncpy_s(search_buffer, search_query_.c_str(), sizeof(search_buffer) - 1);
             }
 
@@ -134,6 +135,10 @@ void Editor::RenderSaveFileMenu() {
         ImGui::OpenPopup("SaveFile");
         if (ImGui::BeginPopupModal("SaveFile", NULL,
             ImGuiWindowFlags_AlwaysAutoResize)) {
+            // Проверка "такой конфиг уже есть" должна видеть свежий список
+            if (ImGui::IsWindowAppearing()) {
+                ScanConfigFiles();
+            }
 
             if (ImGui::BeginChild("SaveFileChild", ImVec2(400, 80), true)) {
 
