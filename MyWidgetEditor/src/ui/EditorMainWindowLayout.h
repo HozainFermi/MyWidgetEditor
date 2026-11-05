@@ -4,6 +4,12 @@
 #include <GLFW/glfw3.h>
 #include "WidgetManager.h"
 #include <core/WindowProperties.h>
+#include <core/Paths.h>
+
+// Папка конфигов: рядом с exe (собранная копия) или в исходниках (разработка)
+inline std::string ConfigsDir() {
+    return core::DataDir("configs", std::string(PROJECT_SOURCE_DIR) + "/configs");
+}
 #include "Connections.h"
 #include "Mesh.h"
 #include "Scene.hpp"
@@ -124,7 +130,7 @@ public:
    
     void ScanConfigFiles() {
         all_files_.clear();
-        for (const auto& entry : std::filesystem::directory_iterator(std::string(PROJECT_SOURCE_DIR)+"/configs")) {
+        for (const auto& entry : std::filesystem::directory_iterator(ConfigsDir())) {
             if (entry.is_regular_file() && entry.path().extension() == ".json") {
                 all_files_.push_back(entry.path().stem().string());
             }

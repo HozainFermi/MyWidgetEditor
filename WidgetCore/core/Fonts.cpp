@@ -1,6 +1,7 @@
 #include "Fonts.h"
 #include <string>
 #include <imgui.h>
+#include "Paths.h"
 
 namespace core {
 
@@ -14,7 +15,7 @@ namespace core {
         cyrillic.OversampleH = 1;
         cyrillic.OversampleV = 1;
         cyrillic.PixelSnapH = true;
-        const std::string path = std::string(ASSETS_SOURCE_DIR) + "/fonts/TerminusTTF.ttf";
+        const std::string path = AssetsDir() + "/fonts/TerminusTTF.ttf";
         io.Fonts->AddFontFromFileTTF(path.c_str(), 13.0f, &cyrillic);
     }
 }

@@ -102,3 +102,8 @@ target_compile_definitions(MyWidgetEditor PRIVATE
     ICONS_DIR="${ICONS_PATH}"
 
 )
+
+# cmake --install: exe, конфиги и иконки рядом с ним
+install(TARGETS MyWidgetEditor RUNTIME DESTINATION .)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/configs/" DESTINATION configs FILES_MATCHING PATTERN "*.json")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/icons/" DESTINATION icons)

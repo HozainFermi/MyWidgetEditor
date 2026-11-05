@@ -7,12 +7,13 @@
 #include <imgui_stdlib.h>
 #include <IconText.h>
 #include "core/WindowProperties.h"
+#include "core/Paths.h"
 
 namespace core {
 
     namespace {
-        const std::filesystem::path kShadersFolder = std::string(ASSETS_SOURCE_DIR) + "/shaders";
-        const std::filesystem::path kModelsFolder = std::string(ASSETS_SOURCE_DIR) + "/models";
+        const std::filesystem::path kShadersFolder = AssetsDir() + "/shaders";
+        const std::filesystem::path kModelsFolder = AssetsDir() + "/models";
 
         const char* PathTypeToString(PathType type) {
             switch (type) {
@@ -239,7 +240,12 @@ namespace core {
         auto json = Widget::ToJson();
         nlohmann::json models_json = nlohmann::json::array();
         for (const auto& model : scene_.models_) {
-            models_json.push_back(model.ToJson());
+            // Пути внутри assets сохраняем как "assets/..." - конфиг работает на другом ПК
+            nlohmann::json m = model.ToJson();
+            for (const char* key : { "model_path", "vert_shader_path", "fragment_shader_path" }) {
+                if (m.contains(key)) m[key] = PortableAssetPath(m[key].get<std::string>());
+            }
+            models_json.push_back(m);
         }
         json["models"] = models_json;
 

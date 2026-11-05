@@ -372,3 +372,6 @@ FodyWeavers.xsd
 !external/assimp/code/AssetLib/Obj/
 !external/assimp/contrib/zlib/win32/
 !assets/**/*.obj
+
+# Собранная для другого ПК копия (build_release.bat)
+dist/

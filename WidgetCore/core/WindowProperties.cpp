@@ -38,14 +38,6 @@ namespace core {
         }
     }
 
-    std::string ResolveAssetPath(const std::string& path) {
-        const std::string prefix = "assets/";
-        if (path.rfind(prefix, 0) == 0) {
-            return std::string(ASSETS_SOURCE_DIR) + "/" + path.substr(prefix.size());
-        }
-        return path;
-    }
-
     nlohmann::json WindowPropertiesToJson(const WindowProperties& props) {
         nlohmann::json window;
         window["mode"] = (int)props.mode;
@@ -64,7 +56,7 @@ namespace core {
         window["moveble"] = props.moveble;
         window["decorated"] = props.decorated;
 
-        window["frag_shader"] = props.frag_GLSLshader_file;
+        window["frag_shader"] = PortableAssetPath(props.frag_GLSLshader_file);  // "assets/..." - работает на другом ПК
         window["width"] = props.width;
         window["height"] = props.height;
         window["rounding"] = props.rounding;

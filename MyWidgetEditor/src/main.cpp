@@ -39,6 +39,7 @@
 #include <widgets/RegisterAllWidgets.h>
 #include <core/FrameLimiter.h>
 #include <core/Fonts.h>
+#include <core/Paths.h>
 
 
 
@@ -96,9 +97,10 @@ int main(int argc, char** argv)
     glfwSwapInterval(0); // кадры отмеряет FrameLimiter (ожидание vsync в драйвере грузило ядро на 100%)
 
     GLFWimage images[4];
-    images[0].pixels = stbi_load(ICONS_DIR"/icon_16.png", &images[0].width, &images[0].height, 0, 4);
-    images[1].pixels = stbi_load(ICONS_DIR"/icon_32.png", &images[1].width, &images[1].height, 0, 4);
-    images[2].pixels = stbi_load(ICONS_DIR"/icon_48.png", &images[1].width, &images[1].height, 0, 4);  
+    const std::string icons = core::DataDir("icons", ICONS_DIR);
+    images[0].pixels = stbi_load((icons + "/icon_16.png").c_str(), &images[0].width, &images[0].height, 0, 4);
+    images[1].pixels = stbi_load((icons + "/icon_32.png").c_str(), &images[1].width, &images[1].height, 0, 4);
+    images[2].pixels = stbi_load((icons + "/icon_48.png").c_str(), &images[2].width, &images[2].height, 0, 4);  
   
     glfwSetWindowIcon(window, 2, images); 
     stbi_image_free(images[0].pixels);
@@ -133,7 +135,7 @@ int main(int argc, char** argv)
     //std::string fonts_path { "%s/assets/fonts/OpenFontIcons.ttf",PROJECT_SOURCE_DIR };
     //C:/Users/dedde/source/repos/MyWidgetEditor/assets/fonts/OpenFontIcons.ttf
     static const ImWchar icon_ranges[] = { ICON_MIN, ICON_MAX, 0 };
-    std::string fontPath = ASSETS_SOURCE_DIR;
+    std::string fontPath = core::AssetsDir();
     fontPath += "/fonts/OpenFontIcons.ttf";
     
     io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 13.0f, &config);

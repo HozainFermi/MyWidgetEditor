@@ -38,11 +38,11 @@ void Editor::SaveCurrentConfig() {
         SetStatus("Nothing to save into: use File > New", true);
         return;
     }
-    SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + loaded_config + ".json");
+    SaveConfigWithConnections(ConfigsDir() + "/" + loaded_config + ".json");
 }
 
 bool Editor::ExecuteLoad(const std::string& filename) {
-    if (!widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR) + "/configs/" + filename + ".json", window_props_)) {
+    if (!widget_manager_.LoadFromFile(ConfigsDir() + "/" + filename + ".json", window_props_)) {
         SetStatus("Can't load " + filename, true);
         return false;
     }
@@ -52,8 +52,12 @@ bool Editor::ExecuteLoad(const std::string& filename) {
 }
 
 bool Editor::ExecuteRun(const std::string& filename) {
-    std::filesystem::path relfilePath(std::string(PROJECT_SOURCE_DIR)+"/configs/" + filename + ".json");
-    std::filesystem::path relDrawer("../Drawer/Drawer.exe");
+    std::filesystem::path relfilePath(ConfigsDir() + "/" + filename + ".json");
+    // Drawer.exe рядом с редактором (собранная копия) или в соседней папке сборки (разработка)
+    std::filesystem::path relDrawer = core::ExeDir() / "Drawer.exe";
+    if (!std::filesystem::exists(relDrawer)) {
+        relDrawer = core::ExeDir() / ".." / "Drawer" / "Drawer.exe";
+    }
     //C:\Users\Hoz\Desktop\MyWidgetEditor\out\build\x64-debug\Drawer
     std::filesystem::path absExePath = std::filesystem::absolute(relDrawer);
     std::filesystem::path absConfigPath = std::filesystem::absolute(relfilePath);
@@ -406,7 +410,7 @@ void Editor::RenderRightPanel() {
 
     static char VERTbuf[150];
     static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
-    static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";
+    static std::filesystem::path shadersFolderPath = core::AssetsDir() + "/shaders";
     static std::vector<std::string> shaderNames {};
     static std::vector<std::filesystem::path> shaders_paths {};
 

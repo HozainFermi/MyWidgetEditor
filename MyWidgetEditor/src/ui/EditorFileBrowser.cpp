@@ -154,7 +154,7 @@ void Editor::RenderSaveFileMenu() {
                         SetStatus("Config '" + temp + "' already exists", true);
                     }
                     else {
-                        SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + temp + ".json");
+                        SaveConfigWithConnections(ConfigsDir() + "/" + temp + ".json");
                         loaded_config = temp;  // дальше Ctrl+S сохраняет в этот же файл
                         filebrowser_open_ = false;
                         filesave_open_ = false;

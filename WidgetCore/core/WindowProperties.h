@@ -2,6 +2,7 @@
 #include <string>
 #include <imgui.h>
 #include <json.hpp>
+#include "Paths.h"
 
 namespace core {
 
@@ -37,7 +38,7 @@ namespace core {
         bool moveble = true;
         bool decorated = true;
 
-        std::string vertex_GLSLshader_file = std::string(ASSETS_SOURCE_DIR) + "/shaders/base_vertex.vert";
+        std::string vertex_GLSLshader_file = AssetsDir() + "/shaders/base_vertex.vert";
         std::string frag_GLSLshader_file = "";
         int width = 500;
         int height = 500;
@@ -53,10 +54,6 @@ namespace core {
         // весь экран без возможности кликнуть, поэтому Drawer делает фон прозрачным
         bool IsClickThroughOverlay() const { return always_on_top && full_screen && mouse_passthrougth; }
     };
-
-    // "assets/shaders/x.frag" -> полный путь в папке ассетов проекта; остальные пути не меняются.
-    // Так конфиги (например, демо) работают не только на том диске, где их сделали
-    std::string ResolveAssetPath(const std::string& path);
 
     nlohmann::json WindowPropertiesToJson(const WindowProperties& props);
     void WindowPropertiesFromJson(const nlohmann::json& json, WindowProperties& props);

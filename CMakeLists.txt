@@ -56,3 +56,16 @@ add_subdirectory(${ASSIMP_DIR} assimp_build)
 add_subdirectory(WidgetCore)
 add_subdirectory(MyWidgetEditor)
 add_subdirectory(Drawer)
+
+# ===== Установка: папка, которую можно унести на другой ПК =====
+# cmake --install <папка сборки> --prefix <куда>   (или просто build_release.bat)
+# Программы ищут assets/configs/icons рядом со своим exe (см. WidgetCore/core/Paths.h)
+install(DIRECTORY "${ASSETS_DIR}/" DESTINATION assets)
+
+# DLL OpenSSL (HTTPS в таблице и погоде)
+set(OPENSSL_DLL_DIR "C:/Program Files/OpenSSL-Win64/bin")
+install(FILES "${OPENSSL_DLL_DIR}/libssl-3-x64.dll" "${OPENSSL_DLL_DIR}/libcrypto-3-x64.dll" DESTINATION .)
+
+# Среда выполнения MSVC (vcruntime140.dll и т.п.) - чтобы не ставить VC++ Redistributable на другом ПК
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .)
+include(InstallRequiredSystemLibraries)

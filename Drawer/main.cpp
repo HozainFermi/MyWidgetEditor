@@ -37,6 +37,7 @@
 #include <widgets/RegisterAllWidgets.h>
 #include <core/FrameLimiter.h>
 #include <core/Fonts.h>
+#include <core/Paths.h>
 #include "ui/LayoutScale.h"
 
 
@@ -53,7 +54,8 @@ int main(int argc, char** argv)
     if (!glfwInit())
         return 1;
     // Без аргумента запускаем демо-конфиг из репозитория
-    std::string test_str = std::string(PROJECT_SOURCE_DIR) + "/../MyWidgetEditor/configs/table_plot.json";
+    std::string test_str = core::DataDir("configs", std::string(PROJECT_SOURCE_DIR) + "/../MyWidgetEditor/configs") + "/demo_living_desktop.json";
+    std::cout << "Assets: " << core::AssetsDir() << std::endl;
     core::RegisterAllWidgets();
     rn::RuntimeWidgetManager* manager = rn::RuntimeWidgetManager::Get();
     if (argc > 1) {

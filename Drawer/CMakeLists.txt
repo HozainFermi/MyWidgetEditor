@@ -26,3 +26,6 @@ target_compile_options(Drawer PRIVATE ${PROJECT_UTF8_FLAG})
 
 # Виджеты, ImGui, ImPlot, OpenGL-хелперы и сторонние либы приходят из WidgetCore
 target_link_libraries(Drawer PRIVATE WidgetCore)
+
+# cmake --install: exe в корень папки установки
+install(TARGETS Drawer RUNTIME DESTINATION .)
