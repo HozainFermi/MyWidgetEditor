@@ -146,10 +146,11 @@ void Editor::RenderSaveFileMenu() {
                     temp = savefile_buffer;
                     auto it = std::find(all_files_.begin(), all_files_.end(), temp);
                     if (it != all_files_.end()) {
-                        ImGui::TextColored(ImVec4(1, 0.5f, 0.5f, 1), "Config file with name '%s' already exists", it);
+                        SetStatus("Config '" + temp + "' already exists", true);
                     }
                     else {
                         SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + temp + ".json");
+                        loaded_config = temp;  // дальше Ctrl+S сохраняет в этот же файл
                         filebrowser_open_ = false;
                         filesave_open_ = false;
                     }

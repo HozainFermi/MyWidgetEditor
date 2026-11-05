@@ -209,6 +209,29 @@ private:
 
     // Сохранение/загрузка конфигурации с учётом connections_
     void SaveConfigWithConnections(const std::string& filename);
+    // Сохранить в загруженный конфиг (Ctrl+S / File > Save)
+    void SaveCurrentConfig();
+
+    // ===== Статус операций: спиннер и результат над канвасом =====
+    enum class PendingAction { None, Save, Load, Run };
+    PendingAction pending_action_ = PendingAction::None;
+    std::string pending_arg_;
+    bool pending_frame_shown_ = false;  // спиннер уже нарисован хотя бы один кадр
+    std::string status_text_;
+    bool status_busy_ = false;
+    bool status_error_ = false;
+    double status_until_ = 0.0;
+    uint32_t launching_pid_ = 0;        // ждём, пока у запущенного виджета появится окно
+    double launch_deadline_ = 0.0;
+
+    // Операция выполнится в следующем кадре, а пока над канвасом крутится спиннер с busy_text
+    void QueueAction(PendingAction action, const std::string& arg, const char* busy_text);
+    void RunPendingAction();
+    void SetStatus(const std::string& text, bool error);
+    void RenderStatus();
+    bool ExecuteLoad(const std::string& name);
+    bool ExecuteRun(const std::string& name);
+    bool ExecuteSave(const std::string& path);
 
     void CheckFileMenuHotKeys();
 

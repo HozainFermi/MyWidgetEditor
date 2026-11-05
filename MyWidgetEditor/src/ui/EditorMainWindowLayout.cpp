@@ -22,11 +22,36 @@ static void HelpMarker(const char* desc)
 }
 
 void Editor::OnFileForLoadSelected(const std::string& filename) {
-    loaded_config = filename;
-    widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR)+"/configs/"+filename+".json", window_props_);
-
+    QueueAction(PendingAction::Load, filename, "Loading...");
 }
+
 void Editor::OnFileForRunSelected(const std::string& filename) {
+    QueueAction(PendingAction::Run, filename, "Launching...");
+}
+
+void Editor::SaveConfigWithConnections(const std::string& filename) {
+    QueueAction(PendingAction::Save, filename, "Saving...");
+}
+
+void Editor::SaveCurrentConfig() {
+    if (loaded_config.empty()) {
+        SetStatus("Nothing to save into: use File > New", true);
+        return;
+    }
+    SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + loaded_config + ".json");
+}
+
+bool Editor::ExecuteLoad(const std::string& filename) {
+    if (!widget_manager_.LoadFromFile(std::string(PROJECT_SOURCE_DIR) + "/configs/" + filename + ".json", window_props_)) {
+        SetStatus("Can't load " + filename, true);
+        return false;
+    }
+    loaded_config = filename;
+    SetStatus("Loaded " + filename, false);
+    return true;
+}
+
+bool Editor::ExecuteRun(const std::string& filename) {
     std::filesystem::path relfilePath(std::string(PROJECT_SOURCE_DIR)+"/configs/" + filename + ".json");
     std::filesystem::path relDrawer("../Drawer/Drawer.exe");
     //C:\Users\Hoz\Desktop\MyWidgetEditor\out\build\x64-debug\Drawer
@@ -36,12 +61,14 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     // Проверка существования файлов
     if (!std::filesystem::exists(absExePath)) {
         std::cerr << "Error: Executable not found: " << absExePath << "\n";
-        return;
+        SetStatus("Drawer.exe not found", true);
+        return false;
     }
 
     if (!std::filesystem::exists(absConfigPath)) {
         std::cerr << "Error: Config file not found: " << absConfigPath << "\n";
-        return;
+        SetStatus("Config not found: " + filename, true);
+        return false;
     }
 
     std::string exePath = "\"" + absExePath.string() + "\"";
@@ -52,31 +79,177 @@ void Editor::OnFileForRunSelected(const std::string& filename) {
     //Раздельная передача
 #ifdef _WIN32   
     HANDLE proc = IndependentLauncher::launch(exePath, configPath);
-    if (proc== nullptr) {///!!!
+    if (proc == nullptr) {
         std::cerr << "Failed to launch process\n";
+        SetStatus("Can't start the widget", true);
+        return false;
     }
-    else {
-        processes_.Add(Process(proc, filename));
-    }
+    Process process(proc, filename);
+    launching_pid_ = process.GetPid();
+    launch_deadline_ = ImGui::GetTime() + 10.0;
+    processes_.Add(std::move(process));
+    // Спиннер крутится, пока у виджета не появится окно (см. RenderStatus)
+    status_text_ = "Starting " + filename + "...";
+    status_busy_ = true;
+    return true;
 #else
     pid_t pid = IndependentLauncher::launch(exePath, configPath);
     if (pid == 0) {
         std::cerr << "Failed to launch process\n";
+        SetStatus("Can't start the widget", true);
+        return false;
     }
-    else {
-        processes_.Add(Process(pid, filename));
-    }
+    processes_.Add(Process(pid, filename));
+    SetStatus("Started " + filename, false);
+    return true;
 #endif
 
 }
 
 
-void Editor::SaveConfigWithConnections(const std::string& filename)
+bool Editor::ExecuteSave(const std::string& path)
 {
-    // Окно, виджеты и связи
     std::string error;
-    if (!core::SaveConfig(filename, widget_manager_.ToJson(window_props_), &error)) {
+    if (!core::SaveConfig(path, widget_manager_.ToJson(window_props_), &error)) {
         std::cerr << error << std::endl;
+        SetStatus("Can't save: " + error, true);
+        return false;
+    }
+    SetStatus("Saved " + std::filesystem::path(path).stem().string(), false);
+    return true;
+}
+
+// ===== Статус операций =====
+
+namespace {
+#ifdef _WIN32
+    struct WindowSearch { DWORD pid; bool found; };
+
+    BOOL CALLBACK FindProcessWindow(HWND hwnd, LPARAM param) {
+        auto* search = reinterpret_cast<WindowSearch*>(param);
+        DWORD pid = 0;
+        GetWindowThreadProcessId(hwnd, &pid);
+        if (pid == search->pid && IsWindowVisible(hwnd)) {
+            search->found = true;
+            return FALSE;
+        }
+        // Окно виджета в режиме обоев - дочернее окно WorkerW, ищем и среди дочерних
+        EnumChildWindows(hwnd, FindProcessWindow, param);
+        return search->found ? FALSE : TRUE;
+    }
+
+    bool ProcessHasWindow(uint32_t pid) {
+        WindowSearch search{ pid, false };
+        EnumWindows(FindProcessWindow, reinterpret_cast<LPARAM>(&search));
+        return search.found;
+    }
+#endif
+
+    // Крутящаяся дуга размером со строку текста
+    void Spinner(ImU32 color) {
+        const float size = ImGui::GetTextLineHeight();
+        const ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImGui::Dummy(ImVec2(size, size));
+        const ImVec2 center(pos.x + size * 0.5f, pos.y + size * 0.5f);
+        const float start = (float)ImGui::GetTime() * 6.0f;
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        dl->PathArcTo(center, size * 0.4f, start, start + IM_PI * 1.4f, 20);
+        dl->PathStroke(color, 0, 2.0f);
+    }
+
+    // Галочка (ok) или крестик (ошибка)
+    void ResultMark(bool error) {
+        const float size = ImGui::GetTextLineHeight();
+        const ImVec2 p = ImGui::GetCursorScreenPos();
+        ImGui::Dummy(ImVec2(size, size));
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        if (error) {
+            const ImU32 red = IM_COL32(240, 90, 90, 255);
+            dl->AddLine(ImVec2(p.x + size * 0.2f, p.y + size * 0.2f), ImVec2(p.x + size * 0.8f, p.y + size * 0.8f), red, 2.0f);
+            dl->AddLine(ImVec2(p.x + size * 0.8f, p.y + size * 0.2f), ImVec2(p.x + size * 0.2f, p.y + size * 0.8f), red, 2.0f);
+        }
+        else {
+            ImVec2 check[] = { ImVec2(p.x + size * 0.15f, p.y + size * 0.55f), ImVec2(p.x + size * 0.4f, p.y + size * 0.8f), ImVec2(p.x + size * 0.85f, p.y + size * 0.25f) };
+            dl->AddPolyline(check, 3, IM_COL32(110, 210, 120, 255), 0, 2.0f);
+        }
+    }
+}
+
+void Editor::QueueAction(PendingAction action, const std::string& arg, const char* busy_text) {
+    pending_action_ = action;
+    pending_arg_ = arg;
+    pending_frame_shown_ = false;
+    status_text_ = busy_text;
+    status_busy_ = true;
+    status_error_ = false;
+}
+
+void Editor::RunPendingAction() {
+    if (pending_action_ == PendingAction::None) {
+        return;
+    }
+    // Сначала кадр со спиннером, потом сама (блокирующая) операция
+    if (!pending_frame_shown_) {
+        pending_frame_shown_ = true;
+        return;
+    }
+    PendingAction action = pending_action_;
+    pending_action_ = PendingAction::None;
+    switch (action) {
+    case PendingAction::Save: ExecuteSave(pending_arg_); break;
+    case PendingAction::Load: ExecuteLoad(pending_arg_); break;
+    case PendingAction::Run:  ExecuteRun(pending_arg_); break;
+    default: break;
+    }
+}
+
+void Editor::SetStatus(const std::string& text, bool error) {
+    status_text_ = text;
+    status_busy_ = false;
+    status_error_ = error;
+    status_until_ = ImGui::GetTime() + (error ? 6.0 : 2.5);
+}
+
+void Editor::RenderStatus() {
+#ifdef _WIN32
+    // Запуск закончен, когда у виджета появилось окно (или процесс сразу умер)
+    if (launching_pid_ != 0 && pending_action_ == PendingAction::None) {
+        HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, launching_pid_);
+        const bool exited = !process || WaitForSingleObject(process, 0) == WAIT_OBJECT_0;
+        if (process) CloseHandle(process);
+
+        if (exited) {
+            SetStatus("Widget exited right after start", true);
+            launching_pid_ = 0;
+        }
+        else if (ProcessHasWindow(launching_pid_)) {
+            SetStatus("Widget started", false);
+            launching_pid_ = 0;
+        }
+        else if (ImGui::GetTime() > launch_deadline_) {
+            SetStatus("Widget started, but no window yet", true);
+            launching_pid_ = 0;
+        }
+    }
+#endif
+
+    if (status_busy_) {
+        Spinner(ImGui::GetColorU32(ImGuiCol_Text));
+        ImGui::SameLine();
+        ImGui::TextUnformatted(status_text_.c_str());
+    }
+    else if (!status_text_.empty() && ImGui::GetTime() < status_until_) {
+        ResultMark(status_error_);
+        ImGui::SameLine();
+        if (status_error_) {
+            ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.45f, 1.0f), "%s", status_text_.c_str());
+        }
+        else {
+            ImGui::TextUnformatted(status_text_.c_str());
+        }
+    }
+    else {
+        ImGui::NewLine();
     }
 }
 
@@ -90,7 +263,7 @@ void Editor::CheckFileMenuHotKeys() {
         filesave_open_ = true;
     }
     if (ImGui::IsKeyPressed(ImGuiKey_S, false)) {
-        if (!loaded_config.empty()) { SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + loaded_config + ".json"); }
+        SaveCurrentConfig();
     }
     if (ImGui::IsKeyPressed(ImGuiKey_L, false)) {
         filebrowser_open_ = true;
@@ -113,7 +286,7 @@ void Editor::RenderMenuBar() {
                 browsermode = FileBrowserMode::Run;
             }
             if (ImGui::MenuItem("Save ", "Ctrl+S")) {                
-               if (!loaded_config.empty()) { SaveConfigWithConnections(std::string(PROJECT_SOURCE_DIR) + "/configs/" + loaded_config + ".json"); }                
+               SaveCurrentConfig();                
             }
             if (ImGui::MenuItem("Load", "Ctrl+L")) {                
                 filebrowser_open_ = true;
@@ -215,19 +388,6 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
 void Editor::RenderRightPanel() {
     core::Widget* selected = widget_manager_.GetSelectedWidget();
 
-    static bool* selections[] = 
-    { 
-      &window_props_.wallpaper_mode,
-      &window_props_.full_screen,
-      &window_props_.always_on_top,
-      &window_props_.always_on_bottom,
-      &window_props_.window_rounding,
-      &window_props_.resizeble,
-      &window_props_.mouse_passthrougth,
-      &window_props_.moveble,
-      &window_props_.decorated
-    };
-    static const char* items[] = {"Wallpaper mode", "Full screen", "Always on top", "Always on bottom", "Window rounding", "Resizeble", "Mouse passthrougth", "Moveble" ,"Decorated"};
     static char VERTbuf[150];
     static char FRAGbuf[150]; // = window_props_.frag_GLSLshader_file.c_str();
     static std::filesystem::path shadersFolderPath = std::string(ASSETS_SOURCE_DIR) + "/shaders";
@@ -254,38 +414,58 @@ void Editor::RenderRightPanel() {
                 window_props_.bg_color_float[3]));
     }
 
+    // ===== Режим окна =====
+    static const char* kModes[] = { "Normal", "Wallpaper", "HUD" };
+    int mode = (int)window_props_.mode;
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
-    if (ImGui::BeginCombo(" ", "Window properties"))
-    {
-        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-        {            
-            if (ImGui::Checkbox(items[n], selections[n])){
-                if (*selections[0]) {
-                    *selections[1] = true;
-                    *selections[2] = false;
-                    *selections[3] = false;
-                    *selections[4] = false;
-                    *selections[5] = false;
-                    *selections[6] = false;
-                    *selections[7] = false;
-                    *selections[8] = false;                    
-                }
+    if (ImGui::Combo("Mode", &mode, kModes, IM_ARRAYSIZE(kModes))) {
+        window_props_.mode = (core::WindowMode)mode;
+        window_props_.ApplyMode();
+    }
+    ImGui::SameLine();
+    HelpMarker("Normal: a regular window, set the properties yourself.\n"
+               "Wallpaper: on the desktop under the icons, full screen.\n"
+               "HUD: on top of everything, full screen, clicks go through, background is transparent.\n\n"
+               "Emergency close of running widgets: Ctrl+Alt+Shift+Q.");
+    if (window_props_.mode == core::WindowMode::Hud) {
+        ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.35f, 1.0f), "HUD: background and shader are transparent.\nClose: Ctrl+Alt+Shift+Q");
+    }
 
-                if( *selections[2] && *selections[3])  {                    
-                    if (n == 2) {
-                        *selections[3] = false;
-                    }
-                    if (n == 3) {
-                        *selections[2] = false;
-                    }
-                }
+    // ===== Свойства окна (флаги, заданные режимом, не меняются) =====
+    struct WindowFlag { const char* name; bool* value; bool locked_by_mode; };
+    const bool normal_mode = window_props_.mode == core::WindowMode::Normal;
+    WindowFlag flags[] = {
+        { "Full screen",        &window_props_.full_screen,        !normal_mode },
+        { "Always on top",      &window_props_.always_on_top,      !normal_mode },
+        { "Always on bottom",   &window_props_.always_on_bottom,   !normal_mode },
+        { "Mouse passthrough",  &window_props_.mouse_passthrougth, !normal_mode },
+        { "Window rounding",    &window_props_.window_rounding,    !normal_mode },
+        { "Resizable",          &window_props_.resizeble,          !normal_mode },
+        { "Movable",            &window_props_.moveble,            !normal_mode },
+        { "Decorated",          &window_props_.decorated,          !normal_mode },
+    };
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
+    if (ImGui::BeginCombo("##window_properties", "Window properties"))
+    {
+        if (!normal_mode) {
+            ImGui::TextDisabled("Set by the \"%s\" mode", kModes[mode]);
+        }
+        for (auto& flag : flags) {
+            ImGui::BeginDisabled(flag.locked_by_mode);
+            if (ImGui::Checkbox(flag.name, flag.value)) {
+                // Поверх всех и под всеми одновременно - нельзя
+                if (flag.value == &window_props_.always_on_top && window_props_.always_on_top) window_props_.always_on_bottom = false;
+                if (flag.value == &window_props_.always_on_bottom && window_props_.always_on_bottom) window_props_.always_on_top = false;
             }
+            ImGui::EndDisabled();
         }
         ImGui::EndCombo();
     }
-    //window_props_.SetProperties(selections);
+    if (normal_mode && window_props_.IsClickThroughOverlay()) {
+        ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.35f, 1.0f), "On top + full screen + passthrough:\nbackground will be transparent.");
+    }
 
-    if (*selections[4]) {
+    if (window_props_.window_rounding) {
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.65f);
         ImGui::DragFloat("Rounding",&window_props_.rounding,0.5f,0.0f,500.0f);
     }
@@ -481,6 +661,8 @@ void Editor::DrawGrid(ImDrawList* draw_list) const {
 
 // Реализация основного метода Render
 void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, std::vector<std::string>& templates) {
+    RunPendingAction();
+
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
 
@@ -534,9 +716,9 @@ void Editor::Render(bool* p_open, ImGuiViewport* viewport, GLFWwindow* window, s
 // Реализация RenderCanvas 
 void Editor::RenderCanvas() {
     
-    if(!loaded_config.empty()){
-        ImGui::Text("Loaded config: %s",loaded_config.c_str());       
-    }
+    ImGui::Text("Config: %s", loaded_config.empty() ? "(not saved)" : loaded_config.c_str());
+    ImGui::SameLine(0.0f, 20.0f);
+    RenderStatus();
     ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
     ImGui::Text("Grid size");
     

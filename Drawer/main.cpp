@@ -60,6 +60,14 @@ int main(int argc, char** argv)
     else {//table_plot
         manager->WindowPropsFromJson(test_str);
     }
+
+    // Окно поверх всего на весь экран, сквозь которое проходят клики: непрозрачный фон закрыл бы
+    // экран, а кликнуть по окну нельзя. Поэтому фон делаем прозрачным, шейдерный фон не рисуем
+    if (manager->window_props_.IsClickThroughOverlay()) {
+        manager->window_props_.bg_color_float[3] = 0.0f;
+        manager->window_props_.FloatToImU32();
+        manager->window_props_.frag_GLSLshader_file.clear();
+    }
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100 (WebGL 1.0)
@@ -124,6 +132,7 @@ int main(int argc, char** argv)
     
     rn::ScopedWindowCleaner wdCleaner(window);
     rn::SetupWindowStyle(window,manager->window_props_);
+    const bool own_close_hotkey = rn::RegisterCloseHotkey(window);
     rn::MainWindowLayout* mainwindow = rn::MainWindowLayout::Get(manager->window_props_);
    
 
@@ -180,8 +189,12 @@ int main(int argc, char** argv)
         // Без действий пользователя рисуем так часто, как нужно виджетам; шейдерный фон анимирован всегда
         const double fps_limit = manager->window_props_.fps_limit;
         const bool shader_background = !manager->window_props_.frag_GLSLshader_file.empty();
-        const double idle_fps = shader_background ? fps_limit : std::min<double>(fps_limit, manager->GetDesiredFps());
-        frame_limiter.WaitForNextFrame(idle_fps, fps_limit);
+        const double idle_fps = shader_background ? fps_limit : (std::min<double>)(fps_limit, manager->GetDesiredFps());
+        // Хоткей занят другим виджетом - проверяем клавиши сами, достаточно часто
+        frame_limiter.WaitForNextFrame(own_close_hotkey ? idle_fps : (std::max)(idle_fps, 5.0), fps_limit);
+        if (!own_close_hotkey && rn::IsCloseHotkeyDown()) {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
         {
             ImGui_ImplGlfw_Sleep(10);

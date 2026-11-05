@@ -5,8 +5,17 @@
 
 namespace core {
 
+    // Готовые режимы окна. Режим сам выставляет нужные флаги, вручную их в этом режиме не меняют
+    enum class WindowMode {
+        Normal = 0,     // обычное окно, флаги - как настроишь
+        Wallpaper = 1,  // на рабочем столе под иконками, на весь экран
+        Hud = 2         // поверх всего, на весь экран, клики проходят насквозь, фон прозрачный
+    };
+
     // Свойства окна виджета (рантайм-окна Drawer). Редактор их настраивает, Drawer применяет
     struct WindowProperties {
+        WindowMode mode = WindowMode::Normal;
+
         ImU32 bg_color = IM_COL32(40, 40, 40, 255);
         float bg_color_float[4]{ 0.15686275f, 0.15686275f, 0.15686275f, 1.0f };
 
@@ -30,6 +39,11 @@ namespace core {
 
         // Пересчитывает bg_color из bg_color_float
         void FloatToImU32();
+        // Выставляет флаги, которые задаёт режим
+        void ApplyMode();
+        // Окно поверх всего, на весь экран и пропускает клики: с непрозрачным фоном оно закрыло бы
+        // весь экран без возможности кликнуть, поэтому Drawer делает фон прозрачным
+        bool IsClickThroughOverlay() const { return always_on_top && full_screen && mouse_passthrougth; }
     };
 
     nlohmann::json WindowPropertiesToJson(const WindowProperties& props);

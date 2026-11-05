@@ -1,4 +1,5 @@
 #include "WindowProperties.h"
+#include <algorithm>
 
 namespace core {
 
@@ -7,8 +8,39 @@ namespace core {
             ImVec4(bg_color_float[0], bg_color_float[1], bg_color_float[2], bg_color_float[3]));
     }
 
+    void WindowProperties::ApplyMode() {
+        switch (mode) {
+        case WindowMode::Wallpaper:
+            wallpaper_mode = true;
+            full_screen = true;
+            always_on_top = false;
+            always_on_bottom = false;
+            mouse_passthrougth = false;
+            decorated = false;
+            resizeble = false;
+            moveble = false;
+            window_rounding = false;
+            break;
+        case WindowMode::Hud:
+            wallpaper_mode = false;
+            full_screen = true;
+            always_on_top = true;
+            always_on_bottom = false;
+            mouse_passthrougth = true;
+            decorated = false;
+            resizeble = false;
+            moveble = false;
+            window_rounding = false;
+            break;
+        case WindowMode::Normal:
+            wallpaper_mode = false;
+            break;
+        }
+    }
+
     nlohmann::json WindowPropertiesToJson(const WindowProperties& props) {
         nlohmann::json window;
+        window["mode"] = (int)props.mode;
         window["bg_color"] = nlohmann::json::array({
             props.bg_color_float[0], props.bg_color_float[1],
             props.bg_color_float[2], props.bg_color_float[3] });
@@ -53,6 +85,21 @@ namespace core {
         props.height = window.value("height", 300);
         props.rounding = window.value("rounding", 0.0f);
         props.fps_limit = window.value("fps_limit", 60);
+
+        // В старых конфигах режима нет - определяем по флагам
+        if (window.contains("mode")) {
+            props.mode = (WindowMode)std::clamp(window["mode"].get<int>(), 0, 2);
+        }
+        else if (props.wallpaper_mode) {
+            props.mode = WindowMode::Wallpaper;
+        }
+        else if (props.IsClickThroughOverlay()) {
+            props.mode = WindowMode::Hud;
+        }
+        else {
+            props.mode = WindowMode::Normal;
+        }
+        props.ApplyMode();
         props.FloatToImU32();
     }
 }

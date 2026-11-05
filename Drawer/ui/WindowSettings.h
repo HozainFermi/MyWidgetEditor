@@ -83,6 +83,36 @@ namespace rn {
         }
     };
 
+    // ===== Аварийное закрытие: Ctrl+Alt+Shift+Q =====
+    // Нужно, когда виджет поверх всего и пропускает клики - иначе его не закрыть мышью.
+    // Системный хоткей может занять только один процесс, поэтому остальные виджеты
+    // проверяют клавиши сами (IsCloseHotkeyDown) - комбинация закрывает все запущенные виджеты.
+    constexpr int kCloseHotkeyId = 0xC105;
+    inline WNDPROC g_glfw_window_proc = nullptr;
+    inline GLFWwindow* g_hotkey_window = nullptr;
+
+    inline LRESULT CALLBACK CloseHotkeyWindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+        if (msg == WM_HOTKEY && wparam == kCloseHotkeyId && g_hotkey_window) {
+            glfwSetWindowShouldClose(g_hotkey_window, GLFW_TRUE);
+            return 0;
+        }
+        return CallWindowProcW(g_glfw_window_proc, hwnd, msg, wparam, lparam);
+    }
+
+    // true - хоткей наш; false - его уже занял другой виджет
+    inline bool RegisterCloseHotkey(GLFWwindow* window) {
+        HWND hwnd = glfwGetWin32Window(window);
+        g_hotkey_window = window;
+        // WM_HOTKEY приходит в оконную процедуру, а её обрабатывает GLFW - встаём перед ней
+        g_glfw_window_proc = (WNDPROC)SetWindowLongPtrW(hwnd, GWLP_WNDPROC, (LONG_PTR)CloseHotkeyWindowProc);
+        return RegisterHotKey(hwnd, kCloseHotkeyId, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, 'Q') != 0;
+    }
+
+    inline bool IsCloseHotkeyDown() {
+        auto down = [](int key) { return (GetAsyncKeyState(key) & 0x8000) != 0; };
+        return down(VK_CONTROL) && down(VK_MENU) && down(VK_SHIFT) && down('Q');
+    }
+
 
 #endif
 

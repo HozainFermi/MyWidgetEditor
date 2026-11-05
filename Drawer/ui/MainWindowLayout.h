@@ -51,6 +51,11 @@ namespace rn {
                  1,2,5
              };
 
+             // Без шейдерного фона сцена не нужна (иначе в консоль сыпались ошибки чтения пустого шейдера)
+             if (window_props_.frag_GLSLshader_file.empty()) {
+                 return;
+             }
+
              Helpers::Mesh background_mesh_{ vertices_,EBOpoints_ };
 
              std::unique_ptr model = std::make_unique<Helpers::Model>();
