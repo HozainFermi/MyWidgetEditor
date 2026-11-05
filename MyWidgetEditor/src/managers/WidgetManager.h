@@ -61,12 +61,17 @@ namespace wg {
         void SetKeepSelection(bool keep) { keep_selection_ = keep; }
 
         // === Кадр ===
+        // Логика и данные виджетов (без мыши) - нужно на любой вкладке
+        void UpdateWidgets();
+        // UpdateWidgets + перетаскивание/ресайз/выделение на раскладке
         void UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size);
         void RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0);
         void RenderContentAll(const ImVec2& canvas_p0);
 
         // === Превью / живые данные ===
         bool IsLiveData() const { return context_.live_data; }
+        // Последние данные на проводах - для инспектора
+        const core::EventBus& GetBus() const { return bus_; }
         void SetLiveData(bool live);
         void SetWindowProperties(const core::WindowProperties* window) { context_.window = window; }
 

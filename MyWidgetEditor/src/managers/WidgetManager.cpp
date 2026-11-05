@@ -172,13 +172,17 @@ namespace wg {
 
     // ================= Кадр =================
 
-    void WidgetManager::UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size) {
+    void WidgetManager::UpdateWidgets() {
         ConnectPortsIfNeeded();
         for (auto& item : items_) {
             item.widget->Update();
         }
         // Доставляем всё, что виджеты отправили (в том числе из фоновых потоков)
         bus_.Dispatch();
+    }
+
+    void WidgetManager::UpdateAll(const ImVec2& canvas_p0, const ImVec2& canvas_size) {
+        UpdateWidgets();
 
         // Клик обрабатываем, только если он внутри канваса и не по всплывающему окну поверх него.
         // Иначе выбор виджета в левой панели сразу сбрасывался бы этим же кликом.
@@ -194,6 +198,7 @@ namespace wg {
         if (click_on_canvas) {
             for (int i = (int)items_.size() - 1; i >= 0; --i) {
                 const CanvasItem& item = items_[i];
+                if (item.widget->IsLogicNode()) continue;
                 ImRect rect = ScreenRect(*item.widget, canvas_p0);
                 if (rect.Contains(mouse) || (item.selected && GetHoveredHandle(mouse, rect) != ResizeHandle::NONE)) {
                     click_owner = i;
@@ -204,6 +209,7 @@ namespace wg {
 
         for (int i = 0; i < (int)items_.size(); ++i) {
             CanvasItem& item = items_[i];
+            if (item.widget->IsLogicNode()) continue;
             if (click_on_canvas && i != click_owner && item.selected && !ImGui::GetIO().KeyCtrl) {
                 item.selected = false;  // клик по другому месту канваса
             }
@@ -347,6 +353,7 @@ namespace wg {
 
     void WidgetManager::RenderAll(ImDrawList* draw_list, const ImVec2& canvas_p0) {
         for (const auto& item : items_) {
+            if (item.widget->IsLogicNode()) continue;  // узлы логики - только на вкладке Logic
             const ImRect rect = ScreenRect(*item.widget, canvas_p0);
             draw_list->AddRectFilled(rect.Min, rect.Max, item.widget->GetBgColor());
             DrawFrame(draw_list, item, rect);
@@ -377,6 +384,7 @@ namespace wg {
 
     void WidgetManager::RenderContentAll(const ImVec2& canvas_p0) {
         for (const auto& item : items_) {
+            if (item.widget->IsLogicNode()) continue;
             item.widget->RenderContent(item.widget->GetScreenMin(canvas_p0), item.widget->GetScreenMax(canvas_p0));
         }
     }

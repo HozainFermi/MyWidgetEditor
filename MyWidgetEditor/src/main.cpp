@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 
     // Список шаблонов берём из фабрики: раньше он собирался сканированием .h в папке исходников
     core::RegisterAllWidgets();
-    std::vector<std::string> templates = core::WidgetFactory::GetRegisteredTypes();
+    std::vector<std::string> templates = core::WidgetFactory::GetRegisteredTypes(core::WidgetCategory::Layout);
 
     // MyWidgetEditor.exe <имя конфига из папки configs> - сразу открыть конфиг
     if (argc > 1) {

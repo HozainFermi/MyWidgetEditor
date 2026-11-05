@@ -196,6 +196,13 @@ private:
     void RenderLeftPanel(std::vector<std::string>& templates_names);
     void RenderRightPanel();
     void RenderCanvas();
+
+    // ===== Вкладки канваса: раскладка окна / схема данных =====
+    enum class CanvasMode { Layout, Logic };
+    CanvasMode canvas_mode_ = CanvasMode::Layout;
+    ImVec2 logic_pan_{ 0.0f, 0.0f };
+    std::string dragging_node_id_;
+    void RenderLogicCanvas();
     void RenderWindowProperties();
     
     // Обработка событий канваса

@@ -374,6 +374,22 @@ void Editor::RenderLeftPanel(std::vector<std::string>& templates) {
     }
 
     ImGui::Separator();
+    ImGui::Text("Logic Nodes");
+    ImGui::SameLine();
+    HelpMarker("Drag to the Logic tab");
+    ImGui::Separator();
+    static const std::vector<std::string> logic_nodes = core::WidgetFactory::GetRegisteredTypes(core::WidgetCategory::Logic);
+    for (const auto& node : logic_nodes) {
+        ImGui::Selectable(node.c_str());
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover)) {
+            ImGui::SetDragDropPayload("LOGIC_NODE", node.c_str(), node.size() + 1);
+            ImGui::Text("Add %s", node.c_str());
+            ImGui::EndDragDropSource();
+            canvas_mode_ = CanvasMode::Logic;  // узлы живут только на вкладке Logic
+        }
+    }
+
+    ImGui::Separator();
     ImGui::Text("Used Widgets");
     ImGui::SameLine();
     HelpMarker("Click to select");
@@ -521,16 +537,15 @@ void Editor::RenderRightPanel() {
         ImGui::Text("Properties: %s", selected->GetName().c_str());
         ImGui::Separator();
 
-        // Позиция
-        ImVec2 pos = selected->GetPosition();
-        if (ImGui::DragFloat2("Position", &pos.x, 1.0f)) {
-            selected->SetPosition(pos);
-        }
-
-        // Размер
-        ImVec2 size = selected->GetSize();
-        if (ImGui::DragFloat2("Size", &size.x, 1.0f, 10.0f, 1000.0f)) {
-            selected->SetSize(size);
+        if (!selected->IsLogicNode()) {
+            ImVec2 pos = selected->GetPosition();
+            if (ImGui::DragFloat2("Position", &pos.x, 1.0f)) {
+                selected->SetPosition(pos);
+            }
+            ImVec2 size = selected->GetSize();
+            if (ImGui::DragFloat2("Size", &size.x, 1.0f, 10.0f, 1000.0f)) {
+                selected->SetSize(size);
+            }
         }
 
         // Имя
@@ -543,31 +558,33 @@ void Editor::RenderRightPanel() {
         // Тип виджета (только для чтения)
         ImGui::Text("Type: %s", core::WidgetTypeToString(selected->GetType()));
 
-        // Общие настройки для запущенного виджета (Drawer)
-        bool visible = selected->IsVisible();
-        if (ImGui::Checkbox("Visible in widget", &visible)) {
-            selected->SetVisible(visible);
-        }
-        ImGui::SameLine();
-        HelpMarker("Hidden widgets are not drawn in the running widget but keep working\n(e.g. a table that only feeds data to a plot).");
+        // Общие настройки для запущенного виджета (Drawer); узлы логики не рисуются вовсе
+        if (!selected->IsLogicNode()) {
+            bool visible = selected->IsVisible();
+            if (ImGui::Checkbox("Visible in widget", &visible)) {
+                selected->SetVisible(visible);
+            }
+            ImGui::SameLine();
+            HelpMarker("Hidden widgets are not drawn in the running widget but keep working\n(e.g. a table that only feeds data to a plot).");
 
-        bool fade = selected->GetFadeOnHover();
-        if (ImGui::Checkbox("Fade on hover", &fade)) {
-            selected->SetFadeOnHover(fade);
+            bool fade = selected->GetFadeOnHover();
+            if (ImGui::Checkbox("Fade on hover", &fade)) {
+                selected->SetFadeOnHover(fade);
+            }
+            ImGui::SameLine();
+            HelpMarker("In the running widget: while the mouse is over the widget it gradually becomes transparent,\nwhen the mouse leaves it comes back.");
+            if (fade) {
+                float min_opacity = selected->GetFadeMinAlpha() * 100.0f;
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
+                if (ImGui::SliderFloat("Min opacity", &min_opacity, 0.0f, 100.0f, "%.0f%%")) {
+                    selected->SetFadeMinAlpha(min_opacity / 100.0f);
+                }
+                float fade_time = 1.0f / selected->GetFadeSpeed();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
+                if (ImGui::SliderFloat("Fade time", &fade_time, 0.1f, 5.0f, "%.1f s")) {
+                    selected->SetFadeSpeed(1.0f / fade_time);
+            }
         }
-        ImGui::SameLine();
-        HelpMarker("In the running widget: while the mouse is over the widget it gradually becomes transparent,\nwhen the mouse leaves it comes back.");
-        if (fade) {
-            float min_opacity = selected->GetFadeMinAlpha() * 100.0f;
-            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-            if (ImGui::SliderFloat("Min opacity", &min_opacity, 0.0f, 100.0f, "%.0f%%")) {
-                selected->SetFadeMinAlpha(min_opacity / 100.0f);
-            }
-            float fade_time = 1.0f / selected->GetFadeSpeed();
-            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-            if (ImGui::SliderFloat("Fade time", &fade_time, 0.1f, 5.0f, "%.1f s")) {
-                selected->SetFadeSpeed(1.0f / fade_time);
-            }
         }
         ImGui::Separator();
 
@@ -626,7 +643,12 @@ void Editor::CreateWidgetFromTemplate(const std::string& widget_class, const ImV
         return;
     }
     widget->SetName(widget_class + std::to_string(widget_counter++));
-    widget->SetPosition(position);
+    if (widget->IsLogicNode()) {
+        widget->SetGraphPosition(position);
+    }
+    else {
+        widget->SetPosition(position);
+    }
     widget_manager_.AddWidget(std::move(widget));
 }
 
@@ -719,7 +741,13 @@ void Editor::RenderCanvas() {
     ImGui::Text("Config: %s", loaded_config.empty() ? "(not saved)" : loaded_config.c_str());
     ImGui::SameLine(0.0f, 20.0f);
     RenderStatus();
-    ImGui::Text("Canvas (Ctrl+S to save, Ctrl+L to load)");   
+    if (ImGui::RadioButton("Layout", canvas_mode_ == CanvasMode::Layout)) canvas_mode_ = CanvasMode::Layout;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Logic", canvas_mode_ == CanvasMode::Logic)) canvas_mode_ = CanvasMode::Logic;
+    ImGui::SameLine();
+    HelpMarker("Layout: where widgets are in the window.\nLogic: how data flows between widgets and logic nodes (Filter, Map...).");
+    ImGui::SameLine(0.0f, 20.0f);
+    ImGui::TextDisabled("Ctrl+S to save, Ctrl+L to load");
     ImGui::Text("Grid size");
     
     ImGui::Checkbox("Grid", &show_grid_);
@@ -733,6 +761,11 @@ void Editor::RenderCanvas() {
     }
     ImGui::SameLine();
     HelpMarker("Off: widgets show preview data.\nOn: widgets load real data (HTTP requests etc.) like in the running widget.");
+
+    if (canvas_mode_ == CanvasMode::Logic) {
+        RenderLogicCanvas();
+        return;
+    }
 
     ImGui::Spacing();
     ImVec2 curmouse= GetMousePosRelativeToCanvas();
@@ -868,7 +901,7 @@ void Editor::RenderPortsAndHandleConnections(ImDrawList* draw_list)
 
     // Сначала собираем все порты и рисуем кружки
     for (auto* w : widgets) {
-        if (!w) continue;
+        if (!w || w->IsLogicNode()) continue;
         ImRect rect(
             w->GetScreenMin(canvas_p0_),
             w->GetScreenMax(canvas_p0_));
@@ -1005,6 +1038,8 @@ void Editor::RenderConnections(ImDrawList* draw_list)
     const auto& connections = widget_manager_.GetConnections();
     for (int i = (int)connections.size() - 1; i >= 0; --i) {
         const auto& c = connections[i];
+        // Связи с узлами логики видны только на вкладке Logic
+        if (!port_positions.count(PortKey(c.from)) || !port_positions.count(PortKey(c.to))) continue;
         ImVec2 p1 = find_pos(c.from);
         ImVec2 p2 = find_pos(c.to);
 
