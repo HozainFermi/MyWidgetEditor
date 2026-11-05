@@ -198,7 +198,12 @@ void Editor::RenderLogicCanvas() {
     }
     if (hovered_wire >= 0) {
         const core::Connection& c = connections[hovered_wire];
-        ImGui::SetTooltip("%s.%s -> %s.%s\n%s", c.from.widget_id.c_str(), c.from.port.c_str(), c.to.widget_id.c_str(), c.to.port.c_str(),
+        auto name_of = [this](const std::string& id) {
+            core::Widget* w = widget_manager_.GetWidget(id);
+            return w ? w->GetName() : id;
+        };
+        ImGui::SetTooltip("%s.%s -> %s.%s\n%s", name_of(c.from.widget_id).c_str(), c.from.port.c_str(),
+            name_of(c.to.widget_id).c_str(), c.to.port.c_str(),
             DescribeValue(widget_manager_.GetBus().GetLastValue(c.from)).c_str());
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
             widget_manager_.RemoveConnection(hovered_wire);
